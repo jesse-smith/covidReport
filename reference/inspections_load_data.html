@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Function reference • covidReport</title>
+<title>Load Inspections Data — inspections_load_data • covidReport</title>
 
 
 <!-- jquery -->
@@ -39,7 +39,10 @@
 
 
 
-<meta property="og:title" content="Function reference" />
+<meta property="og:title" content="Load Inspections Data — inspections_load_data" />
+<meta property="og:description" content="inspections_load_data() loads the data from an excel workbook into the R
+session. standardizes column names, and optionally checks that the column
+names match expected values." />
 
 
 
@@ -58,7 +61,7 @@
   </head>
 
   <body data-spy="scroll" data-target="#toc">
-    <div class="container template-reference-index">
+    <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -105,78 +108,78 @@
       </header>
 
 <div class="row">
-  <div class="contents col-md-9">
+  <div class="col-md-9 contents">
     <div class="page-header">
-      <h1>Reference</h1>
+    <h1>Load Inspections Data</h1>
+    <small class="dont-index">Source: <a href='https://github.com/jesse-smith/covidReport/blob/master/R/inspections_table.R'><code>R/inspections_table.R</code></a></small>
+    <div class="hidden name"><code>inspections_load_data.Rd</code></div>
     </div>
 
-    <table class="ref-index">
+    <div class="ref-description">
+    <p><code>inspections_load_data()</code> loads the data from an excel workbook into the R
+session. standardizes column names, and optionally checks that the column
+names match expected values.</p>
+    </div>
 
-    <colgroup>
-      
-      <col class="alias" />
-      <col class="title" />
-    </colgroup>
+    <pre class="usage"><span class='fu'>inspections_load_data</span><span class='op'>(</span>
+  path <span class='op'>=</span> <span class='fu'>coviData</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/coviData/man/path_create.html'>path_create</a></span><span class='op'>(</span><span class='st'>"V:/Compliance/Inspection Data for Publishing/"</span>,
+    <span class='st'>"Grand List of Inspections"</span>, ext <span class='op'>=</span> <span class='st'>"xlsx"</span><span class='op'>)</span>,
+  check <span class='op'>=</span> <span class='cn'>TRUE</span>
+<span class='op'>)</span></pre>
 
-    <tbody>
-      <tr>
-        <th colspan="2">
-          <h2 id="section-all-functions" class="hasAnchor"><a href="#section-all-functions" class="anchor"></a>All functions</h2>
-          <p class="section-desc"></p>
-        </th>
-      </tr>
-      
-      
-    </tbody><tbody>
-      
-      
-      <tr>
-        
-        <td>
-          <p><code><a href="inspections_archive_table.html">inspections_archive_table()</a></code> </p>
-        </td>
-        <td><p>Create and Manage Inspection Table Archive Files</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="inspections_create_table.html">inspections_create_table()</a></code> </p>
-        </td>
-        <td><p>Create HTML Table of COVID-19 Business Inspections Results</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="inspections_load_data.html">inspections_load_data()</a></code> </p>
-        </td>
-        <td><p>Load Inspections Data</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="inspections_prep_data.html">inspections_prep_data()</a></code> </p>
-        </td>
-        <td><p>Prepare Inspections Data for Displaying in HTML Table</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="inspections_save_table.html">inspections_save_table()</a></code> </p>
-        </td>
-        <td><p>Save an HTML Table Produced by <code>inspections_create_table()</code></p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="inspections_table_pipeline.html">inspections_table_pipeline()</a></code> </p>
-        </td>
-        <td><p>Run the Full Inspections Table Pipeline</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="vctr-helpers.html">vctr-helpers</a></code> </p>
-        </td>
-        <td><p>vctrs: Vector Helpers</p></td>
-      </tr>
-    </tbody>
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>path</th>
+      <td><p>The path to the excel workbook containing inspections data</p></td>
+    </tr>
+    <tr>
+      <th>check</th>
+      <td><p>Should column names be checked? See <strong>Details</strong> for more
+information on name checking.</p></td>
+    </tr>
     </table>
-  </div>
 
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>A <code>tibble</code> containing the inspections data</p>
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p>If <code>check = TRUE</code>, <code>inspections_load_data()</code> expects at least five columns
+giving information on the (last?) inspection visit date, the business name,
+the business address, the number of total violations by the business, and the
+closure date (if it exists). The expected values of the column names are
+formulated as generally as possible to allow for human error. The columns are
+matched as follows:</p>
+<ul>
+<li><p><strong>inspection visit date</strong> must contain the words <em>"date"</em>
+and <em>"visit"</em></p></li>
+<li><p><strong>business name</strong> must contain the words <em>"name"</em> and
+<em>"business"</em></p></li>
+<li><p><strong>business address</strong> must contain the word <em>"address"</em></p></li>
+<li><p><strong>number of violations</strong> must contain the word
+<em>"violations"</em></p></li>
+<li><p><strong>closure date</strong> must contain the string <em>"clos"</em> and the
+word <em>"date"</em></p></li>
+</ul>
+
+    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
+
+    <div class='dont-index'><p>Other functions in the inspections data pipeline (
+<code><a href='inspections_prep_data.html'>inspections_prep_data()</a></code>,
+<code>
+  <a href='inspections_create_table.html'>inspections_create_table()</a>
+  </code>,
+<code><a href='inspections_save_table.html'>inspections_save_table()</a></code>,
+<code>
+  <a href='inspections_archive_table.html'>inspections_archive_table()</a>
+  </code>) and the wrapper for the full workflow
+(<code>
+  <a href='inspections_table_pipeline.html'>inspections_table_pipeline()</a>
+  </code>)</p></div>
+
+  </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
       <h2 data-toc-skip>Contents</h2>

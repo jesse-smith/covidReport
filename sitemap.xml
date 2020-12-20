@@ -1,6 +1,51 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://jesse-smith.github.io/covidreport//index.html</loc>
+    <loc>https://jesse-smith.github.io/covidReport//index.html</loc>
+  </url>
+  <url>
+    <loc>https://jesse-smith.github.io/covidReport//reference/coviData-helpers.html</loc>
+  </url>
+  <url>
+    <loc>https://jesse-smith.github.io/covidReport//reference/inspections_archive_table.html</loc>
+  </url>
+  <url>
+    <loc>https://jesse-smith.github.io/covidReport//reference/inspections_cast_chr_date.html</loc>
+  </url>
+  <url>
+    <loc>https://jesse-smith.github.io/covidReport//reference/inspections_cols_exist.html</loc>
+  </url>
+  <url>
+    <loc>https://jesse-smith.github.io/covidReport//reference/inspections_create_table.html</loc>
+  </url>
+  <url>
+    <loc>https://jesse-smith.github.io/covidReport//reference/inspections_load_data.html</loc>
+  </url>
+  <url>
+    <loc>https://jesse-smith.github.io/covidReport//reference/inspections_prep_data.html</loc>
+  </url>
+  <url>
+    <loc>https://jesse-smith.github.io/covidReport//reference/inspections_replace_year_long.html</loc>
+  </url>
+  <url>
+    <loc>https://jesse-smith.github.io/covidReport//reference/inspections_save_table.html</loc>
+  </url>
+  <url>
+    <loc>https://jesse-smith.github.io/covidReport//reference/inspections_table_pipeline.html</loc>
+  </url>
+  <url>
+    <loc>https://jesse-smith.github.io/covidReport//reference/inspections_trim_archive.html</loc>
+  </url>
+  <url>
+    <loc>https://jesse-smith.github.io/covidReport//reference/inspections_trim_tables.html</loc>
+  </url>
+  <url>
+    <loc>https://jesse-smith.github.io/covidReport//reference/magrittr-helpers.html</loc>
+  </url>
+  <url>
+    <loc>https://jesse-smith.github.io/covidReport//reference/reexports.html</loc>
+  </url>
+  <url>
+    <loc>https://jesse-smith.github.io/covidReport//reference/vctr-helpers.html</loc>
   </url>
 </urlset>
