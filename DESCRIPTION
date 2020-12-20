@@ -9,12 +9,13 @@ Authors@R:
            comment = c(ORCID = "YOUR-ORCID-ID"))
 Description: What the package does (one paragraph).
 License: MIT + file LICENSE
+URL: https://github.com/jesse-smith/covidReport
+BugReports: https://github.com/jesse-smith/covidReport/issues
 Suggests: 
+    covr,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
-URL: https://github.com/jesse-smith/covidReport
-BugReports: https://github.com/jesse-smith/covidReport/issues
