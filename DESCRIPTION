@@ -19,3 +19,7 @@ Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
+Imports: 
+    coviData (>= 0.0.0.9001),
+    magrittr (>= 2.0.1),
+    vctrs (>= 0.3.6)
