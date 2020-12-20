@@ -1,6 +1,6 @@
 template:
   params:
     bootswatch: paper
-url: https://jesse-smith.github.io/covidreport/
+url: https://jesse-smith.github.io/covidReport/
 development:
   mode: unreleased
