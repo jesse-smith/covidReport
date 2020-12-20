@@ -17,7 +17,19 @@ plot_cumulative <- function(.data, .col = "report_date") {
     add_cumulative_axis_labels() %>%
     add_cumulative_title_caption()
 
+}
 
+add_cumulative_scale <- function(gg_obj) {
+
+  breaks <- seq(0L, 1e6L, by = 1e4L)
+
+  labels <- breaks %>% divide_by(1e3L) %>% paste0("k")
+
+  add_scale_month(gg_obj) +
+    ggplot2::scale_y_continuous(
+      breaks = breaks,
+      labels = labels
+    )
 }
 
 add_cumulative_curve <- function(gg_obj) {
@@ -58,19 +70,6 @@ add_cumulative_label <- function(gg_obj) {
       vjust = 1,
       fontface = "bold",
       label.size = 1
-    )
-}
-
-add_cumulative_scale <- function(gg_obj) {
-
-  breaks <- seq(0L, 1e6L, by = 1e4L)
-
-  labels <- breaks %>% divide_by(1e3L) %>% paste0("k")
-
-  add_scale_month(gg_obj) +
-    ggplot2::scale_y_continuous(
-      breaks = breaks,
-      labels = labels
     )
 }
 
