@@ -209,7 +209,7 @@ inspections_prep_data <- function(.data) {
 #'   })
 #'
 #' @export
-inspections_create_table <- function(.data) {
+inspections_create_table <- function(.data, pdf_button = FALSE) {
 
   # Display names of columns
   col_names <- c(
@@ -225,17 +225,30 @@ inspections_create_table <- function(.data) {
     values = c("#77dd77", "gold", "tomato")
   )
 
-  .data %>%
-    DT::datatable(
+  if (pdf_button) {
+
+    datatable <- DT::datatable(
+      .data,
       colnames = col_names,
       rownames = FALSE,
       filter = "top",
-      options = list(autoWidth = TRUE, searchHighlight = TRUE)
-    ) %>%
-    DT::formatStyle(
-      columns = "n_violations",
-      backgroundColor = n_violations_color
+      extensions = "Buttons",
+      options = list(dom = "Bfrtip", buttons = "pdf")
     )
+  } else {
+    datatable <- DT::datatable(
+      .data,
+      colnames = col_names,
+      rownames = FALSE,
+      filter = "top"
+    )
+  }
+
+  DT::formatStyle(
+    datatable,
+    columns = "n_violations",
+    backgroundColor = n_violations_color
+  )
 }
 
 #' Save an HTML Table Produced by `inspections_create_table()`
@@ -277,6 +290,7 @@ inspections_save_table <- function(
     paste0("inspections_table_", Sys.Date()),
     ext = "html"
   ),
+  pdf_button = FALSE,
   force = FALSE
 ) {
 
@@ -286,12 +300,16 @@ inspections_save_table <- function(
 
   path <- coviData::path_create(path)
 
+  if (pdf_button) {
+    fname <- path %>%
+      fs::path_file()
+  }
+
   DT::saveWidget(
     .table,
     file = temp_file,
     selfcontained = TRUE,
-    title = "COVID-19 Business Inspections",
-    background = "#f0f0f0"
+    title = "COVID-19 Business Inspections"
   )
 
   fs::file_copy(path = temp_file, new_path = path, overwrite = force)
