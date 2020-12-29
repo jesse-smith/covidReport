@@ -160,10 +160,10 @@ average_epicurve <- function(
 add_epicurve_count_cols <- function(gg_obj) {
 
   # Create color palette
-  pal_indigo <- ggsci::pal_material("indigo", n = 4L, reverse = TRUE)
+  pal_indigo <- ggsci::pal_material("indigo", n = 10L, reverse = TRUE)
 
   # Assign fill colors
-  collect_color <- pal_indigo(1L)[[1L]]
+  obs_color <- pal_indigo(1L)[[1L]]
   pred_color <- "grey30"
 
   # Add counts to figure
@@ -177,12 +177,12 @@ add_epicurve_count_cols <- function(gg_obj) {
     ggplot2::geom_col(
       ggplot2::aes(y = .data[["collected"]]),
       width = 1,
-      fill = collect_color
+      fill = obs_color
     ) +
     ggplot2::geom_col(
       ggplot2::aes(y = pmax(0L, .data[["new"]])),
       width = 1,
-      fill = collect_color,
+      fill = obs_color,
       # Newly observed cases are marked with off-white outline
       color = "#f0f0f0",
       size = 0.05
