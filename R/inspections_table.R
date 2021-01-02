@@ -209,7 +209,7 @@ inspections_prep_data <- function(.data) {
 #'   })
 #'
 #' @export
-inspections_create_table <- function(.data, pdf_button = FALSE) {
+inspections_create_table <- function(.data) {
 
   # Display names of columns
   col_names <- c(
@@ -225,24 +225,12 @@ inspections_create_table <- function(.data, pdf_button = FALSE) {
     values = c("#77dd77", "gold", "tomato")
   )
 
-  if (pdf_button) {
-
-    datatable <- DT::datatable(
-      .data,
-      colnames = col_names,
-      rownames = FALSE,
-      filter = "top",
-      extensions = "Buttons",
-      options = list(dom = "Bfrtip", buttons = "pdf")
-    )
-  } else {
-    datatable <- DT::datatable(
-      .data,
-      colnames = col_names,
-      rownames = FALSE,
-      filter = "top"
-    )
-  }
+  datatable <- DT::datatable(
+    .data,
+    colnames = col_names,
+    rownames = FALSE,
+    filter = "top"
+  )
 
   DT::formatStyle(
     datatable,
@@ -290,7 +278,7 @@ inspections_save_table <- function(
     paste0("inspections_table_", Sys.Date()),
     ext = "html"
   ),
-  pdf_button = FALSE,
+  self_contained = TRUE,
   force = FALSE
 ) {
 
@@ -300,15 +288,9 @@ inspections_save_table <- function(
 
   path <- coviData::path_create(path)
 
-  if (pdf_button) {
-    fname <- path %>%
-      fs::path_file()
-  }
-
   DT::saveWidget(
     .table,
     file = temp_file,
-    selfcontained = TRUE,
     title = "COVID-19 Business Inspections"
   )
 
@@ -665,4 +647,8 @@ inspections_trim_archive <- function(
   )
 
   invisible(archive_dir)
+}
+
+inspections_decode_base64 <- function(.table) {
+  ?base64enc::base64decode()
 }

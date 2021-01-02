@@ -8,6 +8,7 @@
 ^_pkgdown\.yml$
 ^docs$
 ^pkgdown$
-dev
-scripts
+^dev$
+^scripts$
+^figs$
 ^data-raw$
