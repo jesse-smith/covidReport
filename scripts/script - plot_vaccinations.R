@@ -1,8 +1,8 @@
 devtools::load_all()
 
 p <- plot_vaccinations(
-  n_partial = 5893,
-  n_full = 0
+  n_partial = 11366,
+  n_full = 2
 ) %T>% show()
 
 ggplot2::ggsave(

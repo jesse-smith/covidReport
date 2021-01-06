@@ -2,8 +2,8 @@ plot_vaccinations <- function(
   .data = NULL,
   n_partial = NULL,
   n_full = NULL,
-  n_goal = 6e5L,
-  n_max  = 937967,
+  n_goal = 656600,
+  n_max  = 937166,
   date_updated = NULL
 ) {
 
