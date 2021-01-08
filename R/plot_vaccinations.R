@@ -260,10 +260,17 @@ get_vaccination_label_x_coord <- function(
 }
 
 add_vaccination_title_caption <- function(gg_obj, date_updated) {
+
+  caption <- paste0(
+    "Vaccination goal is 656,600 people, ",
+    "or ~70% of the Shelby County population\n",
+    "Data Source: Tennessee Immunization Information System (TennIIS)"
+  )
+
   add_title_caption(
     gg_obj,
     title = "Shelby County Vaccinations",
     subtitle = format(as.Date(date_updated), "%B %d, %Y"),
-    caption = "Data Source: Tennessee Immunization Information System (TennIIS)"
+    caption = caption
   )
 }

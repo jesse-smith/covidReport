@@ -1,8 +1,9 @@
 devtools::load_all()
 
 p <- plot_vaccinations(
-  n_partial = 11366,
-  n_full = 2
+  n_partial = 11998,
+  n_full = 2,
+  date_updated = as.Date("2020-01-04")
 ) %T>% show()
 
 ggplot2::ggsave(
