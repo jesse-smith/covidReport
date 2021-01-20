@@ -16,14 +16,14 @@ plot_vaccinations <- function(
   }
 
   shelby_poly %>%
-    set_vaccination_count_max(n_max) %>%
+    set_vaccination_count_max(n_max = n_max) %>%
     ggplot2::ggplot(ggplot2::aes(x = x, y = y)) %>%
     set_covid_theme() %>%
     set_axis_limits(xlim = c(0, 1), ylim = c(0, n_max)) %>%
     add_vaccination_scale() %>%
     add_vaccination_polygon() %>%
     add_vaccination_count_fill(n_partial = n_partial, n_full = n_full) %>%
-    add_vaccination_goal_marker(n_goal = n_goal) %>%
+    add_vaccination_goal_marker(n_goal = n_goal, n_max = n_max) %>%
     add_axis_labels(ylab = "Vaccinations") %>%
     add_vaccination_labels(
       n_goal = n_goal,
@@ -84,19 +84,34 @@ add_vaccination_scale <- function(gg_obj) {
     ggplot2::scale_y_continuous(breaks = breaks, labels = labels)
 }
 
-add_vaccination_goal_marker <- function(gg_obj, n_goal) {
+add_vaccination_goal_marker <- function(gg_obj, n_goal, n_max) {
+
+  segment_range <- shelby_poly %>%
+    dplyr::filter(dplyr::near(.data[["y"]], n_goal/n_max, tol = 1e-3)) %>%
+    dplyr::pull(.data[["x"]]) %>%
+    range() %>%
+    set_names(c("min", "max"))
+
   gg_obj +
-    ggplot2::geom_hline(yintercept = n_goal, color = "goldenrod", size = 1) +
+    ggplot2::annotate(
+      "segment",
+      x = segment_range[["min"]],
+      y = n_goal,
+      xend = segment_range[["max"]],
+      yend = n_goal,
+      color = "goldenrod3",
+      size = 1
+    ) +
     ggplot2::annotate(
       "text",
-      x = 0,
-      y = n_goal * 1.01,
+      x = segment_range[["min"]],
+      y = n_goal,
       label = "Goal",
-      color = "goldenrod",
+      color = "goldenrod3",
       fontface = "bold",
       size = 5,
-      hjust = 0,
-      vjust = 0
+      hjust = 1,
+      vjust = 1/3
     )
 }
 
@@ -262,8 +277,8 @@ get_vaccination_label_x_coord <- function(
 add_vaccination_title_caption <- function(gg_obj, date_updated) {
 
   caption <- paste0(
-    "Vaccination goal is 656,600 people, ",
-    "or ~70% of the Shelby County population\n",
+    "Vaccination goal is 656,600 people ",
+    "(~70% of the Shelby County population)\n",
     "Data Source: Tennessee Immunization Information System (TennIIS)"
   )
 

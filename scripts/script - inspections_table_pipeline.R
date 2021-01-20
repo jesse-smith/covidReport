@@ -18,18 +18,19 @@ run_script <- function() {
   )
   to <- c("austen.onek@shelbycountytn.gov", "jesse.smith@shelbycountytn.gov")
 
-  if (weekdays(Sys.Date()) %in% c("Monday", "Friday")) {
-    cc <- c(
-      "jennifer.sharp@shelbycountytn.gov",
-      "chip.washington@shelbycountytn.gov",
-      "joan.e.carr@shelbycountytn.gov",
-      "david.sweat@shelbycountytn.gov",
-      "jennifer.kmet@shelbycountytn.gov",
-      "chaitra.subramanya@shelbycountytn.gov"
-    )
-  } else {
-    cc <- NULL
-  }
+  # if (weekdays(Sys.Date()) %in% c("Monday", "Friday")) {
+  #   cc <- c(
+  #     "jennifer.sharp@shelbycountytn.gov",
+  #     "chip.washington@shelbycountytn.gov",
+  #     "joan.e.carr@shelbycountytn.gov",
+  #     "david.sweat@shelbycountytn.gov",
+  #     "jennifer.kmet@shelbycountytn.gov",
+  #     "chaitra.subramanya@shelbycountytn.gov"
+  #   )
+  # } else {
+  #   cc <- NULL
+  # }
+  cc <- NULL
 
   br <- "<br>"
 
