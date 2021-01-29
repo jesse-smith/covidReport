@@ -1,18 +1,36 @@
 plot_vaccinations <- function(
-  .data = NULL,
+  date = NULL,
   n_partial = NULL,
   n_full = NULL,
-  n_goal = 656600,
+  n_goal = 656016,
   n_max  = 937166,
-  date_updated = NULL
+  date_updated = date,
+  resident_only = TRUE
 ) {
 
+  any_null <- any(is.null(n_partial), is.null(n_full))
+
+  # Get vaccination counts
+  if (any_null) {
+    vaccinations <- coviData::vac_load(date = date) %>%
+      coviData::vac_prep(distinct = TRUE) %>%
+      vac_count(resident_only = resident_only)
+  }
+
   if (is.null(n_partial)) {
-    # Get `n_partial` from `.data`
+    n_partial <- vaccinations %>%
+      dplyr::filter(dose_count == 1L) %>%
+      dplyr::pull(n)
   }
 
   if (is.null(n_full)) {
-    # Get `n_full` from `.data`
+    n_full <- vaccinations %>%
+      dplyr::filter(dose_count == 2L) %>%
+      dplyr::pull(n)
+  }
+
+  if (is.null(date_updated)) {
+    date_updated <- vac_date_updated(date)
   }
 
   shelby_poly %>%
@@ -30,7 +48,7 @@ plot_vaccinations <- function(
       n_partial = n_partial,
       n_full = n_full
     ) %>%
-    add_vaccination_title_caption(date_updated = date_updated)
+    add_vaccination_title_caption(date_updated = date_updated, n_goal = n_goal)
 }
 
 set_vaccination_count_max <- function(.data, n_max) {
@@ -274,10 +292,10 @@ get_vaccination_label_x_coord <- function(
   }
 }
 
-add_vaccination_title_caption <- function(gg_obj, date_updated) {
+add_vaccination_title_caption <- function(gg_obj, date_updated, n_goal) {
 
   caption <- paste0(
-    "Vaccination goal is 656,600 people ",
+    "Vaccination goal is ", format(n_goal, big.mark = ","), " people ",
     "(~70% of the Shelby County population)\n",
     "Data Source: Tennessee Immunization Information System (TennIIS)"
   )
