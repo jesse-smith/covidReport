@@ -30,7 +30,11 @@ plot_vaccinations <- function(
   }
 
   if (is.null(date_updated)) {
-    date_updated <- vac_date_updated(date)
+    date_updated <- vac_date(
+      date,
+      distinct = TRUE,
+      resident_only = resident_only
+    )
   }
 
   shelby_poly %>%
@@ -302,7 +306,7 @@ add_vaccination_title_caption <- function(gg_obj, date_updated, n_goal) {
 
   add_title_caption(
     gg_obj,
-    title = "Shelby County Vaccinations",
+    title = "Shelby County Vaccination Goal",
     subtitle = format(as.Date(date_updated), "%B %d, %Y"),
     caption = caption
   )

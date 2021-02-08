@@ -30,7 +30,11 @@ plot_vaccinations2 <- function(
   }
 
   if (is.null(date_updated)) {
-    date_updated <- vac_date_updated(date)
+    date_updated <- vac_date(
+      date,
+      distinct = FALSE,
+      resident_only = resident_only
+    )
   }
 
   shelby_poly %>%
@@ -42,7 +46,7 @@ plot_vaccinations2 <- function(
     add_vaccination_polygon() %>%
     add_vaccination_count_fill2(n_first = n_first, n_second = n_second) %>%
     add_vaccination_goal_marker(n_goal = n_goal, n_max = n_max) %>%
-    add_axis_labels(ylab = "Vaccinations") %>%
+    add_axis_labels(ylab = "Vaccinations (1st Doses)") %>%
     add_vaccination_labels2(
       n_goal = n_goal,
       n_first = n_first,
@@ -54,6 +58,7 @@ plot_vaccinations2 <- function(
 add_vaccination_count_fill2 <- function(gg_obj, n_first, n_second) {
 
   # Create fill polygon
+  print(n_first)
   y_partial <- rlang::expr(pmin(.data[["y"]], n_first))
 
   # Create and assign fill colors
@@ -82,13 +87,15 @@ add_vaccination_labels2 <- function(gg_obj, n_goal, n_first, n_second) {
 
   # Create label text
 
-  label <- paste0(
+  label_count <- paste0(
     "1st Doses: ",
     format(n_first, big.mark = ",", scientific = FALSE), "\n",
     "2nd Doses: ",
     format(n_second, big.mark = ",", scientific = FALSE), "\n",
     "(", pct_goal, "% of goal)"
   )
+
+  label_pct <- paste0("(", pct_goal, "% of goal)")
 
   # Create total label
   # label_pct <- paste0(pct_goal, "% of goal")
@@ -98,7 +105,7 @@ add_vaccination_labels2 <- function(gg_obj, n_goal, n_first, n_second) {
       "label",
       x = x_pct,
       y = n_first,
-      label = label,
+      label = label_count,
       color = color,
       fill = "#f0f0f0",
       label.size = 1,
@@ -107,14 +114,15 @@ add_vaccination_labels2 <- function(gg_obj, n_goal, n_first, n_second) {
       size = 5
     )
     # ggplot2::annotate(
-    #   "text",
-    #   x = 0L,
-    #   y = 850e3L,
-    #   label = label_count,
-    #   color = "grey30",
+    #   "label",
+    #   x = x_pct,
+    #   y = n_first,
+    #   label = label_pct,
+    #   color = "goldenrod3",
+    #   fill = "#f0f0f0",
+    #   label.size = 0,
+    #   vjust = 0,
     #   fontface = "bold",
-    #   size = 5,
-    #   hjust = 0
+    #   size = 5
     # )
-
 }
