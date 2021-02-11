@@ -1,11 +1,11 @@
 devtools::load_all()
 
-p <- plot_vaccinations2(date_updated = "2021-02-06") %T>% show()
+p <- plot_vaccinations2() %T>% show()
 
 fname <- paste0(
   "V:/EPI DATA ANALYTICS TEAM/COVID SANDBOX REDCAP DATA/",
   "COVID-19 Vaccine Reporting/figs/vaccination_goal/vaccination_goal_",
-  "2021-02-06",
+  vac_date(),
   ".png"
 )
 
