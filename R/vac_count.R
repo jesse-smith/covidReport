@@ -6,6 +6,8 @@
 #'   so, persons of unknown residency will still be included.
 #'
 #' @return A `tibble` with columns `dose_count` and `n`
+#'
+#' @export
 vac_count <- function(
   .data = coviData::vac_load() %>% coviData::vac_prep(),
   resident_only = TRUE

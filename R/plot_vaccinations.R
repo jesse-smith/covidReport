@@ -1,97 +1,78 @@
+#' Plot Vaccination Totals Figure
+#'
+#' @param date Date of file to pull; defaults to most recent
+#'
+#' @param n_first Number of first doses given
+#'
+#' @param n_second Number of second doses given
+#'
+#' @param n_goal Goal for number of people vaccinated
+#'
+#' @param n_max Maximum number of people (population size)
+#'
+#' @param date_updated The date to use for the figure subtitle; defaults to last
+#'   updated date in the file
+#'
+#' @param resident_only Should the figure only count Shelby County residents?
+#'
+#' @return A `ggplot` object
+#'
+#' @export
 plot_vaccinations <- function(
   date = NULL,
-  n_partial = NULL,
-  n_full = NULL,
+  n_first = NULL,
+  n_second = NULL,
   n_goal = 656016,
   n_max  = 937166,
-  date_updated = date,
+  date_updated = NULL,
   resident_only = TRUE
 ) {
 
-  any_null <- any(is.null(n_partial), is.null(n_full))
+  any_null <- any(is.null(n_first), is.null(n_second))
 
   # Get vaccination counts
   if (any_null) {
     vaccinations <- coviData::vac_load(date = date) %>%
-      coviData::vac_prep(distinct = TRUE) %>%
+      coviData::vac_prep(distinct = FALSE) %>%
       vac_count(resident_only = resident_only)
   }
 
-  if (is.null(n_partial)) {
-    n_partial <- vaccinations %>%
+  if (is.null(n_first)) {
+    n_first <- vaccinations %>%
       dplyr::filter(dose_count == 1L) %>%
       dplyr::pull(n)
   }
 
-  if (is.null(n_full)) {
-    n_full <- vaccinations %>%
+  if (is.null(n_second)) {
+    n_second <- vaccinations %>%
       dplyr::filter(dose_count == 2L) %>%
       dplyr::pull(n)
   }
 
   if (is.null(date_updated)) {
-    date_updated <- vac_date(
-      date,
-      distinct = TRUE,
-      resident_only = resident_only
-    )
+    date_updated <- vac_date(date, resident_only = resident_only)
   }
 
-  shelby_poly %>%
+  covidReport::shelby_poly %>%
     set_vaccination_count_max(n_max = n_max) %>%
     ggplot2::ggplot(ggplot2::aes(x = x, y = y)) %>%
     set_covid_theme() %>%
     set_axis_limits(xlim = c(0, 1), ylim = c(0, n_max)) %>%
     add_vaccination_scale() %>%
     add_vaccination_polygon() %>%
-    add_vaccination_count_fill(n_partial = n_partial, n_full = n_full) %>%
+    add_vaccination_count_fill(n_first = n_first, n_second = n_second) %>%
     add_vaccination_goal_marker(n_goal = n_goal, n_max = n_max) %>%
-    add_axis_labels(ylab = "Vaccinations") %>%
+    add_axis_labels(ylab = "Vaccinations (1st Doses)") %>%
     add_vaccination_labels(
       n_goal = n_goal,
-      n_partial = n_partial,
-      n_full = n_full
+      n_first = n_first,
+      n_second = n_second
     ) %>%
     add_vaccination_title_caption(date_updated = date_updated, n_goal = n_goal)
 }
 
 set_vaccination_count_max <- function(.data, n_max) {
   dplyr::mutate(.data, y = n_max * .data[["y"]])
-}
-
-add_vaccination_polygon <- function(gg_obj) {
-  gg_obj + ggplot2::geom_polygon(fill = "grey83")
-}
-
-add_vaccination_count_fill <- function(gg_obj, n_partial, n_full) {
-
-  # Create fill polygons
-  y_partial <- rlang::expr(
-    .data[["y"]] %>%
-      # Truncate top to total vaccinations
-      pmin(n_partial + n_full) %>%
-      # Truncate bottom to full vaccinations
-      pmax(n_full)
-  )
-  y_full <- rlang::expr(pmin(.data[["y"]], n_full))
-
-  # Create and assign fill colors
-  pal_indigo <- ggsci::pal_material("indigo", n = 10L, reverse = TRUE)
-
-  partial_color <- pal_indigo(8L)[[8L]]
-  full_color <- pal_indigo(1L)[[1L]]
-
-  gg_obj +
-    # Partial
-    ggplot2::geom_polygon(
-      ggplot2::aes(y = !!y_partial),
-      fill = partial_color
-    ) +
-    # Full
-    ggplot2::geom_polygon(
-      ggplot2::aes(y = !!y_full),
-      fill = full_color
-    )
 }
 
 add_vaccination_scale <- function(gg_obj) {
@@ -106,9 +87,27 @@ add_vaccination_scale <- function(gg_obj) {
     ggplot2::scale_y_continuous(breaks = breaks, labels = labels)
 }
 
+add_vaccination_polygon <- function(gg_obj) {
+  gg_obj + ggplot2::geom_polygon(fill = "grey83")
+}
+
+add_vaccination_count_fill <- function(gg_obj, n_first, n_second) {
+
+  # Create fill polygon
+  y_partial <- rlang::expr(pmin(.data[["y"]], n_first))
+
+  # Create and assign fill colors
+  pal_indigo <- ggsci::pal_material("indigo", n = 10L, reverse = TRUE)
+
+  fill_color <- pal_indigo(8L)[[8L]]
+
+  gg_obj +
+    ggplot2::geom_polygon(ggplot2::aes(y = !!y_partial), fill = fill_color)
+}
+
 add_vaccination_goal_marker <- function(gg_obj, n_goal, n_max) {
 
-  segment_range <- shelby_poly %>%
+  segment_range <- covidReport::shelby_poly %>%
     dplyr::filter(dplyr::near(.data[["y"]], n_goal/n_max, tol = 1e-3)) %>%
     dplyr::pull(.data[["x"]]) %>%
     range() %>%
@@ -137,129 +136,77 @@ add_vaccination_goal_marker <- function(gg_obj, n_goal, n_max) {
     )
 }
 
-add_vaccination_labels <- function(gg_obj, n_goal, n_partial, n_full) {
+add_vaccination_labels <- function(gg_obj, n_goal, n_first, n_second) {
 
   # Create and assign colors
   pal_indigo <- ggsci::pal_material("indigo", n = 10L, reverse = TRUE)
-  color_full <- pal_indigo(1L)[[1L]]
-  color_partial <- pal_indigo(8L)[[8L]]
 
-  # Get x coordinates
-  x_partial <- get_vaccination_label_x_coord(
-    gg_obj,
-    n = n_partial + n_full,
-    side = "right"
-  )
-  x_full <- get_vaccination_label_x_coord(gg_obj, n = n_full, side = "left")
+  color <- pal_indigo(8L)[[8L]]
 
-  x_total <- mean(c(
-    get_vaccination_label_x_coord(gg_obj, n_partial + n_full, side = "left"),
-    get_vaccination_label_x_coord(gg_obj, n_partial + n_full, side = "right")
+  x_pct <- mean(c(
+    get_vaccination_label_x_coord(gg_obj, n_first, side = "left"),
+    get_vaccination_label_x_coord(gg_obj, n_first, side = "right")
   ))
 
   # Get goal percentage
-  pct_goal <- round(100*(n_partial + n_full) / n_goal, digits = 1L)
+  pct_goal <- round(100*n_first / n_goal, digits = 1L)
 
   # Create label text
 
-  label_partial <- paste0(
-    "Partially Vaccinated: ",
-    format(n_partial, big.mark = ",", scientific = FALSE)
+  label_count <- paste0(
+    "1st Doses: ",
+    format(n_first, big.mark = ",", scientific = FALSE), "\n",
+    "2nd Doses: ",
+    format(n_second, big.mark = ",", scientific = FALSE), "\n",
+    "(", pct_goal, "% of goal)"
   )
 
-  label_full <- paste0(
-    "Fully Vaccinated: ",
-    format(n_full, big.mark = ",", scientific = FALSE)
+  label_pct <- paste0("(", pct_goal, "% of goal)")
+
+  # Create total label
+  # label_pct <- paste0(pct_goal, "% of goal")
+
+  gg_obj +
+    ggplot2::annotate(
+      "label",
+      x = x_pct,
+      y = n_first,
+      label = label_count,
+      color = color,
+      fill = "#f0f0f0",
+      label.size = 1,
+      vjust = 0,
+      fontface = "bold",
+      size = 5
+    )
+    # ggplot2::annotate(
+    #   "label",
+    #   x = x_pct,
+    #   y = n_first,
+    #   label = label_pct,
+    #   color = "goldenrod3",
+    #   fill = "#f0f0f0",
+    #   label.size = 0,
+    #   vjust = 0,
+    #   fontface = "bold",
+    #   size = 5
+    # )
+}
+
+add_vaccination_title_caption <- function(gg_obj, date_updated, n_goal) {
+
+  caption <- paste0(
+    "Vaccination goal is ", format(n_goal, big.mark = ","), " people ",
+    "(~70% of the Shelby County population)\n",
+    "Data Source: Tennessee Immunization Information System (TennIIS)"
   )
 
-  if (n_full == 0L) {
-
-    # Create total label (just partially vaccinated in this case)
-    label_total <- paste0(
-      "Partially Vaccinated\n",
-      format(n_partial + n_full, big.mark = ",", scientific = FALSE), "\n",
-      " (", pct_goal, "% of goal)"
-    )
-
-    gg_obj +
-      ggplot2::annotate(
-        "label",
-        x = x_total,
-        y = n_partial + n_full,
-        label = label_total,
-        color = color_partial,
-        fill = "#f0f0f0",
-        label.size = 1,
-        vjust = 0,
-        fontface = "bold",
-        size = 5
-      )
-  } else if (n_partial == 0) {
-    # Create total label
-    label_total <- paste0(
-      "Fully Vaccinated\n",
-      format(n_partial + n_full, big.mark = ",", scientific = FALSE), "\n",
-      " (", pct_goal, "% of goal)"
-    )
-
-    gg_obj +
-      ggplot2::annotate(
-        "label",
-        x = x_total,
-        y = n_partial + n_full,
-        label = label_total,
-        color = color_full,
-        fill = "#f0f0f0",
-        label.size = 1,
-        vjust = 0,
-        fontface = "bold",
-        size = 5
-      )
-
-
-  } else {
-    # Create total label
-    label_total <- paste0(
-      "Total Vaccinated\n",
-      format(n_partial + n_full, big.mark = ",", scientific = FALSE), "\n",
-      " (", pct_goal, "% of goal)"
-    )
-
-    gg_obj +
-      ggplot2::annotate(
-        "label",
-        x = x_total,
-        y = n_partial + n_full,
-        label = label_total,
-        color = "grey30",
-        fill = "#f0f0f0",
-        label.size = 1,
-        vjust = 0,
-        fontface = "bold",
-        size = 5
-      ) +
-      ggplot2::annotate(
-        "label",
-        x = x_partial,
-        y = n_partial + n_full,
-        label = label_partial,
-        color = color_partial,
-        fill = "#f0f0f0",
-        hjust = 1,
-        vjust = 0
-      ) +
-      ggplot2::annotate(
-        "label",
-        x = x_full,
-        y = n_full,
-        label = label_full,
-        color = color_full,
-        fill = "#f0f0f0",
-        hjust = 0,
-        vjust = 0
-      )
-  }
-
+  add_title_caption(
+    gg_obj,
+    title = "Shelby County Vaccination Goal",
+    subtitle = format(as.Date(date_updated), "%B %d, %Y"),
+    caption = caption
+  )
 }
 
 get_vaccination_label_x_coord <- function(
@@ -294,20 +241,4 @@ get_vaccination_label_x_coord <- function(
       dplyr::filter(.data[["x"]] == choose_side(.data[["x"]])) %>%
       dplyr::pull(.data[["x"]])
   }
-}
-
-add_vaccination_title_caption <- function(gg_obj, date_updated, n_goal) {
-
-  caption <- paste0(
-    "Vaccination goal is ", format(n_goal, big.mark = ","), " people ",
-    "(~70% of the Shelby County population)\n",
-    "Data Source: Tennessee Immunization Information System (TennIIS)"
-  )
-
-  add_title_caption(
-    gg_obj,
-    title = "Shelby County Vaccination Goal",
-    subtitle = format(as.Date(date_updated), "%B %d, %Y"),
-    caption = caption
-  )
 }

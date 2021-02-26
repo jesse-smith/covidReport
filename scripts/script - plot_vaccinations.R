@@ -1,6 +1,6 @@
 devtools::load_all()
 
-p <- plot_vaccinations2() %T>% show()
+p <- plot_vaccinations() %T>% show()
 
 fname <- paste0(
   "V:/EPI DATA ANALYTICS TEAM/COVID SANDBOX REDCAP DATA/",
