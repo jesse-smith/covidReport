@@ -1,12 +1,10 @@
-# Main Functions ###############################################################
-
 #' Load Inspections Data
 #'
-#' `inspections_load_data()` loads the data from an excel workbook into the R
+#' `insp_load_data()` loads the data from an excel workbook into the R
 #' session. standardizes column names, and optionally checks that the column
 #' names match expected values.
 #'
-#' If `check = TRUE`, `inspections_load_data()` expects at least five columns
+#' If `check = TRUE`, `insp_load_data()` expects at least five columns
 #' giving information on the (last?) inspection visit date, the business name,
 #' the business address, the number of total violations by the business, and the
 #' closure date (if it exists). The expected values of the column names are
@@ -33,20 +31,20 @@
 #' @return A `tibble` containing the inspections data
 #'
 #' @seealso Other functions in the inspections data pipeline (
-#'   \code{\link[covidReport:inspections_prep_data]{inspections_prep_data()}},
+#'   \code{\link[covidReport:insp_prep_data]{insp_prep_data()}},
 #'   \code{
-#'   \link[covidReport:inspections_create_table]{inspections_create_table()}
+#'   \link[covidReport:insp_create_table]{insp_create_table()}
 #'   },
-#'   \code{\link[covidReport:inspections_save_table]{inspections_save_table()}},
+#'   \code{\link[covidReport:insp_save_table]{insp_save_table()}},
 #'   \code{
-#'   \link[covidReport:inspections_archive_table]{inspections_archive_table()}
+#'   \link[covidReport:insp_archive_table]{insp_archive_table()}
 #'   }) and the wrapper for the full workflow
 #'   (\code{
-#'   \link[covidReport:inspections_table_pipeline]{inspections_table_pipeline()}
+#'   \link[covidReport:insp_table_pipeline]{insp_table_pipeline()}
 #'   })
 #'
 #' @export
-inspections_load_data <- function(
+insp_load_data <- function(
   path = coviData::path_create(
     "V:/Compliance/Inspection Data for Publishing/",
     "Grand List of Inspections",
@@ -60,21 +58,21 @@ inspections_load_data <- function(
 
   readxl::read_excel(path, guess_max = guess_max) %>%
     janitor::clean_names() %T>%
-    {if (check) inspections_cols_exist(.) else .}
+    {if (check) insp_cols_exist(.) else .}
 
 }
 
 #' Prepare Inspections Data for Displaying in HTML Table
 #'
-#' `inspections_prep_data()` prepares data from the inspections team for display
+#' `insp_prep_data()` prepares data from the inspections team for display
 #' as an HTML table. It selects, transforms, orders, and sorts the five columns
 #' needed for display and outputs a visualization-ready dataset.
 #'
-#' `inspections_prep_data()` chains together a number of operations on the input
+#' `insp_prep_data()` chains together a number of operations on the input
 #' data.
 #'
 #' First, columns are selected as defined in the \strong{Details} of
-#' \code{\link[covidReport:inspections_cols_exist]{inspections_cols_exist()}};
+#' \code{\link[covidReport:insp_cols_exist]{insp_cols_exist()}};
 #' if multiple columns match this selection, they are
 #' \code{\link[coviData:coalesce_across]{coalesced}}.
 #'
@@ -83,11 +81,11 @@ inspections_load_data <- function(
 #' respecively, and converted to the ISO 8601 standard (see
 #' \code{\link[janitor:convert_to_date]{convert_to_date()}},
 #' \code{
-#' \link[covidReport:inspections_cast_chr_date]{inspections_cast_chr_date()}
+#' \link[covidReport:insp_cast_chr_date]{insp_cast_chr_date()}
 #' }, and
 #' \code{
-#' \link[covidReport:inspections_replace_year_long]{
-#' inspections_replace_year_long()
+#' \link[covidReport:insp_replace_year_long]{
+#' insp_replace_year_long()
 #' }}). Name and address columns are assigned to `nm_business` and
 #' `addr_business`, respectively, and converted to character with
 #' extra whitespace removed. The number of violations is assigned to
@@ -114,29 +112,29 @@ inspections_load_data <- function(
 #'
 #' @seealso Other functions in the inspections data pipeline (
 #'   \code{
-#'   \link[covidReport:inspections_load_data]{inspections_load_data()}
+#'   \link[covidReport:insp_load_data]{insp_load_data()}
 #'   },
 #'   \code{
-#'   \link[covidReport:inspections_create_table]{inspections_create_table()}
+#'   \link[covidReport:insp_create_table]{insp_create_table()}
 #'   },
 #'   \code{
-#'   \link[covidReport:inspections_save_table]{inspections_save_table()}
+#'   \link[covidReport:insp_save_table]{insp_save_table()}
 #'   },
 #'   \code{
-#'   \link[covidReport:inspections_archive_table]{inspections_archive_table()}
+#'   \link[covidReport:insp_archive_table]{insp_archive_table()}
 #'   }) and the wrapper for the full workflow
 #'   (\code{
-#'   \link[covidReport:inspections_table_pipeline]{inspections_table_pipeline()}
+#'   \link[covidReport:insp_table_pipeline]{insp_table_pipeline()}
 #'   })
 #'
 #' @export
-inspections_prep_data <- function(.data) {
+insp_prep_data <- function(.data) {
   .data %>%
     tidylog::mutate(
       dt_visit = coviData::coalesce_across(
         dplyr::contains("date") & dplyr::contains("visit")
       ) %>%
-        janitor::convert_to_date(character_fun = inspections_cast_chr_date),
+        janitor::convert_to_date(character_fun = insp_cast_chr_date),
       nm_business = coviData::coalesce_across(
         dplyr::contains("name") & dplyr::contains("business")
       ) %>%
@@ -155,7 +153,9 @@ inspections_prep_data <- function(.data) {
       dt_closed = coviData::coalesce_across(
         dplyr::contains("closed") & dplyr::contains("date")
       ) %>%
-        janitor::convert_to_date(character_fun = inspections_cast_chr_date)
+        coviData::std_dates() %>%
+        format("%m/%d/%Y") %>%
+        stringr::str_replace_na("")
     ) %>%
     # Entries with no name or number of violations aren't useful to show
     tidylog::filter(
@@ -182,67 +182,76 @@ inspections_prep_data <- function(.data) {
 
 #' Create HTML Table of COVID-19 Business Inspections Results
 #'
-#' `inspections_create_table()` takes prepared inspections data and creates an
+#' `insp_create_table()` takes prepared inspections data and creates an
 #' HTML table for publishing on the web (using the \strong{DT} package). Data
 #' should first be prepared using
-#' \code{\link[covidReport:inspections_prep_data]{inspections_prep_data()}}.
+#' \code{\link[covidReport:insp_prep_data]{insp_prep_data()}}.
 #'
 #' @param .data The prepared inspections data
 #'
-#' @return A `datatables` object
+#' @return A `reactable` object
 #'
 #' @seealso Other functions in the inspections data pipeline (
 #'   \code{
-#'   \link[covidReport:inspections_load_data]{inspections_load_data()}
+#'   \link[covidReport:insp_load_data]{insp_load_data()}
 #'   },
 #'   \code{
-#'   \link[covidReport:inspections_prep_data]{inspections_prep_data()}
+#'   \link[covidReport:insp_prep_data]{insp_prep_data()}
 #'   },
 #'   \code{
-#'   \link[covidReport:inspections_save_table]{inspections_save_table()}
+#'   \link[covidReport:insp_save_table]{insp_save_table()}
 #'   },
 #'   \code{
-#'   \link[covidReport:inspections_archive_table]{inspections_archive_table()}
+#'   \link[covidReport:insp_archive_table]{insp_archive_table()}
 #'   }) and the wrapper for the full workflow
 #'   (\code{
-#'   \link[covidReport:inspections_table_pipeline]{inspections_table_pipeline()}
+#'   \link[covidReport:insp_table_pipeline]{insp_table_pipeline()}
 #'   })
 #'
 #' @export
-inspections_create_table <- function(.data) {
+insp_create_table <- function(.data) {
+  # Create column definitions
+  def_n_violations <- reactable::colDef(
+    name = "Violations",
+    style = violation_style
+  )
+  def_nm_business <- reactable::colDef(name = "Business")
+  def_addr_business <- reactable::colDef(name = "Address")
+  def_dt_visit <- reactable::colDef(
+    name = "Date Visited",
+    format = reactable::colFormat(date = TRUE)
+  )
+  def_dt_closed <- reactable::colDef(name = "Date Closed")
 
-  # Display names of columns
-  col_names <- c(
-    "Number of Violations",
-    "Business",
-    "Address",
-    "Date of Visit",
-    "Date of Closure"
+  cols <- list(
+    n_violations = def_n_violations,
+    nm_business = def_nm_business,
+    addr_business = def_addr_business,
+    dt_visit = def_dt_visit,
+    dt_closed = def_dt_closed
   )
 
-  n_violations_color <- DT::styleInterval(
-    cuts = c(1.999, 3.999),
-    values = c("#77dd77", "gold", "tomato")
-  )
-
-  datatable <- DT::datatable(
+  reactable::reactable(
     .data,
-    colnames = col_names,
-    rownames = FALSE,
-    filter = "top"
-  )
-
-  DT::formatStyle(
-    datatable,
-    columns = "n_violations",
-    backgroundColor = n_violations_color
+    columns = cols,
+    resizable = TRUE,
+    filterable = TRUE,
+    showPageSizeOptions = TRUE,
+    highlight = TRUE,
+    striped = TRUE,
+    showSortable = TRUE,
+    showPageInfo = FALSE
   )
 }
 
-#' Save an HTML Table Produced by `inspections_create_table()`
+#' Save an HTML Table Produced by `insp_create_table()`
 #'
-#' `inspections_save_table()` saves a `datatables` object to the specified
+#' `insp_save_table()` saves a `reactable` object to the specified
 #' `path`. The defaults are intended for saving the inspections data table.
+#'
+#' This function replies on \code{\link[htmlwidgets:saveWidget]{saveWidget()}},
+#' but replaces the base64 encoded dependencies in the self-contained file with
+#' the human-readable equivalent.
 #'
 #' @param .table A `datatables` object
 #'
@@ -255,57 +264,58 @@ inspections_create_table <- function(.data) {
 #'
 #' @seealso Other functions in the inspections data pipeline (
 #'   \code{
-#'   \link[covidReport:inspections_load_data]{inspections_load_data()}
+#'   \link[covidReport:insp_load_data]{insp_load_data()}
 #'   },
 #'   \code{
-#'   \link[covidReport:inspections_prep_data]{inspections_prep_data()}
+#'   \link[covidReport:insp_prep_data]{insp_prep_data()}
 #'   },
 #'   \code{
-#'   \link[covidReport:inspections_create_table]{inspections_create_table()}
+#'   \link[covidReport:insp_create_table]{insp_create_table()}
 #'   },
 #'   \code{
-#'   \link[covidReport:inspections_archive_table]{inspections_archive_table()}
+#'   \link[covidReport:insp_archive_table]{insp_archive_table()}
 #'   }) and the wrapper for the full workflow
 #'   (\code{
-#'   \link[covidReport:inspections_table_pipeline]{inspections_table_pipeline()}
+#'   \link[covidReport:insp_table_pipeline]{insp_table_pipeline()}
 #'   })
 #'
 #' @export
-inspections_save_table <- function(
+insp_save_table <- function(
   .table,
   path = coviData::path_create(
     "V:/Compliance/Inspection Data for Publishing/Table/",
-    paste0("inspections_table_", Sys.Date()),
+    paste0("insp_table_", Sys.Date()),
     ext = "html"
   ),
-  self_contained = TRUE,
   force = FALSE
 ) {
 
-  temp_file <- fs::file_temp("inspections_table", ext = "html")
-  on.exit(fs::file_delete(temp_file), add = TRUE)
-
   path <- coviData::path_create(path)
+
+  if (fs::file_exists(path) && !force) {
+    rlang::abort("File already exists. To overwrite, set `force = TRUE`.")
+  }
+
+  temp_file <- fs::file_temp("insp_table", ext = "html")
+  on.exit(fs::file_delete(temp_file), add = TRUE)
 
   htmlwidgets::saveWidget(
     .table,
     file = temp_file,
-    selfcontained = self_contained,
+    selfcontained = TRUE,
     title = "COVID-19 Business Inspections"
   )
 
-  if (self_contained) {
-
-  }
-
-  fs::file_copy(path = temp_file, new_path = path, overwrite = force)
+  readr::read_lines(temp_file) %>%
+    insp_convert_base64() %>%
+    readr::write_lines(path)
 
   invisible(.table)
 }
 
 #' Create and Manage Inspection Table Archive Files
 #'
-#' `inspection_archive_table()` creates a backup of the file at `table_path`
+#' `insp_archive_table()` creates a backup of the file at `table_path`
 #' and ensures that only one file matching `table_pattern` is in the directory
 #' specified in `table_path`. It also ensures that backups are kept to a
 #' reasonable number in `archive_dir` (at least seven at all times, possibly
@@ -325,32 +335,32 @@ inspections_save_table <- function(
 #'
 #' @seealso Other functions in the inspections data pipeline (
 #'   \code{
-#'   \link[covidReport:inspections_load_data]{inspections_load_data()}
+#'   \link[covidReport:insp_load_data]{insp_load_data()}
 #'   },
 #'   \code{
-#'   \link[covidReport:inspections_prep_data]{inspections_prep_data()}
+#'   \link[covidReport:insp_prep_data]{insp_prep_data()}
 #'   },
 #'   \code{
-#'   \link[covidReport:inspections_create_table]{inspections_create_table()}
+#'   \link[covidReport:insp_create_table]{insp_create_table()}
 #'   },
 #'   \code{
-#'   \link[covidReport:inspections_save_table]{inspections_save_table()}
+#'   \link[covidReport:insp_save_table]{insp_save_table()}
 #'   }) and the wrapper for the full workflow
 #'   (\code{
-#'   \link[covidReport:inspections_table_pipeline]{inspections_table_pipeline()}
+#'   \link[covidReport:insp_table_pipeline]{insp_table_pipeline()}
 #'   })
 #'
 #' @export
-inspections_archive_table <- function(
+insp_archive_table <- function(
   table_path = coviData::path_create(
     "V:/Compliance/Inspection Data for Publishing/Table/",
-    paste0("inspections_table_", Sys.Date()),
+    paste0("insp_table_", Sys.Date()),
     ext = "html"
   ),
   archive_dir = coviData::path_create(
     "V:/Compliance/Inspection Data for Publishing/Table/Archive/"
   ),
-  table_pattern = "inspections_table_.*html",
+  table_pattern = "insp_table_.*html",
   force = FALSE
 ) {
 
@@ -365,14 +375,14 @@ inspections_archive_table <- function(
   fs::file_copy(path = table_path, new_path = archive_path, overwrite = force)
 
   # Make sure only the most recent table is in the "Table" directory
-  inspections_trim_tables(
+  insp_trim_tables(
     table_dir = table_dir,
     table_pattern = table_pattern,
     min_tables = 1L
   )
 
   # Clean up backups as well
-  inspections_trim_archive(
+  insp_trim_archive(
     archive_dir = archive_dir,
     min_backups = 7L
   )
@@ -400,23 +410,23 @@ inspections_archive_table <- function(
 #'
 #' @seealso The component functions of the inspections table pipeline:
 #'   \code{
-#'   \link[covidReport:inspections_load_data]{inspections_load_data()}
+#'   \link[covidReport:insp_load_data]{insp_load_data()}
 #'   },
 #'   \code{
-#'   \link[covidReport:inspections_prep_data]{inspections_prep_data()}
+#'   \link[covidReport:insp_prep_data]{insp_prep_data()}
 #'   },
 #'   \code{
-#'   \link[covidReport:inspections_create_table]{inspections_create_table()}
+#'   \link[covidReport:insp_create_table]{insp_create_table()}
 #'   },
 #'   \code{
-#'   \link[covidReport:inspections_save_table]{inspections_save_table()}
+#'   \link[covidReport:insp_save_table]{insp_save_table()}
 #'   },
 #'   \code{
-#'   \link[covidReport:inspections_archive_table]{inspections_archive_table()}
+#'   \link[covidReport:insp_archive_table]{insp_archive_table()}
 #'   }
 #'
 #' @export
-inspections_table_pipeline <- function(
+insp_table_pipeline <- function(
   data_path = coviData::path_create(
     "V:/Compliance/Inspection Data for Publishing/",
     "Grand List of Inspections",
@@ -424,7 +434,7 @@ inspections_table_pipeline <- function(
   ),
   table_path = coviData::path_create(
     "V:/Compliance/Inspection Data for Publishing/Table/",
-    paste0("inspections_table_", Sys.Date()),
+    paste0("insp_table_", Sys.Date()),
     ext = "html"
   ),
   archive_dir = coviData::path_create(
@@ -434,19 +444,19 @@ inspections_table_pipeline <- function(
 ) {
 
   rlang::inform("Loading inspections data...")
-  table_data_raw <- inspections_load_data(path = data_path)
+  table_data_raw <- insp_load_data(path = data_path)
 
   rlang::inform("Preparing inspections data...")
-  table_data_prepped <- inspections_prep_data(table_data_raw)
+  table_data_prepped <- insp_prep_data(table_data_raw)
 
   rlang::inform("Creating inspections table...")
-  table <- inspections_create_table(table_data_prepped)
+  table <- insp_create_table(table_data_prepped)
 
   rlang::inform("Saving inspections table...")
-  inspections_save_table(table, path = table_path, force = force)
+  insp_save_table(table, path = table_path, force = force)
 
   rlang::inform("Managing inspections archive...")
-  inspections_archive_table(
+  insp_archive_table(
     table_path = table_path,
     archive_dir = archive_dir,
     force = force
@@ -456,16 +466,77 @@ inspections_table_pipeline <- function(
   invisible(table)
 }
 
-# Internal Helper Functions ####################################################
+# Helpers ----------------------------------------------------------------------
+
+#' Inspections Violations Color Helper
+#'
+#' Map number of violations to a color (green, orange, or red). Invalid values
+#' default to black (`"#000000"`).
+#'
+#' @param value A scalar or vector numeric. This function *can* accept vectors;
+#'   however, \code{\link[reactable:colDef]{colDef()}} passes scalars.
+#'
+#' @return A hex color code
+violation_style <- function(value) {
+  color <- dplyr::case_when(
+    !is.numeric(value) ~ "#000000",
+    value < 0L ~ "#000000",
+    value < 2L ~ "#008000",
+    value < 4L ~ "#ff8c00",
+    value < Inf ~ "#e00000",
+    TRUE ~ "#000000"
+  )
+
+  list(color = color, fontWeight = "bold")
+}
+
+decode_base64 <- function(string) {
+  string %>%
+    jsonlite::base64_dec() %>%
+    rawToChar()
+}
+
+insp_convert_base64 <- function(html) {
+
+  is_b64_script <- stringr::str_detect(html, "<script.+base64,")
+
+  b64 <- html[is_b64_script] %>%
+    stringr::str_remove("<script.+base64,") %>%
+    stringr::str_extract("[^\">]+")
+
+  chr <- purrr::map_chr(b64, decode_base64)
+
+  vctrs::vec_assign(
+    html,
+    i = is_b64_script,
+    value = paste0("<script>", chr, "</script>")
+  ) %>% insp_convert_null()
+}
+
+insp_convert_null <- function(html) {
+  is_data <- stringr::str_detect(
+    html,
+    "<script type=\"application/json\" data-for"
+  )
+
+  data_converted <- stringr::str_replace_all(
+    html[is_data],
+    "(?<=,)null|null(?=,)",
+    replacement = "\" \""
+  )
+
+  vctrs::vec_assign(html, i = is_data, value = data_converted)
+}
+
 
 #' Replace Malformed Years in Inspections Data
 #'
-#' `inspections_replace_year_long()` replaces numeric years which only have
+#' `insp_replace_year_long()` replaces numeric years which only have
 #' three digits, rather than the expected four (i.e. `202` instead of `2020`).
 #' The replacement value is the current year. This function is intended for
 #' use inside
 #' \code{
-#' \link[covidReport:inspections_cast_chr_date]{inspections_cast_chr_date()}
+#' \link[covidReport:insp_cast_chr_date]{insp_cast_chr_date()}
 #' }.
 #'
 #' @param x A vector of dates
@@ -476,15 +547,15 @@ inspections_table_pipeline <- function(
 #'
 #' @seealso The calling function
 #'   \code{
-#'   \link[covidReport:inspections_cast_chr_date]{inspections_cast_chr_date()}
+#'   \link[covidReport:insp_cast_chr_date]{insp_cast_chr_date()}
 #'   }, as well as higher-level functions
 #'   \code{\link[janitor:convert_to_date]{convert_to_date()}} and
 #'   \code{
-#'   \link[covidReport:inspections_prep_data]{inspections_prep_data()}
+#'   \link[covidReport:insp_prep_data]{insp_prep_data()}
 #'   }
 #'
 #' @keywords internal
-inspections_replace_year_long <- function(x, quiet = FALSE) {
+insp_replace_year_long <- function(x, quiet = FALSE) {
 
   year_malformed <- "[0-9]{3,}"
 
@@ -510,7 +581,7 @@ inspections_replace_year_long <- function(x, quiet = FALSE) {
 
 #' Cast Character Dates to a Standard Format
 #'
-#' `inspections_cast_chr_date()` converts dates in a variety of character
+#' `insp_cast_chr_date()` converts dates in a variety of character
 #' formats to the ISO 8601 standard. It is intended for use as the
 #' `character_fun` in \code{\link[janitor:convert_to_date]{convert_to_date()}}.
 #'
@@ -522,37 +593,37 @@ inspections_replace_year_long <- function(x, quiet = FALSE) {
 #'   \code{\link[janitor:convert_to_date]{convert_to_date()}}, as well as the
 #'   higher-level function
 #'   \code{
-#'   \link[covidReport:inspections_prep_data]{inspections_prep_data()}
+#'   \link[covidReport:insp_prep_data]{insp_prep_data()}
 #'   }
 #'
 #' @keywords internal
-inspections_cast_chr_date <- function(x) {
+insp_cast_chr_date <- function(x) {
 
   orders <- c("mdy", "dmy", "ymd", "dmyT", "mdyT", "ymdT")
 
   x %>%
-    inspections_replace_year_long() %>%
+    insp_replace_year_long() %>%
     lubridate::parse_date_time(orders = orders) %>%
     lubridate::as_date()
 }
 
 #' Check that the Expected Columns are Present in Inspections Data
 #'
-#' `inspections_cols_exist()` is a wrapper around
+#' `insp_cols_exist()` is a wrapper around
 #' \code{\link[coviData:cols_exist]{cols_exist()}} that checks for the existence
 #' of columns expected in the inspections data. It is intended for use in
-#' \code{\link[covidReport:inspections_load_data]{inspections_load_data()}}.
+#' \code{\link[covidReport:insp_load_data]{insp_load_data()}}.
 #'
 #' @param .data A data frame containing the inspections data
 #'
 #' @return The input data frame
 #'
 #' @seealso \code{
-#'   \link[covidReport:inspections_load_data]{inspections_load_data()}
+#'   \link[covidReport:insp_load_data]{insp_load_data()}
 #'   }
 #'
 #' @keywords internal
-inspections_cols_exist <- function(.data) {
+insp_cols_exist <- function(.data) {
   coviData::cols_exist(
     .data,
     dplyr::contains("date") & dplyr::contains("visit"),
@@ -565,12 +636,12 @@ inspections_cols_exist <- function(.data) {
 
 #' Trim Table Directory for Inspections Tables
 #'
-#' `inspections_trim_tables()` ensures that at least `min_tables` tables are
+#' `insp_trim_tables()` ensures that at least `min_tables` tables are
 #' in the tables directory at a time, but that at most `min_tables` days worth
 #' of tables are kept if there are more than `min_tables` tables. All tables
 #' should be archived before removal. This function is for internal use in
 #' \code{
-#' \link[covidReport:inspections_archive_table]{inspections_archive_table()}
+#' \link[covidReport:insp_archive_table]{insp_archive_table()}
 #' }.
 #'
 #' @param table_dir The directory containing the most recent inspections
@@ -584,15 +655,15 @@ inspections_cols_exist <- function(.data) {
 #' @return `table_dir` (invisibly)
 #'
 #' @seealso \code{
-#'   \link[covidReport:inspections_archive_table]{inspections_archive_table()}
+#'   \link[covidReport:insp_archive_table]{insp_archive_table()}
 #'   }, \code{\link[coviData:trim_backups]{trim_backups()}}
 #'
 #' @keywords internal
-inspections_trim_tables <- function(
+insp_trim_tables <- function(
   table_dir = coviData::path_create(
     "V:/Compliance/Inspection Data for Publishing/Table/"
   ),
-  table_pattern = "inspections_table_.*html",
+  table_pattern = "insp_table_.*html",
   min_tables = 1L
 ) {
 
@@ -613,12 +684,12 @@ inspections_trim_tables <- function(
 
 #' Trim Archive Directory for Inspections Tables
 #'
-#' `inspections_trim_archive()` ensures that at least `min_backups` backups are
+#' `insp_trim_archive()` ensures that at least `min_backups` backups are
 #' always kept of the inspections table, but that at most `min_backups` days
 #' worth of backups are kept if there are more than `min_backups` backups. This
 #' function is for internal use in
 #' \code{
-#' \link[covidReport:inspections_archive_table]{inspections_archive_table()}
+#' \link[covidReport:insp_archive_table]{insp_archive_table()}
 #' }.
 #'
 #' @param archive_dir The directory containing archived inspections tables
@@ -628,11 +699,11 @@ inspections_trim_tables <- function(
 #' @return `archive_dir` (invisibly)
 #'
 #' @seealso \code{
-#'   \link[covidReport:inspections_archive_table]{inspections_archive_table()}
+#'   \link[covidReport:insp_archive_table]{insp_archive_table()}
 #'   }, \code{\link[coviData:trim_backups]{trim_backups()}}
 #'
 #' @keywords internal
-inspections_trim_archive <- function(
+insp_trim_archive <- function(
   archive_dir = coviData::path_create(
     "V:/Compliance/Inspection Data for Publishing/Table/Archive/"
   ),
@@ -651,8 +722,4 @@ inspections_trim_archive <- function(
   )
 
   invisible(archive_dir)
-}
-
-inspections_decode_base64 <- function(.table) {
-  ?base64enc::base64decode()
 }

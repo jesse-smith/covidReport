@@ -8,6 +8,7 @@ inspections_save_table(
   .table,
   path = coviData::path_create("V:/Compliance/Inspection Data for Publishing/Table/",
     paste0("inspections_table_", Sys.Date()), ext = "html"),
+  self_contained = TRUE,
   force = FALSE
 )
 }
