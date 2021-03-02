@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Save an HTML Table Produced by inspections_create_table() — inspections_save_table • covidReport</title>
+<title>Save a ggplot Object — save_plot • covidReport</title>
 
 
 <!-- jquery -->
@@ -39,9 +39,12 @@
 
 
 
-<meta property="og:title" content="Save an HTML Table Produced by inspections_create_table() — inspections_save_table" />
-<meta property="og:description" content="inspections_save_table() saves a datatables object to the specified
-path. The defaults are intended for saving the inspections data table." />
+<meta property="og:title" content="Save a ggplot Object — save_plot" />
+<meta property="og:description" content="save_plot() saves a ggplot object to the specified path. It is a wrapper
+around ggsave() that takes the plot as the
+first argument and provides alternate defaults for use in SCHD slides. Unlike
+ggsave() the ggplot object must always be supplied explicitly, and it
+will not overwrite existing files by default." />
 
 
 
@@ -109,63 +112,54 @@ path. The defaults are intended for saving the inspections data table." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Save an HTML Table Produced by <code>inspections_create_table()</code></h1>
-    <small class="dont-index">Source: <a href='https://github.com/jesse-smith/covidReport/blob/master/R/inspections_table.R'><code>R/inspections_table.R</code></a></small>
-    <div class="hidden name"><code>inspections_save_table.Rd</code></div>
+    <h1>Save a <code>ggplot</code> Object</h1>
+    <small class="dont-index">Source: <a href='https://github.com/jesse-smith/covidReport/blob/master/R/save_plot.R'><code>R/save_plot.R</code></a></small>
+    <div class="hidden name"><code>save_plot.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p><code>inspections_save_table()</code> saves a <code>datatables</code> object to the specified
-<code>path</code>. The defaults are intended for saving the inspections data table.</p>
+    <p><code>save_plot()</code> saves a <code>ggplot</code> object to the specified path. It is a wrapper
+around <code><a href='https://ggplot2.tidyverse.org/reference/ggsave.html'>ggsave()</a></code> that takes the plot as the
+first argument and provides alternate defaults for use in SCHD slides. Unlike
+<code>ggsave()</code> the <code>ggplot</code> object must always be supplied explicitly, and it
+will not overwrite existing files by default.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>inspections_save_table</span><span class='op'>(</span>
-  <span class='va'>.table</span>,
-  path <span class='op'>=</span> <span class='fu'>coviData</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/coviData/man/path_create.html'>path_create</a></span><span class='op'>(</span><span class='st'>"V:/Compliance/Inspection Data for Publishing/Table/"</span>,
-    <span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span><span class='op'>(</span><span class='st'>"inspections_table_"</span>, <span class='fu'><a href='https://rdrr.io/r/base/Sys.time.html'>Sys.Date</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span>, ext <span class='op'>=</span> <span class='st'>"html"</span><span class='op'>)</span>,
-  self_contained <span class='op'>=</span> <span class='cn'>TRUE</span>,
-  force <span class='op'>=</span> <span class='cn'>FALSE</span>
-<span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>save_plot</span><span class='op'>(</span><span class='va'>gg_obj</span>, <span class='va'>path</span>, width <span class='op'>=</span> <span class='fl'>16</span>, height <span class='op'>=</span> <span class='fl'>9</span>, force <span class='op'>=</span> <span class='cn'>FALSE</span>, <span class='va'>...</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>.table</th>
-      <td><p>A <code>datatables</code> object</p></td>
+      <th>gg_obj</th>
+      <td><p>A <code>ggplot</code> object to save</p></td>
     </tr>
     <tr>
       <th>path</th>
-      <td><p>The location to save the table</p></td>
+      <td><p>The location for saving</p></td>
+    </tr>
+    <tr>
+      <th>width</th>
+      <td><p>The width of the saved figure, in inches by default</p></td>
+    </tr>
+    <tr>
+      <th>height</th>
+      <td><p>The height of the saved figure, in inches by default</p></td>
     </tr>
     <tr>
       <th>force</th>
-      <td><p>Should an existing file at <code>path</code> be overwritten if a
-conflict occurs?</p></td>
+      <td><p>Should existing files be overwritten?</p></td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td><p>Additional arguments to pass to
+<code><a href='https://ggplot2.tidyverse.org/reference/ggsave.html'>ggsave()</a></code></p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>The input <code>.table</code> (invisibly)</p>
-    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
-
-    <div class='dont-index'><p>Other functions in the inspections data pipeline (
-<code>
-  <a href='inspections_load_data.html'>inspections_load_data()</a>
-  </code>,
-<code>
-  <a href='inspections_prep_data.html'>inspections_prep_data()</a>
-  </code>,
-<code>
-  <a href='inspections_create_table.html'>inspections_create_table()</a>
-  </code>,
-<code>
-  <a href='inspections_archive_table.html'>inspections_archive_table()</a>
-  </code>) and the wrapper for the full workflow
-(<code>
-  <a href='inspections_table_pipeline.html'>inspections_table_pipeline()</a>
-  </code>)</p></div>
+    <p>The <code>gg_obj</code>, invisibly</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

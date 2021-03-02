@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Save an HTML Table Produced by inspections_create_table() — inspections_save_table • covidReport</title>
+<title>Inspections Violations Color Helper — violation_style • covidReport</title>
 
 
 <!-- jquery -->
@@ -39,9 +39,9 @@
 
 
 
-<meta property="og:title" content="Save an HTML Table Produced by inspections_create_table() — inspections_save_table" />
-<meta property="og:description" content="inspections_save_table() saves a datatables object to the specified
-path. The defaults are intended for saving the inspections data table." />
+<meta property="og:title" content="Inspections Violations Color Helper — violation_style" />
+<meta property="og:description" content="Map number of violations to a color (green, orange, or red). Invalid values
+default to black (&quot;#000000&quot;)." />
 
 
 
@@ -109,63 +109,31 @@ path. The defaults are intended for saving the inspections data table." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Save an HTML Table Produced by <code>inspections_create_table()</code></h1>
-    <small class="dont-index">Source: <a href='https://github.com/jesse-smith/covidReport/blob/master/R/inspections_table.R'><code>R/inspections_table.R</code></a></small>
-    <div class="hidden name"><code>inspections_save_table.Rd</code></div>
+    <h1>Inspections Violations Color Helper</h1>
+    <small class="dont-index">Source: <a href='https://github.com/jesse-smith/covidReport/blob/master/R/inspections_table2.R'><code>R/inspections_table2.R</code></a></small>
+    <div class="hidden name"><code>violation_style.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p><code>inspections_save_table()</code> saves a <code>datatables</code> object to the specified
-<code>path</code>. The defaults are intended for saving the inspections data table.</p>
+    <p>Map number of violations to a color (green, orange, or red). Invalid values
+default to black (<code>"#000000"</code>).</p>
     </div>
 
-    <pre class="usage"><span class='fu'>inspections_save_table</span><span class='op'>(</span>
-  <span class='va'>.table</span>,
-  path <span class='op'>=</span> <span class='fu'>coviData</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/coviData/man/path_create.html'>path_create</a></span><span class='op'>(</span><span class='st'>"V:/Compliance/Inspection Data for Publishing/Table/"</span>,
-    <span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span><span class='op'>(</span><span class='st'>"inspections_table_"</span>, <span class='fu'><a href='https://rdrr.io/r/base/Sys.time.html'>Sys.Date</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span>, ext <span class='op'>=</span> <span class='st'>"html"</span><span class='op'>)</span>,
-  self_contained <span class='op'>=</span> <span class='cn'>TRUE</span>,
-  force <span class='op'>=</span> <span class='cn'>FALSE</span>
-<span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>violation_style</span><span class='op'>(</span><span class='va'>value</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>.table</th>
-      <td><p>A <code>datatables</code> object</p></td>
-    </tr>
-    <tr>
-      <th>path</th>
-      <td><p>The location to save the table</p></td>
-    </tr>
-    <tr>
-      <th>force</th>
-      <td><p>Should an existing file at <code>path</code> be overwritten if a
-conflict occurs?</p></td>
+      <th>value</th>
+      <td><p>A scalar or vector numeric. This function <em>can</em> accept vectors;
+however, <code>colDef()</code> passes scalars.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>The input <code>.table</code> (invisibly)</p>
-    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
-
-    <div class='dont-index'><p>Other functions in the inspections data pipeline (
-<code>
-  <a href='inspections_load_data.html'>inspections_load_data()</a>
-  </code>,
-<code>
-  <a href='inspections_prep_data.html'>inspections_prep_data()</a>
-  </code>,
-<code>
-  <a href='inspections_create_table.html'>inspections_create_table()</a>
-  </code>,
-<code>
-  <a href='inspections_archive_table.html'>inspections_archive_table()</a>
-  </code>) and the wrapper for the full workflow
-(<code>
-  <a href='inspections_table_pipeline.html'>inspections_table_pipeline()</a>
-  </code>)</p></div>
+    <p>A hex color code</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

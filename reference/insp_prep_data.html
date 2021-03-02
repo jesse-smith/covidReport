@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Save an HTML Table Produced by inspections_create_table() — inspections_save_table • covidReport</title>
+<title>Prepare Inspections Data for Displaying in HTML Table — insp_prep_data • covidReport</title>
 
 
 <!-- jquery -->
@@ -39,9 +39,10 @@
 
 
 
-<meta property="og:title" content="Save an HTML Table Produced by inspections_create_table() — inspections_save_table" />
-<meta property="og:description" content="inspections_save_table() saves a datatables object to the specified
-path. The defaults are intended for saving the inspections data table." />
+<meta property="og:title" content="Prepare Inspections Data for Displaying in HTML Table — insp_prep_data" />
+<meta property="og:description" content="insp_prep_data() prepares data from the inspections team for display
+as an HTML table. It selects, transforms, orders, and sorts the five columns
+needed for display and outputs a visualization-ready dataset." />
 
 
 
@@ -109,62 +110,82 @@ path. The defaults are intended for saving the inspections data table." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Save an HTML Table Produced by <code>inspections_create_table()</code></h1>
-    <small class="dont-index">Source: <a href='https://github.com/jesse-smith/covidReport/blob/master/R/inspections_table.R'><code>R/inspections_table.R</code></a></small>
-    <div class="hidden name"><code>inspections_save_table.Rd</code></div>
+    <h1>Prepare Inspections Data for Displaying in HTML Table</h1>
+    <small class="dont-index">Source: <a href='https://github.com/jesse-smith/covidReport/blob/master/R/inspections_table2.R'><code>R/inspections_table2.R</code></a></small>
+    <div class="hidden name"><code>insp_prep_data.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p><code>inspections_save_table()</code> saves a <code>datatables</code> object to the specified
-<code>path</code>. The defaults are intended for saving the inspections data table.</p>
+    <p><code>insp_prep_data()</code> prepares data from the inspections team for display
+as an HTML table. It selects, transforms, orders, and sorts the five columns
+needed for display and outputs a visualization-ready dataset.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>inspections_save_table</span><span class='op'>(</span>
-  <span class='va'>.table</span>,
-  path <span class='op'>=</span> <span class='fu'>coviData</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/coviData/man/path_create.html'>path_create</a></span><span class='op'>(</span><span class='st'>"V:/Compliance/Inspection Data for Publishing/Table/"</span>,
-    <span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span><span class='op'>(</span><span class='st'>"inspections_table_"</span>, <span class='fu'><a href='https://rdrr.io/r/base/Sys.time.html'>Sys.Date</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span>, ext <span class='op'>=</span> <span class='st'>"html"</span><span class='op'>)</span>,
-  self_contained <span class='op'>=</span> <span class='cn'>TRUE</span>,
-  force <span class='op'>=</span> <span class='cn'>FALSE</span>
-<span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>insp_prep_data</span><span class='op'>(</span><span class='va'>.data</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>.table</th>
-      <td><p>A <code>datatables</code> object</p></td>
-    </tr>
-    <tr>
-      <th>path</th>
-      <td><p>The location to save the table</p></td>
-    </tr>
-    <tr>
-      <th>force</th>
-      <td><p>Should an existing file at <code>path</code> be overwritten if a
-conflict occurs?</p></td>
+      <th>.data</th>
+      <td><p>A data frame containing the inspections data</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>The input <code>.table</code> (invisibly)</p>
+    <p>The processed data frame</p>
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p><code>insp_prep_data()</code> chains together a number of operations on the input
+data.</p>
+<p>First, columns are selected as defined in the <strong>Details</strong> of
+<code><a href='insp_cols_exist.html'>insp_cols_exist()</a></code>;
+if multiple columns match this selection, they are
+<code><a href='https://rdrr.io/pkg/coviData/man/coalesce_across.html'>coalesced</a></code>.</p>
+<p>Second, columns are transformed according to type and assigned a standard
+name. Visit date and closure date are assigned to <code>dt_visit</code> and <code>dt_closed</code>,
+respecively, and converted to the ISO 8601 standard (see
+<code><a href='https://rdrr.io/pkg/janitor/man/convert_to_date.html'>convert_to_date()</a></code>,
+<code>
+<a href='insp_cast_chr_date.html'>insp_cast_chr_date()</a>
+</code>, and
+<code>
+<a href='insp_replace_year_long.html'>
+insp_replace_year_long()
+</a></code>). Name and address columns are assigned to <code>nm_business</code> and
+<code>addr_business</code>, respectively, and converted to character with
+extra whitespace removed. The number of violations is assigned to
+<code>n_violations</code> and converted to integer.</p>
+<p>Third, rows missing a business name or number of violations (<code>nm_business</code>
+or <code>n_violations</code>) are removed from the dataset. Entries without names are
+not easily identifiable, and the primary purpose of the table is to display
+violations.</p>
+<p>Fourth, columns are reordered for ease of viewing, and unnecessary columns
+(any not listed above) are dropped. The ordering is <code>n_violations</code>,
+<code>nm_business</code>, <code>addr_business</code>, <code>dt_visit</code>, and <code>dt_closed</code>.</p>
+<p>Last, rows are arranged by column from left to right (first by
+<code>n_violations</code>, then by <code>nm_business</code>, and so on). <code>n_violations</code>,
+<code>dt_visit</code>, and <code>dt_closed</code> are arranged in descending order (most violations
+and most recent dates first); <code>nm_business</code> and <code>addr_business</code> are arranged
+in ascending order (aka alphabetically).</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p>Other functions in the inspections data pipeline (
 <code>
-  <a href='inspections_load_data.html'>inspections_load_data()</a>
+  <a href='insp_load_data.html'>insp_load_data()</a>
   </code>,
 <code>
-  <a href='inspections_prep_data.html'>inspections_prep_data()</a>
+  <a href='insp_create_table.html'>insp_create_table()</a>
   </code>,
 <code>
-  <a href='inspections_create_table.html'>inspections_create_table()</a>
+  <a href='insp_save_table.html'>insp_save_table()</a>
   </code>,
 <code>
-  <a href='inspections_archive_table.html'>inspections_archive_table()</a>
+  <a href='insp_archive_table.html'>insp_archive_table()</a>
   </code>) and the wrapper for the full workflow
 (<code>
-  <a href='inspections_table_pipeline.html'>inspections_table_pipeline()</a>
+  <a href='insp_table_pipeline.html'>insp_table_pipeline()</a>
   </code>)</p></div>
 
   </div>
