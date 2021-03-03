@@ -5,12 +5,16 @@
 #' @param resident_only Should counts include Shelby County residents only? If
 #'   so, persons of unknown residency will still be included.
 #'
+#' @param date The date of the vaccination data to load; defaults to latest
+#'   data
+#'
 #' @return A `tibble` with columns `dose_count` and `n`
 #'
 #' @export
 vac_count <- function(
-  .data = coviData::vac_load() %>% coviData::vac_prep(),
-  resident_only = TRUE
+  .data = coviData::vac_prep(coviData::vac_load(date = date)),
+  resident_only = TRUE,
+  date = NULL
 ) {
 
   .data %>%
