@@ -118,8 +118,9 @@
     </div>
 
     <pre class="usage"><span class='fu'>vac_count</span><span class='op'>(</span>
-  .data <span class='op'>=</span> <span class='fu'>coviData</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/coviData/man/vac_load.html'>vac_load</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>%&gt;%</span> <span class='fu'>coviData</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/coviData/man/vac_prep.html'>vac_prep</a></span><span class='op'>(</span><span class='op'>)</span>,
-  resident_only <span class='op'>=</span> <span class='cn'>TRUE</span>
+  .data <span class='op'>=</span> <span class='fu'>coviData</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/coviData/man/vac_prep.html'>vac_prep</a></span><span class='op'>(</span><span class='fu'>coviData</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/coviData/man/vac_load.html'>vac_load</a></span><span class='op'>(</span>date <span class='op'>=</span> <span class='va'>date</span><span class='op'>)</span><span class='op'>)</span>,
+  resident_only <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  date <span class='op'>=</span> <span class='cn'>NULL</span>
 <span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -133,6 +134,11 @@
       <th>resident_only</th>
       <td><p>Should counts include Shelby County residents only? If
 so, persons of unknown residency will still be included.</p></td>
+    </tr>
+    <tr>
+      <th>date</th>
+      <td><p>The date of the vaccination data to load; defaults to latest
+data</p></td>
     </tr>
     </table>
 
