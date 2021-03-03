@@ -5,8 +5,9 @@
 \title{Count Vaccinations by Dose}
 \usage{
 vac_count(
-  .data = coviData::vac_load() \%>\% coviData::vac_prep(),
-  resident_only = TRUE
+  .data = coviData::vac_prep(coviData::vac_load(date = date)),
+  resident_only = TRUE,
+  date = NULL
 )
 }
 \arguments{
@@ -14,6 +15,9 @@ vac_count(
 
 \item{resident_only}{Should counts include Shelby County residents only? If
 so, persons of unknown residency will still be included.}
+
+\item{date}{The date of the vaccination data to load; defaults to latest
+data}
 }
 \value{
 A \code{tibble} with columns \code{dose_count} and \code{n}
