@@ -1,5 +1,7 @@
 #' Plot Vaccination Totals Figure
 #'
+#' @param data Vaccination date from \code{\link[coviData:vac_prep]{vac_prep()}}
+#'
 #' @param date Date of file to pull; defaults to most recent
 #'
 #' @param n_first Number of first doses given
@@ -19,10 +21,11 @@
 #'
 #' @export
 plot_vaccinations <- function(
+  data = coviData::vac_prep(coviData::vac_load(date = date)),
   date = NULL,
   n_first = NULL,
   n_second = NULL,
-  n_goal = 656016,
+  n_goal = 700000,
   n_max  = 937166,
   date_updated = NULL,
   resident_only = TRUE
@@ -68,7 +71,11 @@ plot_vaccinations <- function(
       n_first = n_first,
       n_second = n_second
     ) %>%
-    add_vaccination_title_caption(date_updated = date_updated, n_goal = n_goal)
+    add_vaccination_title_caption(
+      date_updated = date_updated,
+      n_goal = n_goal,
+      n_max = n_max
+    )
 }
 
 set_vaccination_count_max <- function(.data, n_max) {
@@ -193,11 +200,15 @@ add_vaccination_labels <- function(gg_obj, n_goal, n_first, n_second) {
     # )
 }
 
-add_vaccination_title_caption <- function(gg_obj, date_updated, n_goal) {
+add_vaccination_title_caption <- function(gg_obj, date_updated, n_goal, n_max) {
+
+  n_chr   <- format(n_goal, scientific = FALSE, big.mark = ",")
+
+  pct_chr <- scales::percent(n_goal / n_max)
 
   caption <- paste0(
-    "Vaccination goal is ", format(n_goal, big.mark = ","), " people ",
-    "(~70% of the Shelby County population)\n",
+    "Vaccination goal is ", n_chr, " people ",
+    "(~", pct_chr, " of the Shelby County population)\n",
     "Data Source: Tennessee Immunization Information System (TennIIS)"
   )
 
