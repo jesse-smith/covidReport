@@ -20,7 +20,7 @@
 #' @return A `ggplot` object
 #'
 #' @export
-plot_vaccinations <- function(
+vac_plot_goal <- function(
   data = coviData::vac_prep(coviData::vac_load(date = date)),
   date = NULL,
   n_first = NULL,
@@ -252,4 +252,29 @@ get_vaccination_label_x_coord <- function(
       dplyr::filter(.data[["x"]] == choose_side(.data[["x"]])) %>%
       dplyr::pull(.data[["x"]])
   }
+}
+
+#' @rdname vac_plot_goal
+#'
+#' @export
+plot_vaccinations <- function(
+  data = coviData::vac_prep(coviData::vac_load(date = date)),
+  date = NULL,
+  n_first = NULL,
+  n_second = NULL,
+  n_goal = 700000,
+  n_max  = 937166,
+  date_updated = NULL,
+  resident_only = TRUE
+) {
+  vac_plot_goal(
+    data = data,
+    date = date,
+    n_first = n_first,
+    n_second = n_second,
+    n_goal = n_goal,
+    n_max = n_max,
+    date_updated = date_updated,
+    resident_only = resident_only
+  )
 }

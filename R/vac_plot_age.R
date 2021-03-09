@@ -2,6 +2,7 @@
 #'
 #' `plot_vac_age()` plots vaccinations by age group in a bar chart. It can
 #' produce 4 distinct figures, depending on the values of `pct` and `by_pop`.
+#' `plot_vac_age()` is a deprecated wrapper for `vac_plot_age()`.
 #'
 #' When `by_pop = TRUE`,
 #' the resulting figure displays vaccinations with reference to the population
@@ -32,7 +33,7 @@
 #' @return A `ggplot` object
 #'
 #' @export
-plot_vac_age <- function(
+vac_plot_age <- function(
   .data = coviData::vac_load() %>% coviData::vac_prep(),
   pct = TRUE,
   by_pop = TRUE,
@@ -63,6 +64,23 @@ plot_vac_age <- function(
     remove_x_grid() %>%
     add_vac_age_scale(by_pop = by_pop) %>%
     add_vac_age_title_caption(by_pop = by_pop, date = date)
+}
+
+#' @rdname vac_plot_age
+#'
+#' @export
+plot_vac_age <- function(
+  .data = coviData::vac_load() %>% coviData::vac_prep(),
+  pct = TRUE,
+  by_pop = TRUE,
+  incl_under_15 = FALSE
+) {
+  vac_plot_age(
+    .data = .data,
+    pct = pct,
+    by_pop = by_pop,
+    incl_under_15 = incl_under_15
+  )
 }
 
 vac_age_ggplot <- function(.data, pct, by_pop) {
