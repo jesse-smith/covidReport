@@ -6,6 +6,7 @@
 \usage{
 vac_count(
   .data = coviData::vac_prep(coviData::vac_load(date = date)),
+  by = c("person", "dose"),
   resident_only = TRUE,
   date = NULL
 )
