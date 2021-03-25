@@ -56,7 +56,7 @@ insp_load_data <- function(
   path <- coviData::path_create(path)
   guess_max <- .Machine$integer.max %/% 100L
 
-  readxl::read_excel(path, guess_max = guess_max) %>%
+  readxl::read_excel(path, guess_max = guess_max, sheet = "Sheet1") %>%
     janitor::clean_names() %T>%
     {if (check) insp_cols_exist(.) else .}
 
@@ -521,8 +521,8 @@ insp_convert_null <- function(html) {
 
   data_converted <- stringr::str_replace_all(
     html[is_data],
-    "(?<=,)null|null(?=,)",
-    replacement = "\" \""
+    '(?<=,)(null|["]{2})|(null|["]{2})(?=,)',
+    replacement = '" "'
   )
 
   vctrs::vec_assign(html, i = is_data, value = data_converted)
