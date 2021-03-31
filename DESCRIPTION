@@ -7,41 +7,50 @@ Authors@R:
            role = c("aut", "cre"),
            email = "jesse.smith@shelbycountytn.gov",
            comment = c(ORCID = "0000-0001-7375-2463"))
-Description: The goal of covidReport is to provide a simple interface to
-    generate reports and graphics from Shelby County COVID-19 data. The hope is
-    that responsibility for all regularly produced outputs will eventually be
-    shifted to this package.
+Description: The goal of covidReport is to provide a simple
+    interface to generate reports and graphics from Shelby County COVID-19
+    data. The hope is that responsibility for all regularly produced
+    outputs will eventually be shifted to this package.
 License: GPL (>= 3)
 URL: https://github.com/jesse-smith/covidReport,
     https://jesse-smith.github.io/covidReport/
 BugReports: https://github.com/jesse-smith/covidReport/issues
+Depends: 
+    R (>= 2.10)
 Imports: 
+    base64enc,
     coviData,
     covidModel,
-    dplyr,
-    DT,
-    fs,
-    ggplot2,
-    janitor,
-    lubridate,
+    ggsci,
+    gt,
     magrittr,
-    purrr,
+    reactable,
+    readr,
     readxl,
     rlang,
-    stringr,
     tidylog,
     timetk,
     vctrs
 Suggests: 
     covr,
+    dplyr,
+    fs,
+    ggplot2,
+    htmlwidgets,
+    janitor,
+    jsonlite,
+    lubridate,
+    purrr,
+    scales,
+    stringr,
+    tibble,
+    tidyr,
     testthat (>= 3.0.0)
-Config/testthat/edition: 3
 Remotes: 
     jesse-smith/coviData,
     jesse-smith/covidModel
+Config/testthat/edition: 3
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
-Depends: 
-    R (>= 2.10)

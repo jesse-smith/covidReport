@@ -8,8 +8,7 @@ insp_archive_table(
  
     table_path = coviData::path_create("V:/Compliance/Inspection Data for Publishing/Table/",
     paste0("insp_table_", Sys.Date()), ext = "html"),
- 
-    archive_dir = coviData::path_create("V:/Compliance/Inspection Data for Publishing/Table/Archive/"),
+  archive_dir = "V:/Compliance/Inspection Data for Publishing/Table/Archive/",
   table_pattern = "insp_table_.*html",
   force = FALSE
 )
