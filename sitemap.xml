@@ -43,10 +43,19 @@
     <loc>https://jesse-smith.github.io/covidReport//reference/magrittr-helpers.html</loc>
   </url>
   <url>
+    <loc>https://jesse-smith.github.io/covidReport//reference/pop_age_2019.html</loc>
+  </url>
+  <url>
     <loc>https://jesse-smith.github.io/covidReport//reference/reexports.html</loc>
   </url>
   <url>
     <loc>https://jesse-smith.github.io/covidReport//reference/save_plot.html</loc>
+  </url>
+  <url>
+    <loc>https://jesse-smith.github.io/covidReport//reference/shelby_poly.html</loc>
+  </url>
+  <url>
+    <loc>https://jesse-smith.github.io/covidReport//reference/utils-tidyeval-symbols.html</loc>
   </url>
   <url>
     <loc>https://jesse-smith.github.io/covidReport//reference/vac_count.html</loc>
