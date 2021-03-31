@@ -60,7 +60,7 @@ vac_plot_goal <- function(
 
   covidReport::shelby_poly %>%
     set_vaccination_count_max(n_max = n_max) %>%
-    ggplot2::ggplot(ggplot2::aes(x = x, y = y)) %>%
+    ggplot2::ggplot(ggplot2::aes(x = .data[["x"]], y = .data[["y"]])) %>%
     set_covid_theme() %>%
     set_axis_limits(xlim = c(0, 1), ylim = c(0, n_max)) %>%
     add_vaccination_scale() %>%
