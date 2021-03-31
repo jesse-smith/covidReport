@@ -12,9 +12,7 @@ A \code{tibble} with 8 rows and 2 variables:
 }
 }
 \source{
-\href{
-https://data.census.gov/cedsci/table?q=ACSDP5Y2019.DP05\%20Shelby\%20County,\%20Tennessee&g=0500000US47157&tid=ACSDP1Y2019.DP05&hidePreview=true
-}{US Census Bureau}
+US ACS Census Estimates 2019
 }
 \usage{
 pop_age_2019
