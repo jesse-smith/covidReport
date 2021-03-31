@@ -5,8 +5,7 @@
 \title{Trim Table Directory for Inspections Tables}
 \usage{
 insp_trim_tables(
- 
-    table_dir = coviData::path_create("V:/Compliance/Inspection Data for Publishing/Table/"),
+  table_dir = "V:/Compliance/Inspection Data for Publishing/Table/",
   table_pattern = "insp_table_.*html",
   min_tables = 1L
 )
