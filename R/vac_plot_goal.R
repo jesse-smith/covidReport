@@ -37,19 +37,21 @@ vac_plot_goal <- function(
   if (any_null) {
     vaccinations <- coviData::vac_load(date = date) %>%
       coviData::vac_prep(distinct = FALSE) %>%
-      vac_count(resident_only = resident_only)
+      vac_count(resident_only = resident_only, by = "dose", filter_2nd_dose = FALSE)
   }
 
   if (is.null(n_first)) {
     n_first <- vaccinations %>%
-      dplyr::filter(dose_count == 1L) %>%
-      dplyr::pull(n)
+      dplyr::filter(.data[["dose_count"]] == 1L) %>%
+      dplyr::pull("n") %>%
+      sum(na.rm = TRUE)
   }
 
   if (is.null(n_second)) {
     n_second <- vaccinations %>%
-      dplyr::filter(dose_count == 2L) %>%
-      dplyr::pull(n)
+      dplyr::filter(.data[["dose_count"]] == 2L) %>%
+      dplyr::pull("n") %>%
+      sum(na.rm = TRUE)
   }
 
   if (is.null(date_updated)) {
