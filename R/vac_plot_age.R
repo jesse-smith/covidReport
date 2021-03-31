@@ -263,7 +263,7 @@ add_vac_age_title_caption <- function(gg_obj, by_pop, date) {
 
 vac_count_age_grp <- function(.data) {
   .data %>%
-    dplyr::filter(.data[["resident"]] | is.na(.data[["resident"]])) %>%
+    vac_residents() %>%
     dplyr::filter(as.integer(.data[["dose_count"]]) == 1L) %>%
     dplyr::transmute(
       age_grp = .data[["age_at_admin"]] %>% std_age() %>% vac_age_grp()
