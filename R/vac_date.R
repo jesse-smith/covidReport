@@ -1,28 +1,14 @@
 #' Get Latest Date Contained in Vaccination File
 #'
-#' @param data Vaccination data
-#'
-#' @param date The date of the file to use; defaults to most recent
-#'
-#' @param resident_only Should non-residents be filtered from the data?
-#'
-#' @return A `Date`
+#' @param date The date of the file to use; defaults to most recent. If you
+#'   know this, you don't actually need this function; it's here for
+#'   compatiblity reasons only.
 #'
 #' @export
-vac_date <- function(
-  data = NULL,
-  date = NULL,
-  resident_only = TRUE
-) {
-  if (vec_is_empty(data)) {
-    data <- coviData::vac_prep(coviData::vac_load(date = date))
-  }
-  data %>%
-    purrr::when(
-      resident_only ~ dplyr::filter(., .data[["resident"]]),
-      ~ .
-    ) %>%
-    dplyr::pull("vacc_date") %>%
-    coviData::std_dates(orders = "mdY", force = "dt") %>%
-    max(na.rm = TRUE)
+vac_date <- function(date = NULL) {
+  coviData::path_vac(date = date) %>%
+    fs::path_file() %>%
+    fs::path_ext_remove() %>%
+    stringr::str_extract("[0-9]{1,4}.?[0-9]{1,2}.?[0-9]{1,4}") %>%
+    coviData::std_dates(orders = "ymd", force = "dt", train = FALSE)
 }

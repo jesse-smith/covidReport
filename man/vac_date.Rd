@@ -4,17 +4,12 @@
 \alias{vac_date}
 \title{Get Latest Date Contained in Vaccination File}
 \usage{
-vac_date(data = NULL, date = NULL, resident_only = TRUE)
+vac_date(date = NULL)
 }
 \arguments{
-\item{data}{Vaccination data}
-
-\item{date}{The date of the file to use; defaults to most recent}
-
-\item{resident_only}{Should non-residents be filtered from the data?}
-}
-\value{
-A \code{Date}
+\item{date}{The date of the file to use; defaults to most recent. If you
+know this, you don't actually need this function; it's here for
+compatiblity reasons only.}
 }
 \description{
 Get Latest Date Contained in Vaccination File
