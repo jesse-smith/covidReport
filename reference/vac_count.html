@@ -119,7 +119,9 @@
 
     <pre class="usage"><span class='fu'>vac_count</span><span class='op'>(</span>
   .data <span class='op'>=</span> <span class='fu'>coviData</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/coviData/man/vac_prep.html'>vac_prep</a></span><span class='op'>(</span><span class='fu'>coviData</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/coviData/man/vac_load.html'>vac_load</a></span><span class='op'>(</span>date <span class='op'>=</span> <span class='va'>date</span><span class='op'>)</span><span class='op'>)</span>,
+  by <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"person"</span>, <span class='st'>"dose"</span><span class='op'>)</span>,
   resident_only <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  filter_2nd_dose <span class='op'>=</span> <span class='cn'>TRUE</span>,
   date <span class='op'>=</span> <span class='cn'>NULL</span>
 <span class='op'>)</span></pre>
 
@@ -131,9 +133,18 @@
       <td><p>Vaccination data; default loads and parses the latest file</p></td>
     </tr>
     <tr>
+      <th>by</th>
+      <td><p>Should counts be by person, or by dose?</p></td>
+    </tr>
+    <tr>
       <th>resident_only</th>
       <td><p>Should counts include Shelby County residents only? If
 so, persons of unknown residency will still be included.</p></td>
+    </tr>
+    <tr>
+      <th>filter_2nd_dose</th>
+      <td><p>Should 2nd doses of single-dose vaccines be filtered
+out? For backwards compatibility only- will be removed in the future.</p></td>
     </tr>
     <tr>
       <th>date</th>

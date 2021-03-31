@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Plot Vaccination Totals Figure — vac_plot_goal • covidReport</title>
+<title>Create a Table of Vaccination Totals — vac_table_totals • covidReport</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,8 @@
 
 
 
-<meta property="og:title" content="Plot Vaccination Totals Figure — vac_plot_goal" />
-<meta property="og:description" content="Plot Vaccination Totals Figure" />
+<meta property="og:title" content="Create a Table of Vaccination Totals — vac_table_totals" />
+<meta property="og:description" content="Create a Table of Vaccination Totals" />
 
 
 
@@ -108,37 +108,18 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Plot Vaccination Totals Figure</h1>
-    <small class="dont-index">Source: <a href='https://github.com/jesse-smith/covidReport/blob/master/R/vac_plot_goal.R'><code>R/vac_plot_goal.R</code></a></small>
-    <div class="hidden name"><code>vac_plot_goal.Rd</code></div>
+    <h1>Create a Table of Vaccination Totals</h1>
+    <small class="dont-index">Source: <a href='https://github.com/jesse-smith/covidReport/blob/master/R/vac_table_totals.R'><code>R/vac_table_totals.R</code></a></small>
+    <div class="hidden name"><code>vac_table_totals.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Plot Vaccination Totals Figure</p>
+    <p>Create a Table of Vaccination Totals</p>
     </div>
 
-    <pre class="usage"><span class='fu'>vac_plot_goal</span><span class='op'>(</span>
+    <pre class="usage"><span class='fu'>vac_table_totals</span><span class='op'>(</span>
   data <span class='op'>=</span> <span class='fu'>coviData</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/coviData/man/vac_prep.html'>vac_prep</a></span><span class='op'>(</span><span class='fu'>coviData</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/coviData/man/vac_load.html'>vac_load</a></span><span class='op'>(</span>date <span class='op'>=</span> <span class='va'>date</span><span class='op'>)</span><span class='op'>)</span>,
-  date <span class='op'>=</span> <span class='cn'>NULL</span>,
-  n_vaccinated <span class='op'>=</span> <span class='cn'>NULL</span>,
-  n_first <span class='op'>=</span> <span class='cn'>NULL</span>,
-  n_second <span class='op'>=</span> <span class='cn'>NULL</span>,
-  n_goal <span class='op'>=</span> <span class='fl'>7e+05</span>,
-  n_max <span class='op'>=</span> <span class='fl'>937166</span>,
-  date_updated <span class='op'>=</span> <span class='cn'>NULL</span>,
-  resident_only <span class='op'>=</span> <span class='cn'>TRUE</span>
-<span class='op'>)</span>
-
-<span class='fu'>plot_vaccinations</span><span class='op'>(</span>
-  data <span class='op'>=</span> <span class='fu'>coviData</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/coviData/man/vac_prep.html'>vac_prep</a></span><span class='op'>(</span><span class='fu'>coviData</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/coviData/man/vac_load.html'>vac_load</a></span><span class='op'>(</span>date <span class='op'>=</span> <span class='va'>date</span><span class='op'>)</span><span class='op'>)</span>,
-  date <span class='op'>=</span> <span class='cn'>NULL</span>,
-  n_vaccinated <span class='op'>=</span> <span class='cn'>NULL</span>,
-  n_first <span class='op'>=</span> <span class='cn'>NULL</span>,
-  n_second <span class='op'>=</span> <span class='cn'>NULL</span>,
-  n_goal <span class='op'>=</span> <span class='fl'>7e+05</span>,
-  n_max <span class='op'>=</span> <span class='fl'>937166</span>,
-  date_updated <span class='op'>=</span> <span class='cn'>NULL</span>,
-  resident_only <span class='op'>=</span> <span class='cn'>TRUE</span>
+  date <span class='op'>=</span> <span class='cn'>NULL</span>
 <span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -146,46 +127,19 @@
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>data</th>
-      <td><p>Vaccination date from <code><a href='https://rdrr.io/pkg/coviData/man/vac_prep.html'>vac_prep()</a></code></p></td>
+      <td><p>TennIIS vaccination data, as output by
+<code><a href='https://rdrr.io/pkg/coviData/man/vac_prep.html'>vac_prep()</a></code></p></td>
     </tr>
     <tr>
       <th>date</th>
-      <td><p>Date of file to pull; defaults to most recent</p></td>
-    </tr>
-    <tr>
-      <th>n_vaccinated</th>
-      <td><p>Number of people vaccinated</p></td>
-    </tr>
-    <tr>
-      <th>n_first</th>
-      <td><p>Deprecated (use <code>n_vaccinated</code>). Number of first doses given</p></td>
-    </tr>
-    <tr>
-      <th>n_second</th>
-      <td><p>Deprecate (no longer used). Number of second doses given</p></td>
-    </tr>
-    <tr>
-      <th>n_goal</th>
-      <td><p>Goal for number of people vaccinated</p></td>
-    </tr>
-    <tr>
-      <th>n_max</th>
-      <td><p>Maximum number of people (population size)</p></td>
-    </tr>
-    <tr>
-      <th>date_updated</th>
-      <td><p>The date to use for the figure subtitle; defaults to last
-updated date in the file</p></td>
-    </tr>
-    <tr>
-      <th>resident_only</th>
-      <td><p>Should the figure only count Shelby County residents?</p></td>
+      <td><p>The download date of the data to use; defaults to most recent
+file</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A <code>ggplot</code> object</p>
+    <p>A <code>gt_tbl</code></p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
