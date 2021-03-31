@@ -27,6 +27,7 @@ Imports:
     reactable,
     readr,
     readxl,
+    rlang,
     tidylog,
     timetk,
     vctrs
@@ -40,7 +41,6 @@ Suggests:
     jsonlite,
     lubridate,
     purrr,
-    rlang,
     scales,
     stringr,
     tibble,
