@@ -55,7 +55,7 @@ vac_plot_goal <- function(
   }
 
   if (is.null(date_updated)) {
-    date_updated <- vac_date(date, resident_only = resident_only)
+    date_updated <- vac_date(date)
   }
 
   covidReport::shelby_poly %>%

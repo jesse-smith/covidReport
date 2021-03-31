@@ -14,7 +14,7 @@ vac_table_recent <- function(
   date = NULL
 ) {
 
-  today <- Sys.Date()
+  today <- vac_date(date)
 
   residents <- data %>%
     vac_residents() %>%

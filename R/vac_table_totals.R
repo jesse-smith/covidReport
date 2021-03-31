@@ -14,7 +14,7 @@ vac_table_totals <- function(
   date = NULL
 ) {
 
-  today <- vac_date(data = data)
+  today <- vac_date(date)
 
   title <- paste0(
     "People Vaccinated (", format(today, "%m/%d/%y"), ")"
