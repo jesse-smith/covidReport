@@ -8,6 +8,7 @@
 vac_plot_goal(
   data = coviData::vac_prep(coviData::vac_load(date = date)),
   date = NULL,
+  n_vaccinated = NULL,
   n_first = NULL,
   n_second = NULL,
   n_goal = 7e+05,
@@ -19,6 +20,7 @@ vac_plot_goal(
 plot_vaccinations(
   data = coviData::vac_prep(coviData::vac_load(date = date)),
   date = NULL,
+  n_vaccinated = NULL,
   n_first = NULL,
   n_second = NULL,
   n_goal = 7e+05,
@@ -32,9 +34,11 @@ plot_vaccinations(
 
 \item{date}{Date of file to pull; defaults to most recent}
 
-\item{n_first}{Number of first doses given}
+\item{n_vaccinated}{Number of people vaccinated}
 
-\item{n_second}{Number of second doses given}
+\item{n_first}{Deprecated (use \code{n_vaccinated}). Number of first doses given}
+
+\item{n_second}{Deprecate (no longer used). Number of second doses given}
 
 \item{n_goal}{Goal for number of people vaccinated}
 
