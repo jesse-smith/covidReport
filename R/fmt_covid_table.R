@@ -6,10 +6,7 @@ fmt_covid_table <- function(gt_tbl) {
         gt::cell_fill(color = "midnightblue"),
         gt::cell_borders()
       ),
-      locations = list(
-        gt::cells_column_labels(gt::everything()),
-        gt::cells_column_spanners(gt::everything())
-      )
+      locations = gt::cells_column_labels(gt::everything())
     ) %>%
     gt::tab_style(
       style = gt::cell_borders(),
