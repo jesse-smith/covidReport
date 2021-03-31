@@ -12,7 +12,7 @@ vac_table_doses <- function(
   date = NULL
 ) {
 
-  today <- vac_date(data = data)
+  today <- vac_date(date)
 
   vac_count(.data = data, by = "dose", filter_2nd_dose = FALSE) %>%
     dplyr::summarize(
