@@ -1,3 +1,12 @@
+#' Create Table of Vaccination Dose Totals
+#'
+#' @param data TennIIS data
+#'
+#' @param date Download date
+#'
+#' @return `gt_tbl`
+#'
+#' @export
 vac_table_doses <- function(
   data = coviData::vac_prep(coviData::vac_load(date = date)),
   date = NULL
@@ -5,40 +14,24 @@ vac_table_doses <- function(
 
   today <- vac_date(data = data)
 
-  title <- paste0(
-    "People Vaccinated (", format(today, "%m/%d/%y"), ")"
-  )
-  vac_count(.data = data) %>%
+  vac_count(.data = data, by = "dose", filter_2nd_dose = FALSE) %>%
     dplyr::summarize(
       total = sum(.data[["n"]], na.rm = TRUE),
-      partial = sum(
-        vctrs::vec_slice(.data[["n"]], i = !.data[["recip_fully_vacc"]]),
+      dose1 = sum(
+        vctrs::vec_slice(.data[["n"]], i = .data[["dose_count"]] == 1L),
         na.rm = TRUE
       ),
-      full1  = sum(
-        vctrs::vec_slice(
-          .data[["n"]],
-          i = .data[["recip_fully_vacc"]] & .data[["dose_count"]] == 1L
-        ),
-        na.rm = TRUE
-      ),
-      full2 = sum(
-        vctrs::vec_slice(
-          .data[["n"]],
-          i = .data[["recip_fully_vacc"]] & .data[["dose_count"]] == 2L
-        ),
+      dose2 = sum(
+        vctrs::vec_slice(.data[["n"]], i = .data[["dose_count"]] == 2L),
         na.rm = TRUE
       )
     ) %>%
     gt::gt() %>%
-    gt::tab_header(gt::html("<b>", title, "</b>")) %>%
     gt::cols_label(
-      total = gt::html("<b>Total</b>"),
-      partial = gt::html("<b>Partial<br</b>"),
-      full1 = gt::html("<b>1 dose</b>"),
-      full2 = gt::html("<b>2 dose</b>")
+      total = gt::html("<b>Vaccinations<br>(Total)</b>"),
+      dose1 = gt::html("<b>Vaccinations<br>(1st doses)</b>"),
+      dose2 = gt::html("<b>Vaccinations<br>(2nd doses)</b>")
     ) %>%
-    gt::tab_spanner(label = gt::html("<b>Full</b>"), columns = c("full1", "full2")) %>%
     gt::fmt_number(gt::everything(), decimals = 0L) %>%
     fmt_covid_table() %>%
     gt::tab_style(
