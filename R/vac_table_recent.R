@@ -1,9 +1,20 @@
+#' Create Table of Recent and Total Vaccine Doses
+#'
+#' @param data TennIIS vaccination data, as output from
+#'   \code{\link[coviData:vac_prep]{vac_prep()}}
+#'
+#' @param date The download date of the data to use; defaults to the most recent
+#'   file
+#'
+#' @return A `gt_tbl`
+#'
+#' @export
 vac_table_recent <- function(
   data = coviData::vac_prep(coviData::vac_load(date = date)),
   date = NULL
 ) {
 
-  today <- vac_date(data = data)
+  today <- Sys.Date()
 
   residents <- data %>%
     vac_residents() %>%
@@ -18,7 +29,7 @@ vac_table_recent <- function(
   remove(data)
 
   n_total <- NROW(residents)
-  n_last_day <- NROW(dplyr::filter(residents, .data[["vacc_date"]] == today))
+  # n_last_day <- NROW(dplyr::filter(residents, .data[["vacc_date"]] == today-1L))
   n_last_week <- NROW(
     dplyr::filter(residents, .data[["vacc_date"]] > today - 7L)
   )
@@ -30,7 +41,7 @@ vac_table_recent <- function(
     gt::tab_header(gt::html("<b>", title, "</b>")) %>%
     gt::cols_label(
       n_total = gt::html("<b>Total Vaccinations</b>"),
-      n_last_day = gt::html("<b>Vaccinations Reported<br>Within Last Day</b>"),
+      # n_last_day = gt::html("<b>Vaccinations Reported<br>Within Last Day</b>"),
       n_last_week = gt::html("<b>Vaccinations Reported<br>Within Last 7 Days</b>")
     ) %>%
     gt::fmt_number(columns = gt::everything(), decimals = 0L) %>%
