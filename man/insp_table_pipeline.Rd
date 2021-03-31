@@ -10,8 +10,7 @@ insp_table_pipeline(
  
     table_path = coviData::path_create("V:/Compliance/Inspection Data for Publishing/Table/",
     paste0("insp_table_", Sys.Date()), ext = "html"),
- 
-    archive_dir = coviData::path_create("V:/Compliance/Inspection Data for Publishing/Table/Archive/"),
+  archive_dir = "V:/Compliance/Inspection Data for Publishing/Table/Archive/",
   force = FALSE
 )
 }

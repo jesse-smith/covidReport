@@ -5,8 +5,7 @@
 \title{Trim Archive Directory for Inspections Tables}
 \usage{
 insp_trim_archive(
- 
-    archive_dir = coviData::path_create("V:/Compliance/Inspection Data for Publishing/Table/Archive/"),
+  archive_dir = "V:/Compliance/Inspection Data for Publishing/Table/Archive/",
   min_backups = 7L
 )
 }
