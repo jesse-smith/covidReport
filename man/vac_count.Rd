@@ -6,15 +6,22 @@
 \usage{
 vac_count(
   .data = coviData::vac_prep(coviData::vac_load(date = date)),
+  by = c("person", "dose"),
   resident_only = TRUE,
+  filter_2nd_dose = TRUE,
   date = NULL
 )
 }
 \arguments{
 \item{.data}{Vaccination data; default loads and parses the latest file}
 
+\item{by}{Should counts be by person, or by dose?}
+
 \item{resident_only}{Should counts include Shelby County residents only? If
 so, persons of unknown residency will still be included.}
+
+\item{filter_2nd_dose}{Should 2nd doses of single-dose vaccines be filtered
+out? For backwards compatibility only- will be removed in the future.}
 
 \item{date}{The date of the vaccination data to load; defaults to latest
 data}

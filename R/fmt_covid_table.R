@@ -2,8 +2,9 @@ fmt_covid_table <- function(gt_tbl) {
   gt_tbl %>%
     gt::tab_style(
       style = list(
-        gt::cell_text(color = "white"),
-        gt::cell_fill(color = "midnightblue")
+        gt::cell_text(color = "white", v_align = "top"),
+        gt::cell_fill(color = "midnightblue"),
+        gt::cell_borders()
       ),
       locations = gt::cells_column_labels(gt::everything())
     ) %>%
@@ -14,5 +15,6 @@ fmt_covid_table <- function(gt_tbl) {
         gt::cells_body()
       )
     ) %>%
-    gt::opt_table_lines("none")
+    gt::opt_table_lines("none") %>%
+    gt::tab_options()
 }

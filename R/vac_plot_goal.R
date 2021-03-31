@@ -4,9 +4,11 @@
 #'
 #' @param date Date of file to pull; defaults to most recent
 #'
-#' @param n_first Number of first doses given
+#' @param n_vaccinated Number of people vaccinated
 #'
-#' @param n_second Number of second doses given
+#' @param n_first Deprecated (use `n_vaccinated`). Number of first doses given
+#'
+#' @param n_second Deprecate (no longer used). Number of second doses given
 #'
 #' @param n_goal Goal for number of people vaccinated
 #'
@@ -23,6 +25,7 @@
 vac_plot_goal <- function(
   data = coviData::vac_prep(coviData::vac_load(date = date)),
   date = NULL,
+  n_vaccinated = NULL,
   n_first = NULL,
   n_second = NULL,
   n_goal = 700000,
@@ -31,29 +34,28 @@ vac_plot_goal <- function(
   resident_only = TRUE
 ) {
 
-  any_null <- any(is.null(n_first), is.null(n_second))
-
-  # Get vaccination counts
-  if (any_null) {
-    vaccinations <- coviData::vac_load(date = date) %>%
-      coviData::vac_prep(distinct = FALSE) %>%
-      vac_count(resident_only = resident_only)
+  # Handled deprecated arguments
+  if (!is.null(n_first) || !is.null(n_second)) {
+    rlang::warn(paste(
+      "`n_first` and `n_second` arguments are deprecated and will be removed",
+      "in the future. Please use `n_vaccinated` instead of `n_first`;",
+      "this switch is currently performed for you.",
+      "`n_second` is not used in current figure."
+    ))
   }
 
-  if (is.null(n_first)) {
-    n_first <- vaccinations %>%
-      dplyr::filter(dose_count == 1L) %>%
-      dplyr::pull(n)
-  }
-
-  if (is.null(n_second)) {
-    n_second <- vaccinations %>%
-      dplyr::filter(dose_count == 2L) %>%
-      dplyr::pull(n)
+  # Get counts
+  if (is.null(n_vaccinated) && !is.null(n_first)) {
+    n_vaccinated <- n_first
+  } else if (is.null(n_vaccinated)) {
+    n_vaccinated <- data %>%
+      vac_count() %>%
+      dplyr::pull("n") %>%
+      sum(na.rm = TRUE)
   }
 
   if (is.null(date_updated)) {
-    date_updated <- vac_date(date, resident_only = resident_only)
+    date_updated <- vac_date(date)
   }
 
   covidReport::shelby_poly %>%
@@ -63,13 +65,12 @@ vac_plot_goal <- function(
     set_axis_limits(xlim = c(0, 1), ylim = c(0, n_max)) %>%
     add_vaccination_scale() %>%
     add_vaccination_polygon() %>%
-    add_vaccination_count_fill(n_first = n_first, n_second = n_second) %>%
+    add_vaccination_count_fill(n_vaccinated = n_vaccinated) %>%
     add_vaccination_goal_marker(n_goal = n_goal, n_max = n_max) %>%
-    add_axis_labels(ylab = "Vaccinations (1st Doses)") %>%
+    add_axis_labels(ylab = "People") %>%
     add_vaccination_labels(
       n_goal = n_goal,
-      n_first = n_first,
-      n_second = n_second
+      n_vaccinated = n_vaccinated
     ) %>%
     add_vaccination_title_caption(
       date_updated = date_updated,
@@ -98,10 +99,10 @@ add_vaccination_polygon <- function(gg_obj) {
   gg_obj + ggplot2::geom_polygon(fill = "grey83")
 }
 
-add_vaccination_count_fill <- function(gg_obj, n_first, n_second) {
+add_vaccination_count_fill <- function(gg_obj, n_vaccinated) {
 
   # Create fill polygon
-  y_partial <- rlang::expr(pmin(.data[["y"]], n_first))
+  y_partial <- rlang::expr(pmin(.data[["y"]], n_vaccinated))
 
   # Create and assign fill colors
   pal_indigo <- ggsci::pal_material("indigo", n = 10L, reverse = TRUE)
@@ -143,7 +144,11 @@ add_vaccination_goal_marker <- function(gg_obj, n_goal, n_max) {
     )
 }
 
-add_vaccination_labels <- function(gg_obj, n_goal, n_first, n_second) {
+add_vaccination_labels <- function(
+  gg_obj,
+  n_goal,
+  n_vaccinated
+) {
 
   # Create and assign colors
   pal_indigo <- ggsci::pal_material("indigo", n = 10L, reverse = TRUE)
@@ -151,34 +156,27 @@ add_vaccination_labels <- function(gg_obj, n_goal, n_first, n_second) {
   color <- pal_indigo(8L)[[8L]]
 
   x_pct <- mean(c(
-    get_vaccination_label_x_coord(gg_obj, n_first, side = "left"),
-    get_vaccination_label_x_coord(gg_obj, n_first, side = "right")
+    get_vaccination_label_x_coord(gg_obj, n_vaccinated, side = "left"),
+    get_vaccination_label_x_coord(gg_obj, n_vaccinated, side = "right")
   ))
 
   # Get goal percentage
-  pct_goal <- round(100*n_first / n_goal, digits = 1L)
+  pct_goal <- round(100 * n_vaccinated / n_goal, digits = 1L)
 
   # Create label text
 
-  label_count <- paste0(
-    "1st Doses: ",
-    format(n_first, big.mark = ",", scientific = FALSE), "\n",
-    "2nd Doses: ",
-    format(n_second, big.mark = ",", scientific = FALSE), "\n",
+  label <- paste0(
+    "People Vaccinated: ",
+    format(n_vaccinated, big.mark = ",", scientific = FALSE), "\n",
     "(", pct_goal, "% of goal)"
   )
-
-  label_pct <- paste0("(", pct_goal, "% of goal)")
-
-  # Create total label
-  # label_pct <- paste0(pct_goal, "% of goal")
 
   gg_obj +
     ggplot2::annotate(
       "label",
       x = x_pct,
-      y = n_first,
-      label = label_count,
+      y = n_vaccinated,
+      label = label,
       color = color,
       fill = "#f0f0f0",
       label.size = 1,
@@ -186,18 +184,6 @@ add_vaccination_labels <- function(gg_obj, n_goal, n_first, n_second) {
       fontface = "bold",
       size = 5
     )
-    # ggplot2::annotate(
-    #   "label",
-    #   x = x_pct,
-    #   y = n_first,
-    #   label = label_pct,
-    #   color = "goldenrod3",
-    #   fill = "#f0f0f0",
-    #   label.size = 0,
-    #   vjust = 0,
-    #   fontface = "bold",
-    #   size = 5
-    # )
 }
 
 add_vaccination_title_caption <- function(gg_obj, date_updated, n_goal, n_max) {
@@ -260,6 +246,7 @@ get_vaccination_label_x_coord <- function(
 plot_vaccinations <- function(
   data = coviData::vac_prep(coviData::vac_load(date = date)),
   date = NULL,
+  n_vaccinated = NULL,
   n_first = NULL,
   n_second = NULL,
   n_goal = 700000,
@@ -270,6 +257,7 @@ plot_vaccinations <- function(
   vac_plot_goal(
     data = data,
     date = date,
+    n_vaccinated = n_vaccinated,
     n_first = n_first,
     n_second = n_second,
     n_goal = n_goal,
