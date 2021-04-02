@@ -16,7 +16,11 @@ vac_table_recent <- function(
 
   today <- vac_date(date)
 
-  n_total <- data %>% vac_count(by = "dose") %>% sum(na.rm = TRUE)
+  n_total <- data %>%
+    vac_count(by = "dose") %>%
+    dplyr::pull("n") %>%
+    sum(na.rm = TRUE)
+
   n_last_week <- data %>%
     dplyr::mutate(
       vacc_date = coviData::std_dates(
@@ -28,6 +32,7 @@ vac_table_recent <- function(
     ) %>%
     dplyr::filter(.data[["vacc_date"]] > today - 7L) %>%
     vac_count(by = "dose") %>%
+    dplyr::pull("n") %>%
     sum(na.rm = TRUE)
 
   title <- paste0("COVID-19 Vaccinations (", format(today, "%m/%d/%y"), ")")
