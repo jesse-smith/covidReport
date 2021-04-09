@@ -151,7 +151,7 @@ insp_prep_data <- function(.data) {
         stringr::str_squish() %>%
         as.integer(),
       dt_closed = coviData::coalesce_across(
-        dplyr::contains("closed") & dplyr::contains("date")
+        dplyr::contains("clos") & dplyr::contains("date")
       ) %>%
         coviData::std_dates() %>%
         format("%m/%d/%Y") %>%
