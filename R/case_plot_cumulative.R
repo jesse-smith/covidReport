@@ -1,3 +1,13 @@
+#' Plot Cumulative Case Time Series
+#'
+#' @param data Case data (by person) from NBS, as output by
+#'   \code{\link[coviData:process_positive_people]{process_positive_people()}}
+#'
+#' @param date The download date of `data`; the default is the most recent
+#'
+#' @return A `ggplot` object
+#'
+#' @export
 case_plot_cumulative <- function(
   data = coviData::process_positive_people(date = date),
   date = NULL
@@ -36,6 +46,23 @@ case_plot_cumulative <- function(
     add_cumulative_title_caption(date = date)
 }
 
+#' Prepare Case Data for Cumulative Plotting
+#'
+#' `prep_cumulative_data` merges case data with report dates and calculates
+#' the \code{\link[base:cumsum]{cumsum()}} for each report date (implicitly
+#' missing dates are made explicit, and all missing daily counts are set to `0`
+#' before taking the cumulative sum). For data that start after `min_date`,
+#' cumulative counts are interpolated from `1` to the count at the minimum
+#' report date.
+#'
+#' @inheritParams case_plot_cumulative
+#'
+#' @param min_date The minimum date to be plotted
+#'
+#' @return A `tibble` with columns `report_date` (as `Date`) and `n`
+#'   (cumulative counts, incl. interpolated values)
+#'
+#' @noRd
 prep_cumulative_data <- function(data, min_date, date) {
 
   # Coerce dates
@@ -88,6 +115,17 @@ prep_cumulative_data <- function(data, min_date, date) {
     dplyr::arrange(.data[["report_date"]])
 }
 
+#' Set Theme for Cumulative Case Plot
+#'
+#' Sets ggplot2 theme using
+#' \code{\link[coviData:set_covid_theme]{set_covid_theme()}} and rotates
+#' x-axis labels by 45 degrees.
+#'
+#' @param gg_obj A `ggplot` object
+#'
+#' @return The `ggplot` object with adjusted theme
+#'
+#' @noRd
 set_cumulative_theme <- function(gg_obj) {
   set_covid_theme(gg_obj) +
     ggplot2::theme(
@@ -95,6 +133,17 @@ set_cumulative_theme <- function(gg_obj) {
     )
 }
 
+#' Add x- and y-axis Scales to Cumulative Case Plot
+#'
+#' Adds x-axis scale with monthly breaks using
+#' \code{\link[coviData:add_scale_month]{add_scale_month()}} and y-axis scale
+#' with 10k breaks.
+#'
+#' @param gg_obj A `ggplot` object
+#'
+#' @return The `ggplot` object with scales set
+#'
+#' @noRd
 add_cumulative_scale <- function(gg_obj) {
 
   breaks <- seq(0L, 1e6L, by = 1e4L)
@@ -108,6 +157,15 @@ add_cumulative_scale <- function(gg_obj) {
     )
 }
 
+#' Add Cumulative Case Curve to Plot
+#'
+#' Adds a \code{\link[ggplot2:geom_col]{geom_col()}} curve to the plot
+#'
+#' @param gg_obj A `ggplot` object
+#'
+#' @param The `ggplot` object with the added geom
+#'
+#' @noRd
 add_cumulative_curve <- function(gg_obj) {
   gg_obj +
     ggplot2::geom_col(
@@ -117,6 +175,19 @@ add_cumulative_curve <- function(gg_obj) {
     )
 }
 
+#' Add Label to Cumulative Case Plot
+#'
+#' Adds a label in the upper-left with 'Total' and 'New' cases
+#'
+#' @param gg_obj A `ggplot` object
+#'
+#' @param total Total cases in data
+#'
+#' @param new New cases for report date
+#'
+#' @return The `ggplot` object with the added label
+#'
+#' @noRd
 add_cumulative_label <- function(gg_obj, total, new) {
 
   x <- gg_var(gg_obj, "x")
@@ -145,10 +216,31 @@ add_cumulative_label <- function(gg_obj, total, new) {
     )
 }
 
+#' Add Axis Labels to Cumulative Case Plot
+#'
+#' Adds `"Report Date"` x-axis label and `"Cumulative Cases"` y-axis label
+#'
+#' @param gg_obj A `ggplot` object
+#'
+#' @return The `ggplot` object with added axis labels
+#'
+#' @noRd
 add_cumulative_axis_labels <- function(gg_obj) {
   add_axis_labels(gg_obj, xlab = "Report Date", ylab = "Cumulative Cases")
 }
 
+#' Add Title and Subtitle to Cumulative Case Plot
+#'
+#' Adds title `"Cumulative COVID-19 Cases by Report Date"` and a subtitle
+#' displaying the report date
+#'
+#' @param gg_obj A `ggplot` object
+#'
+#' @param date The report date to add as subtitle
+#'
+#' @return The `ggplot` object with added title and subtitle
+#'
+#' @noRd
 add_cumulative_title_caption <- function(gg_obj, date) {
   add_title_caption(
     gg_obj,
