@@ -22,15 +22,35 @@ case_plot_cumulative <- function(
   n_prev <- NROW(coviData::process_positive_people(date = date - 1L))
   n_new <- n_total - n_prev
 
-  gg_data <- data %>%
-    dplyr::left_join(
-      dplyr::as_tibble(coviData::load_report_date()),
-      by = "inv_local_id"
+  # Prep data for plotting - output is `report_date` and cumulative `n`
+
+  prep_cumulative_data(data, min_date = min_date, date = date) %>%
+    ggplot2::ggplot(
+      ggplot2::aes(x = .data[["report_date"]], y = .data[["n"]])
     ) %>%
+    set_cumulative_theme() %>%
+    add_cumulative_scale() %>%
+    add_cumulative_curve() %>%
+    add_cumulative_label(total = n_total, new = n_new) %>%
+    add_cumulative_axis_labels() %>%
+    add_cumulative_title_caption(date = date)
+}
+
+prep_cumulative_data <- function(data, min_date, date) {
+
+  # Coerce dates
+  min_date <- lubridate::as_date(min_date)
+  date <- lubridate::as_date(date)
+
+  # Load report dates
+  inv_report_dates <- dplyr::as_tibble(coviData::load_report_date())
+
+  gg_data <- data %>%
+    dplyr::left_join(inv_report_dates, by = "inv_local_id") %>%
     dplyr::mutate(report_date = lubridate::as_date(.data[["report_date"]])) %>%
     dplyr::filter(
       {{ min_date }} <= .data[["report_date"]],
-      .data[["report_date"]] <= lubridate::today()
+      .data[["report_date"]] <= {{ date }}
     ) %>%
     dplyr::count(.data[["report_date"]]) %>%
     tidyr::complete(
@@ -43,35 +63,29 @@ case_plot_cumulative <- function(
     ) %>%
     dplyr::mutate(n = cumsum(.data[["n"]]))
 
+  # Need to ensure data starts at `min_date`
   min_report_date <- min(gg_data[["report_date"]], na.rm = TRUE)
 
-  if (min_report_date > min_date) {
-    min_n <- min(gg_data[["n"]], na.rm = TRUE)
-    fill_data <- spline(
-      x = c(min_date, min_report_date),
-      y = c(1L, min_n),
-      xout = seq(min_date, min_report_date, by = 1L)
-    ) %>%
-      dplyr::as_tibble() %>%
-      dplyr::transmute(
-        report_date = lubridate::as_date(.data[["x"]]),
-        n = as.integer(round(.data[["y"]]))
-      ) %>%
-      dplyr::slice_head(n = NROW(.) - 1L)
-    gg_data <- dplyr::bind_rows(fill_data, gg_data) %>%
-      dplyr::arrange(.data[["report_date"]])
-  }
+  # Data is already limited to dates after `min_date`
+  # Return if no further transformation is needed
+  if (min_report_date <= min_date) return(gg_data)
 
-  gg_data %>%
-    ggplot2::ggplot(
-      ggplot2::aes(x = .data[["report_date"]], y = .data[["n"]])
+  # Otherwise, interpolate from `min_date` to `min_report_date`
+  min_n <- min(gg_data[["n"]], na.rm = TRUE)
+  x_in  <- c(min_date, min_report_date)
+  y_in  <- c(1L, min_n)
+  x_out <- seq(x_in[[1L]], x_in[[2L]] - 1L, by = 1L)
+
+  spline(x = x_in, y = y_in, xout = x_out) %>%
+    dplyr::as_tibble() %>%
+    dplyr::transmute(
+      report_date = lubridate::as_date(.data[["x"]]),
+      n = as.integer(round(.data[["y"]]))
     ) %>%
-    set_cumulative_theme() %>%
-    add_cumulative_scale() %>%
-    add_cumulative_curve() %>%
-    add_cumulative_label(total = n_total, new = n_new) %>%
-    add_cumulative_axis_labels() %>%
-    add_cumulative_title_caption(date = date)
+    dplyr::bind_rows(gg_data) %>%
+    dplyr::arrange(dplyr::desc(dplyr::row_number())) %>%
+    dplyr::distinct(.data[["report_date"]], .keep_all = TRUE) %>%
+    dplyr::arrange(.data[["report_date"]])
 }
 
 set_cumulative_theme <- function(gg_obj) {
