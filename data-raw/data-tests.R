@@ -10,4 +10,11 @@ test_report_data <- dplyr::mutate(
   inv_local_id = as.character(digest::digest2int(inv_local_id))
 )
 
-usethis::use_data(test_cumulative_data, test_report_data, internal = TRUE)
+saveRDS(
+  test_cumulative_data,
+  file = testthat::test_path("../data/test_cumulative_data.rds")
+)
+saveRDS(
+  test_report_data,
+  file = testthat::test_path("../data/test_report_data.rds")
+)
