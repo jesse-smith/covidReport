@@ -32,9 +32,16 @@ case_plot_cumulative <- function(
   n_prev <- NROW(coviData::process_positive_people(date = date - 1L))
   n_new <- n_total - n_prev
 
-  # Prep data for plotting - output is `report_date` and cumulative `n`
+  # Loading report dates in `case_plot_cumulative()` rather than
+  # `prep_cumulative_data()` due to limitations in testing
+  rpt_data <- dplyr::as_tibble(coviData::load_report_date())
 
-  prep_cumulative_data(data, min_date = min_date, date = date) %>%
+  data %>%
+    prep_cumulative_data(
+      min_date = min_date,
+      date = date,
+      rpt_data = rpt_data
+    ) %>%
     ggplot2::ggplot(
       ggplot2::aes(x = .data[["report_date"]], y = .data[["n"]])
     ) %>%
@@ -59,26 +66,32 @@ case_plot_cumulative <- function(
 #'
 #' @param min_date The minimum date to be plotted
 #'
+#' @param rpt_data `tibble` of `inv_local_id` and `report_date`
+#'
 #' @return A `tibble` with columns `report_date` (as `Date`) and `n`
 #'   (cumulative counts, incl. interpolated values)
 #'
 #' @noRd
-prep_cumulative_data <- function(data, min_date, date) {
+prep_cumulative_data <- function(
+  data,
+  min_date,
+  date,
+  rpt_data = dplyr::as_tibble(coviData::load_report_date())
+) {
 
   # Coerce dates
   min_date <- lubridate::as_date(min_date)
   date <- lubridate::as_date(date)
 
-  # Load report dates
-  inv_report_dates <- dplyr::as_tibble(coviData::load_report_date())
-
   gg_data <- data %>%
-    dplyr::left_join(inv_report_dates, by = "inv_local_id") %>%
+    dplyr::left_join(rpt_data, by = "inv_local_id") %>%
     dplyr::mutate(report_date = lubridate::as_date(.data[["report_date"]])) %>%
     dplyr::filter(
       {{ min_date }} <= .data[["report_date"]],
       .data[["report_date"]] <= {{ date }}
     ) %>%
+    dplyr::arrange(.data[["report_date"]], .data[["inv_local_id"]]) %>%
+    dplyr::distinct(.data[["inv_local_id"]], .keep_all = TRUE) %>%
     dplyr::count(.data[["report_date"]]) %>%
     tidyr::complete(
       "report_date" = seq(
