@@ -1,3 +1,17 @@
+#' Plot Daily New Cases by Specimen Collection Date
+#'
+#' @param data Case data, as output by
+#'   \code{\link[coviData:process_positive_people]{process_positive_people()}}
+#'
+#' @param date The report date of the data; defaults to the most recent date
+#'
+#' @param delay Number of days to ignore 7 day average (due to incomplete data);
+#'   default is calculated using
+#'   \code{\link[covidModel:estimate_delay]{estimate_delay()}}
+#'
+#' @return A `ggplot` object
+#'
+#' @export
 case_plot_daily <- function(
   data = coviData::process_positive_people(date = date),
   date = NULL,
@@ -60,6 +74,20 @@ case_plot_daily <- function(
     add_daily_title_caption(date = date, missing = n_missing)
 }
 
+#' Prepare Data for Plotting Daily New Cases
+#'
+#' @param data Case data, as output by
+#'   \code{\link[coviData:process_positive_people]{process_positive_people()}}
+#'
+#' @param min_date Minimum plotting date
+#'
+#' @param date Report date
+#'
+#' @param delay Number of days to ignore moving average (due to incomplete data)
+#'
+#' @return A `tibble` with columns `report_date`, `n`, and `avg`
+#'
+#' @noRd
 prep_daily_data <- function(data, min_date, date, delay) {
   data %>%
     dplyr::transmute(
@@ -118,7 +146,7 @@ set_ts_theme <- function(gg_obj) {
     )
 }
 
-#' Add x- and y-axis Scales to Cumulative Case Plot
+#' Add x- and y-axis Scales to Daily Case Plot
 #'
 #' Adds x-axis scale with monthly breaks using
 #' \code{\link[coviData:add_scale_month]{add_scale_month()}} and y-axis scale
