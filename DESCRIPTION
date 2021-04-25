@@ -40,6 +40,7 @@ Suggests:
     janitor,
     jsonlite,
     lubridate,
+    mockery,
     purrr,
     scales,
     stringr,
