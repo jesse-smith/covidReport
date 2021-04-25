@@ -40,12 +40,14 @@ Suggests:
     janitor,
     jsonlite,
     lubridate,
+    mockery,
     purrr,
     scales,
     stringr,
+    testthat (>= 3.0.0),
     tibble,
     tidyr,
-    testthat (>= 3.0.0)
+    vdiffr
 Remotes: 
     jesse-smith/coviData,
     jesse-smith/covidModel
