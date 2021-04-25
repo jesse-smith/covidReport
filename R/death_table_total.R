@@ -11,6 +11,7 @@ death_table_total <- function(
     ) %>%
     janitor::tabyl(.data[["died"]]) %>%
     janitor::adorn_totals() %>%
+    dplyr::arrange(c(2L, 1L, 3L)) %>%
     gt::gt() %>%
     fmt_covid_table() %>%
     gt::cols_label(died = "COVID-19 Deaths", n = "N", percent = "%") %>%
