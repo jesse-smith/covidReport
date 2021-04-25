@@ -1,3 +1,13 @@
+#' Tabulated Death and Survival Outcomes from COVID-19
+#'
+#' @param data Case data, as output by
+#'   \code{\link[coviData:process_positive_people]{process_positive_people()}}
+#'
+#' @param date The download data of the data; defaults to most recent
+#'
+#' @return A `gt_tbl`
+#'
+#' @export
 death_table_total <- function(
   data = coviData::process_positive_people(date = date),
   date = NULL
