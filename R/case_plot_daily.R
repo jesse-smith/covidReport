@@ -39,7 +39,7 @@ case_plot_daily <- function(
       dplyr::mutate(
         collection_date = lubridate::as_date(.data[["collection_date"]])
       ) %>%
-      covidModel::estimate_delay() %>%
+      covidModel::estimate_delay(today = date) %>%
       dplyr::pull("collection_date")
 
     delay <- date - complete_date
@@ -62,13 +62,7 @@ case_plot_daily <- function(
     set_ts_theme() %>%
     add_daily_scale() %>%
     add_daily_curve() %>%
-    add_covid_events(
-      lab_y = 1200L,
-      color = "grey60",
-      size = 3,
-      fill = "#f0f0f0",
-      angle = -90
-    ) %>%
+    add_covid_events(lab_y = 1200L, color = "grey60", size = 3) %>%
     add_daily_label(total = n_total, new = n_new) %>%
     add_daily_axis_labels() %>%
     add_daily_title_caption(date = date, missing = n_missing)
