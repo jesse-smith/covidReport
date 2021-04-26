@@ -1,4 +1,4 @@
-test_that("`case_plot_daily()` returns expected graphic", {
+test_that("`case_plot_daily()` matches doppelganger", {
   mockery::stub(
     case_plot_daily,
     "coviData::process_positive_people",
@@ -23,7 +23,9 @@ test_that("`case_plot_daily()` returns expected graphic", {
       specimen_coll_dt = lubridate::as_date(.data[["collection_date"]])
     )
 
-  plt <- case_plot_daily(data, date = "2021-04-19")
+  plt <- suppressMessages(case_plot_daily(data, date = "2021-04-19"))
 
-  vdiffr::expect_doppelganger(title = "daily cases", fig = plt)
+  suppressWarnings(
+    vdiffr::expect_doppelganger(title = "daily cases", fig = plt)
+  )
 })

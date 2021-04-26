@@ -1,4 +1,4 @@
-test_that("`case_table_confirmed_probable()` returns expected table", {
+test_that("`case_table_confirmed_probable()` matches snapshot", {
 
   data <- tibble::tibble(
     inv_case_status = c(rep("C", 8e4L), rep("P", 2e4L)),

@@ -16,5 +16,7 @@ test_that("`case_plot_cumulative()` returns expected graphic", {
     date = "2021-04-19"
   )
 
-  vdiffr::expect_doppelganger(title = "cumulative cases", fig = plt)
+  suppressWarnings(
+    vdiffr::expect_doppelganger(title = "cumulative cases", fig = plt)
+  )
 })
