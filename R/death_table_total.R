@@ -13,11 +13,10 @@ death_table_total <- function(
   date = NULL
 ) {
   data %>%
+    dplyr::mutate(.id_tmp_ = dplyr::row_number()) %>%
     dplyr::transmute(
-      died = .data[["inv_death_dt"]] %>%
-        is.na() %>%
-        dplyr::if_else(FALSE, .data[["die_from_illness_ind"]] %in% "Y") %>%
-        dplyr::if_else("Yes", "No")
+      .died_tmp_ = .data[[".id_tmp_"]] %in% filter_deaths(.)[[".id_tmp_"]],
+      died = dplyr::if_else(.data[[".died_tmp_"]], "Yes", "No")
     ) %>%
     janitor::tabyl(.data[["died"]]) %>%
     janitor::adorn_totals() %>%

@@ -65,12 +65,7 @@ case_table_summary <- function(date = NULL, row = c(1L, 2L)) {
     n_pos_ppl_prev <- NROW(coviData::process_positive_people(date = rpt_dt-1L))
     n_new <- n_pos_ppl - n_pos_ppl_prev
 
-    n_deaths <- pos_ppl %>%
-      dplyr::filter(
-        .data[["die_from_illness_ind"]] == "Y",
-        !is.na(.data[["inv_death_dt"]])
-      ) %>%
-      NROW()
+    n_deaths <- NROW(filter_deaths(pos_ppl))
 
     n_inactive <- n_pos_ppl - n_active - n_deaths
 
