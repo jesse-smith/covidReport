@@ -11,8 +11,9 @@ test_that("`death_table_total()` output expected table", {
   ) %>%
     dplyr::slice_sample(prop = 1)
 
-  tbl <- death_table_total(data, date = "2021-03-27") %>%
-    gt::as_latex()
+  tbl <- suppressWarnings(
+    gt::as_raw_html(death_table_total(data, date = "2021-03-27"))
+  )
 
   expect_snapshot(tbl)
 })
