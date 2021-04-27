@@ -1,3 +1,13 @@
+#' Tabulate Active, Deceased, and Inactive/Recovered COVID-19 Cases
+#'
+#' @param data Case data, as output by
+#'   \code{\link[coviData:process_positive_people]{process_positive_people()}}
+#'
+#' @param date Download date of the data; defaults to most recent
+#'
+#' @return A `gt_tbl`
+#'
+#' @export
 case_table_active <- function(
   data = coviData::process_positive_people(date = date),
   date = NULL
