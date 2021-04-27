@@ -3,6 +3,7 @@
 export("%>%")
 export(case_plot_cumulative)
 export(case_plot_daily)
+export(case_table_active)
 export(case_table_confirmed_probable)
 export(case_table_summary)
 export(death_table_age)
