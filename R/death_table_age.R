@@ -16,16 +16,17 @@ death_table_age <- function(
     filter_deaths() %>%
     dplyr::transmute(age = as.integer(.data[["age_in_years"]])) %>%
     dplyr::summarize(
-      median = median(.data[["age"]], na.rm = TRUE),
+      median = stats::median(.data[["age"]], na.rm = TRUE),
       range = paste0(range(.data[["age"]], na.rm = TRUE), collapse = "-")
     )
 
   age %>%
     gt::gt() %>%
     fmt_covid_table() %>%
-    gt::cols_label(median = "Median", range = "Range") %>%
+    gt::cols_label(median = "Median Age", range = "Age Range") %>%
     gt::tab_style(
       style = gt::cell_text(weight = "bold"),
       locations = gt::cells_column_labels(gt::everything())
-    )
+    ) %>%
+    gt::cols_align("center")
 }
