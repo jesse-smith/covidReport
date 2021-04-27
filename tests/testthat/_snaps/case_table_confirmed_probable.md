@@ -1,4 +1,4 @@
-# `case_table_confirmed_probable()` returns expected table
+# `case_table_confirmed_probable()` matches snapshot
 
     Code
       tbl

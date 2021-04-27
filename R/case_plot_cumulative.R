@@ -116,7 +116,7 @@ prep_cumulative_data <- function(
   y_in  <- c(1L, min_n)
   x_out <- seq(x_in[[1L]], x_in[[2L]] - 1L, by = 1L)
 
-  spline(x = x_in, y = y_in, xout = x_out) %>%
+  stats::spline(x = x_in, y = y_in, xout = x_out) %>%
     dplyr::as_tibble() %>%
     dplyr::transmute(
       report_date = lubridate::as_date(.data[["x"]]),

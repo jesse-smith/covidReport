@@ -1,4 +1,4 @@
-# `death_table_total()` output expected table
+# `death_table_total()` matches snapshot
 
     Code
       tbl

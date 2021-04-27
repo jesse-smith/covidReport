@@ -1,7 +1,5 @@
-test_that("`case_table_confirmed_probable()` matches snapshot", {
-
+test_that("`filter_deaths()` removes invalid rows", {
   data <- tibble::tibble(
-    inv_case_status = c(rep("C", 8e4L), rep("P", 2e4L)),
     die_from_illness_ind = rep(
       c("Y", rep("N", 3L), rep("U", 3L), rep(NA, 3L)),
       1e4L
@@ -13,9 +11,9 @@ test_that("`case_table_confirmed_probable()` matches snapshot", {
   ) %>%
     dplyr::slice_sample(prop = 1)
 
-  tbl <- suppressWarnings(
-    gt::as_raw_html(case_table_confirmed_probable(data, date = "2021-03-27"))
-  )
+  deaths <- filter_deaths(data)
 
-  expect_snapshot(tbl)
+  expect_true(all(deaths$die_from_illness_ind == "Y"))
+  expect_true(all(!is.na(deaths$inv_death_dt)))
+  expect_snapshot(deaths)
 })

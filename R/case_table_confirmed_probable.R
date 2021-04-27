@@ -22,7 +22,7 @@ case_table_confirmed_probable <- function(
     )
 
   deaths <- data %>%
-    dplyr::filter(die_from_illness_ind == "Y", !is.na(inv_death_dt)) %>%
+    filter_deaths() %>%
     dplyr::count(.data[["inv_case_status"]]) %>%
     tidyr::pivot_wider(names_from = "inv_case_status", values_from = "n") %>%
     dplyr::mutate(

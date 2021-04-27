@@ -1,4 +1,4 @@
-test_that("`death_table_total()` output expected table", {
+test_that("`death_table_total()` matches snapshot", {
   data <- tibble::tibble(
     die_from_illness_ind = rep(
       c("Y", rep("N", 3L), rep("U", 3L), rep(NA, 3L)),
