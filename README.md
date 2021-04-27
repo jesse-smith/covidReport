@@ -4,6 +4,7 @@
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/jesse-smith/covidReport/workflows/R-CMD-check/badge.svg)](https://github.com/jesse-smith/covidReport/actions)
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
+[![Codecov test coverage](https://codecov.io/gh/jesse-smith/covidReport/branch/master/graph/badge.svg)](https://codecov.io/gh/jesse-smith/covidReport?branch=master)
 [![test-coverage](https://github.com/jesse-smith/covidReport/workflows/test-coverage/badge.svg)](https://github.com/jesse-smith/covidReport/actions)
 <!-- badges: end -->
 
