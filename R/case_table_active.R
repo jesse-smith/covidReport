@@ -41,6 +41,34 @@ case_table_active <- function(
       )
     ) %>%
     janitor::tabyl(.data[["status"]]) %>%
+    purrr::when(
+      "Active" %in% dplyr::pull(., "status") ~ .,
+      ~ dplyr::add_row(
+        .,
+        status = "Active",
+        n = 0L,
+        percent = 0
+      )
+    ) %>%
+    purrr::when(
+      "Deceased" %in% dplyr::pull(., "status") ~ .,
+      ~ dplyr::add_row(
+        .,
+        status = "Deceased",
+        n = 0L,
+        percent = 0
+      )
+    ) %>%
+    purrr::when(
+      "Inactive/Recovered" %in% dplyr::pull(., "status") ~ .,
+      ~ dplyr::add_row(
+        .,
+        status = "Inactive/Recovered",
+        n = 0L,
+        percent = 0
+      )
+    ) %>%
+    dplyr::arrange(.data[["status"]]) %>%
     dplyr::mutate(
       percent = .data[["percent"]] %>%
         round(digits = 3) %>%
