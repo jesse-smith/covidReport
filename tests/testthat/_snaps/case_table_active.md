@@ -1,4 +1,4 @@
-# `death_table_age()` html matches snapshot
+# `case_table_active()` html matches snapshot
 
     Code
       tbl_html
