@@ -250,7 +250,7 @@ add_vac_age_title_caption <- function(gg_obj, by_pop, date) {
   subtitle <- format(as.Date(date), "%B %d, %Y")
 
   caption <- paste0(
-    "Totals, percentages, and ages are calculated using first doses only\n",
+    "Totals, percentages, and ages are calculated using latest dose\n",
     "Data Source: Tennessee Immunization Information System (TennIIS)"
   )
   add_title_caption(
@@ -264,7 +264,7 @@ add_vac_age_title_caption <- function(gg_obj, by_pop, date) {
 vac_count_age_grp <- function(.data) {
   .data %>%
     vac_residents() %>%
-    dplyr::filter(as.integer(.data[["dose_count"]]) == 1L) %>%
+    vac_distinct() %>%
     dplyr::transmute(
       age_grp = .data[["age_at_admin"]] %>% std_age() %>% vac_age_grp()
     ) %>%
