@@ -273,14 +273,14 @@ vac_count_age_grp <- function(.data) {
 
 std_age <- function(x) {
   x_dbl <- as.double(x)
-  dplyr::if_else(dplyr::between(x_dbl, 0, 120), x_dbl, NA_real_)
+  dplyr::if_else(0 <= x_dbl & x_dbl < 115, x_dbl, NA_real_)
 }
 
 vac_age_grp <- function(dbl) {
 
   vctrs::vec_assert(dbl, ptype = double())
 
-  breaks <- c(0, seq(15, 75, by = 10), 120)
+  breaks <- c(0, seq(15, 75, by = 10), 115)
   lbls <- c("0-14", "15-24", "25-34", "35-44", "45-54", "55-64", "65-74", "75+")
 
   cut(
