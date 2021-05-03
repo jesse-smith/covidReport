@@ -250,7 +250,8 @@ add_vac_age_title_caption <- function(gg_obj, by_pop, date) {
   subtitle <- format(as.Date(date), "%B %d, %Y")
 
   caption <- paste0(
-    "Totals, percentages, and ages are calculated using latest dose\n",
+    "Totals, percentages, and ages are calculated using latest dose ",
+    "for an individual\n",
     "Data Source: Tennessee Immunization Information System (TennIIS)"
   )
   add_title_caption(
