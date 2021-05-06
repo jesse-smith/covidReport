@@ -13,6 +13,7 @@ pcr_table_total <- function(
 ) {
   n_positive <- NROW(coviData::process_positive_tests(data, date = date))
   n_negative <- NROW(coviData::process_negative_tests(data, date = date))
+  n_total    <- n_positive + n_negative
 
   tibble::tibble(
     result = c("Positive", "Negative", "Total"),
