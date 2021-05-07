@@ -1,7 +1,7 @@
 test_plot_positivity <- function(
   data = coviData::read_file_delim(coviData::path_pcr(date)),
   date = NULL,
-  delay = NULL
+  delay = 5L
 ) {
 
   # Get report date
@@ -12,7 +12,7 @@ test_plot_positivity <- function(
     lubridate::mdy()
 
   # Prep data
-  gg_data <- prep_test_positivity(data, date = date, delay = 7L)
+  gg_data <- prep_test_positivity(data, date = date, delay = delay)
 
   gg_data %>%
     ggplot_test_positivity() %>%
@@ -100,7 +100,10 @@ prep_test_positivity <- function(data, date, delay) {
       avg = purrr::map2_dbl(
         1:(dplyr::n()-6),
         7:dplyr::n(),
-        ~ mean(.data[["pct_pos"]][.x:.y], na.rm = TRUE)
+        ~ magrittr::divide_by(
+          sum(.data[["positive"]][.x:.y], na.rm = TRUE),
+          sum(.data[["total"]][.x:.y], na.rm = TRUE)
+        )
       ) %>% purrr::prepend(rep(NA_real_, 6L))
     ) %>%
     dplyr::filter(
@@ -156,7 +159,7 @@ add_test_pos_title_caption <- function(gg_obj, n_obs, n_missing, date) {
 
   coviData::add_title_caption(
     gg_obj,
-    title = "COVID-19 Test Positivity Rate (7-Day Average)",
+    title = "COVID-19 Test Positivity Rate (7-Day Rolling)",
     subtitle = format(lubridate::as_date(date), "%m/%d/%y"),
     caption = paste0(
       "Note: Chart excludes tests with missing collection date ",
