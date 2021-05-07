@@ -1,3 +1,12 @@
+#' Plot 7-Day Rolling Test Positivity Rate
+#'
+#' @param data PCR test data, read from an NBS snapshot file
+#'
+#' @param date The download date of the data to read; defaults to most recent
+#'
+#' @return A `gt_tbl`
+#'
+#' @export
 test_plot_positivity <- function(
   data = coviData::read_file_delim(coviData::path_pcr(date)),
   date = NULL,
@@ -12,9 +21,7 @@ test_plot_positivity <- function(
     lubridate::mdy()
 
   # Prep data
-  gg_data <- prep_test_positivity(data, date = date, delay = delay)
-
-  gg_data %>%
+  prep_test_pos(data, date = date, delay = delay) %>%
     ggplot_test_positivity() %>%
     coviData::set_covid_theme() %>%
     add_test_pos_curve() %>%
@@ -30,6 +37,17 @@ test_plot_positivity <- function(
     )
 }
 
+#' Convert an NBS Test Dataset to A Count Time Series
+#'
+#' @inheritParams test_plot_positivity
+#'
+#' @param result Should positive or negative test counts be returned?
+#'
+#' @return A `tibble` with columns `test_date` (`Date`) and `n` (`int`), as well
+#'   as attributes `n_obs` (total positive/negative observations) and
+#'   `n_missing` (missing `test_date`s)
+#'
+#' @noRd
 prep_test_ts <- function(data, date, result = c("positive", "negative")) {
 
   result <- rlang::arg_match(result)[[1L]]
@@ -86,7 +104,17 @@ prep_test_ts <- function(data, date, result = c("positive", "negative")) {
     tibble::validate_tibble()
 }
 
-prep_test_positivity <- function(data, date, delay) {
+#' Prepare NBS Test Data for Plotting
+#'
+#' @inheritParams test_plot_positivity
+#'
+#' @return A `tibble` with columns `test_date` (`Date`), `positive` (`int`),
+#'   `negative` (`int`), `total` (`int`), `pct_pos` (`dbl`), and `avg` (`dbl`),
+#'   as well as attributes `n_obs` (total tests) and `n_missing`
+#'   (missing `test_date`s)
+#'
+#' @noRd
+prep_test_pos <- function(data, date, delay) {
   positive <- prep_test_ts(data, date = date, result = "positive")
   negative <- prep_test_ts(data, date = date, result = "negative")
 
@@ -119,6 +147,13 @@ prep_test_positivity <- function(data, date, delay) {
     tibble::validate_tibble()
 }
 
+#' Initialize `ggplot()` for Test Positivity
+#'
+#' @param data Data prepared for plotting by `prep_test_pos()`
+#'
+#' @return A `ggplot` object
+#'
+#' @noRd
 ggplot_test_positivity <- function(data) {
   ggplot2::ggplot(
     data,
@@ -126,10 +161,24 @@ ggplot_test_positivity <- function(data) {
   )
 }
 
+#' Add Columns for Test Positivity
+#'
+#' @param gg_obj A ggplot object w/ data from `prep_test_pos()`
+#'
+#' @return The `gg_obj` with a `geom_col()` added
+#'
+#' @noRd
 add_test_pos_curve <- function(gg_obj) {
   gg_obj + ggplot2::geom_col(fill = "midnightblue", width = 1)
 }
 
+#' Add Label for Latest Test Positivity Observation
+#'
+#' @param gg_obj A ggplot object w/ data from `prep_test_pos()`
+#'
+#' @return The `gg_obj` with a label added at the last observed date
+#'
+#' @noRd
 add_test_pos_label <- function(gg_obj) {
 
   last_obs <- dplyr::slice_tail(gg_obj[["data"]], n = 1L)
@@ -146,12 +195,33 @@ add_test_pos_label <- function(gg_obj) {
   )
 }
 
+#' Add Y Scale for Test Positivity
+#'
+#' @param gg_obj A ggplot object w/ data from `prep_test_pos()`
+#'
+#' @return The `gg_obj` with a percent scale on the y axis
+#'
+#' @noRd
 add_test_pos_scale <- function(gg_obj) {
 
   pct_fn <- rlang::as_function(~ scales::percent(.x, accuracy = 1))
   gg_obj + ggplot2::scale_y_continuous(labels = pct_fn)
 }
 
+#' Add Title, Subtitle, and Caption for Test Positivity
+#'
+#' @param gg_obj A ggplot object plotting test positivity
+#'
+#' @param n_obs The total number of tests performed
+#'
+#' @param n_missing The number of tests missing specimen collection date
+#'
+#' @param date The download date of the data used to create the plot
+#'
+#' @return The `gg_obj` with title, a subtitle containing the date, and a
+#'   caption containing total and missing observations added
+#'
+#' @noRd
 add_test_pos_title_caption <- function(gg_obj, n_obs, n_missing, date) {
 
   obs <- format(n_obs, big.mark = ",")
