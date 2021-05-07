@@ -1,0 +1,167 @@
+test_plot_positivity <- function(
+  data = coviData::read_file_delim(coviData::path_pcr(date)),
+  date = NULL,
+  delay = NULL
+) {
+
+  # Get report date
+  date <- coviData::path_pcr(date) %>%
+    fs::path_file() %>%
+    fs::path_ext_remove() %>%
+    stringr::str_extract("[0-9]{1,4}.?[0-9]{1,2}.?[0-9]{1,4}") %>%
+    lubridate::mdy()
+
+  # Prep data
+  gg_data <- prep_test_positivity(data, date = date, delay = 7L)
+
+  gg_data %>%
+    ggplot_test_positivity() %>%
+    coviData::set_covid_theme() %>%
+    add_test_pos_curve() %>%
+    add_axis_labels(ylab = "% Positive") %>%
+    add_scale_month() %>%
+    add_covid_events(lab_y = 0.25, color = "grey60") %>%
+    add_test_pos_label() %>%
+    add_test_pos_scale() %>%
+    add_test_pos_title_caption(
+      n_obs   = attr(gg_data, "n_obs"),
+      n_missing = attr(gg_data, "n_missing"),
+      date    = date
+    )
+}
+
+prep_test_ts <- function(data, date, result = c("positive", "negative")) {
+
+  result <- rlang::arg_match(result)[[1L]]
+
+  if (result == "positive") {
+    min_dt <- lubridate::as_date("2020-03-05")
+  } else {
+    min_dt <- lubridate::as_date("2020-03-06")
+  }
+
+  data_processed <- purrr::when(
+    data,
+    result == "positive" ~ coviData::process_positive_tests(., date = date),
+    result == "negative" ~ coviData::process_negative_tests(., date = date),
+    ~ rlang::abort("`result` must be positive or negative")
+  )
+  remove(data)
+
+  data_dt <- data_processed %>%
+    dplyr::transmute(
+      test_date = coviData::std_dates(
+        .data[["specimen_coll_dt"]],
+        orders = c("ymdT", "ymd"),
+        train = FALSE,
+        force = "dt"
+      )
+    ) %>%
+    dplyr::filter(
+      {{ min_dt }} <= .data[["test_date"]],
+      .data[["test_date"]] <= lubridate::as_date({{ date }})
+    )
+
+  n_obs     <- vec_size(data_processed)
+  n_missing <- n_obs - vec_size(data_dt)
+  remove(data_processed)
+
+  data_dt %>%
+    dplyr::count(.data[["test_date"]]) %>%
+    tidyr::complete(
+      "test_date" = seq(
+        lubridate::as_date("2020-03-05"),
+        lubridate::as_date(date),
+        by = 1L
+      ),
+      fill = list(n = 0L)
+    ) %>%
+    dplyr::rename({{ result }} := "n") %>%
+    tibble::new_tibble(
+      n_obs = n_obs,
+      n_missing = n_missing,
+      nrow  = vec_size(.),
+      class = "n_tbl"
+    ) %>%
+    tibble::validate_tibble()
+}
+
+prep_test_positivity <- function(data, date, delay) {
+  positive <- prep_test_ts(data, date = date, result = "positive")
+  negative <- prep_test_ts(data, date = date, result = "negative")
+
+  n_obs   <- attr(positive, "n_obs")     + attr(negative, "n_obs")
+  n_missing <- attr(positive, "n_missing") + attr(negative, "n_missing")
+
+  dplyr::left_join(positive, negative, by = "test_date") %>%
+    dplyr::mutate(
+      total   = .data[["positive"]] + .data[["negative"]],
+      pct_pos = .data[["positive"]] / .data[["total"]],
+      avg = purrr::map2_dbl(
+        1:(dplyr::n()-6),
+        7:dplyr::n(),
+        ~ mean(.data[["pct_pos"]][.x:.y], na.rm = TRUE)
+      ) %>% purrr::prepend(rep(NA_real_, 6L))
+    ) %>%
+    dplyr::filter(
+      lubridate::as_date("2020-03-14") <= .data[["test_date"]],
+      .data[["test_date"]] <= {{ date }} - {{ delay }}
+    ) %>%
+    tibble::new_tibble(
+      nrow = vec_size(.),
+      n_obs = n_obs,
+      n_missing = n_missing,
+      class = "n_tbl"
+    ) %>%
+    tibble::validate_tibble()
+}
+
+ggplot_test_positivity <- function(data) {
+  ggplot2::ggplot(
+    data,
+    ggplot2::aes(x = .data[["test_date"]], y = .data[["avg"]])
+  )
+}
+
+add_test_pos_curve <- function(gg_obj) {
+  gg_obj + ggplot2::geom_col(fill = "midnightblue", width = 1)
+}
+
+add_test_pos_label <- function(gg_obj) {
+
+  last_obs <- dplyr::slice_tail(gg_obj[["data"]], n = 1L)
+
+  gg_obj + ggplot2::annotate(
+    "text",
+    x = last_obs[["test_date"]],
+    y = last_obs[["avg"]] + 0.001,
+    label = scales::percent(last_obs[["avg"]], accuracy = 0.1),
+    fontface = "bold",
+    color = "grey30",
+    hjust = 0,
+    vjust = 0
+  )
+}
+
+add_test_pos_scale <- function(gg_obj) {
+
+  pct_fn <- rlang::as_function(~ scales::percent(.x, accuracy = 1))
+  gg_obj + ggplot2::scale_y_continuous(labels = pct_fn)
+}
+
+add_test_pos_title_caption <- function(gg_obj, n_obs, n_missing, date) {
+
+  obs <- format(n_obs, big.mark = ",")
+  missing <- format(n_missing, big.mark = ",")
+
+  coviData::add_title_caption(
+    gg_obj,
+    title = "COVID-19 Test Positivity Rate (7-Day Average)",
+    subtitle = format(lubridate::as_date(date), "%m/%d/%y"),
+    caption = paste0(
+      "Note: Chart excludes tests with missing collection date ",
+      "(N = ", missing, "; Total = ", obs, ")\n",
+      "Data Source: National Electronic Disease Surveillance System (NEDSS)"
+    )
+  )
+}
