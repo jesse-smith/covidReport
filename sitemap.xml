@@ -67,9 +67,6 @@
     <loc>https://jesse-smith.github.io/covidReport//reference/magrittr-helpers.html</loc>
   </url>
   <url>
-    <loc>https://jesse-smith.github.io/covidReport//reference/pcr_table_total.html</loc>
-  </url>
-  <url>
     <loc>https://jesse-smith.github.io/covidReport//reference/pop_age_2019.html</loc>
   </url>
   <url>
@@ -83,6 +80,12 @@
   </url>
   <url>
     <loc>https://jesse-smith.github.io/covidReport//reference/shelby_poly.html</loc>
+  </url>
+  <url>
+    <loc>https://jesse-smith.github.io/covidReport//reference/test_plot_positivity.html</loc>
+  </url>
+  <url>
+    <loc>https://jesse-smith.github.io/covidReport//reference/test_table_total.html</loc>
   </url>
   <url>
     <loc>https://jesse-smith.github.io/covidReport//reference/utils-tidyeval-symbols.html</loc>
