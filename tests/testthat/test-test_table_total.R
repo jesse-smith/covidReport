@@ -1,23 +1,23 @@
-test_that("`pcr_table_total()` info matches reference", {
+test_that("`test_table_total()` info matches reference", {
   # Make fake data to pass to function
   data <- tibble::tibble(.rows = 1e6L)
 
   # Stub `process_tests_*` functions
 
   mockery::stub(
-    pcr_table_total,
+    test_table_total,
     "coviData::process_positive_tests",
     tibble::tibble(.rows = 1e5L)
   )
 
   mockery::stub(
-    pcr_table_total,
+    test_table_total,
     "coviData::process_negative_tests",
     tibble::tibble(.rows = 9e5L)
   )
 
-  tbl_pcr <- suppressWarnings(
-    pcr_table_total(data) %>%
+  tbl_test <- suppressWarnings(
+    test_table_total(data) %>%
       gt::as_raw_html() %>%
       xml2::read_html() %>%
       rvest::html_node("table") %>%
@@ -32,29 +32,29 @@ test_that("`pcr_table_total()` info matches reference", {
            "Total", "1,000,000", "100&percnt;"
   )
 
-  expect_equal(tbl_pcr, tbl_ref)
+  expect_equal(tbl_test, tbl_ref)
 })
 
-test_that("`pcr_table_total()` html matches snapshot", {
+test_that("`test_table_total()` html matches snapshot", {
   # Make fake data to pass to function
   data <- tibble::tibble(.rows = 1e6L)
 
   # Stub `process_tests_*` functions
 
   mockery::stub(
-    pcr_table_total,
+    test_table_total,
     "coviData::process_positive_tests",
     tibble::tibble(.rows = 1e5L)
   )
 
   mockery::stub(
-    pcr_table_total,
+    test_table_total,
     "coviData::process_negative_tests",
     tibble::tibble(.rows = 9e5L)
   )
 
   tbl_html <- suppressWarnings(
-    pcr_table_total(data) %>%
+    test_table_total(data) %>%
       gt::as_raw_html() %>%
       xml2::read_html()
   )

@@ -7,7 +7,7 @@
 #' @return A `gt_tbl`
 #'
 #' @export
-pcr_table_total <- function(
+test_table_total <- function(
   data = coviData::read_file_delim(coviData::path_pcr(date)),
   date = NULL
 ) {

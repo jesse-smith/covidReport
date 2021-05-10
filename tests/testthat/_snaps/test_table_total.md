@@ -1,4 +1,4 @@
-# `pcr_table_total()` html matches snapshot
+# `test_table_total()` html matches snapshot
 
     Code
       tbl_html
