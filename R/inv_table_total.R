@@ -27,6 +27,8 @@ inv_table_total <- function(
       stringr::str_extract("[0-9]{1,4}.?[0-9]{1,2}.?[0-9]{1,4}")
   }
 
+  date <- lubridate::as_date(date)
+
   contacts <- redcap_contacts(date)
 
   contacts_total <- sum(contacts[["n"]], na.rm = TRUE) + prior_contacts
