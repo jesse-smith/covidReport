@@ -20,6 +20,8 @@ test_plot_positivity <- function(
     stringr::str_extract("[0-9]{1,4}.?[0-9]{1,2}.?[0-9]{1,4}") %>%
     lubridate::mdy()
 
+  gg_data <- prep_test_pos(data, date = date, delay = delay)
+
   # Prep data
   prep_test_pos(data, date = date, delay = delay) %>%
     ggplot_test_positivity() %>%
