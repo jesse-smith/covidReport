@@ -90,8 +90,8 @@ test_that("`inv_table_total()` html matches snapshot", {
 })
 
 test_that("`redcap_contacts()` returns expected output", {
+  skip_on_ci()
   data <- redcap_contacts(date = as.Date("2021-04-19"))
-
   ref_dates <- seq(as.Date("2021-02-02"), as.Date("2021-04-19"), by = 1L)
   expect_s3_class(data, "tbl_df")
   expect_equal(data[["date"]], ref_dates)
