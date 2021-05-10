@@ -14,6 +14,9 @@ test_plot_positivity(
 \item{data}{PCR test data, read from an NBS snapshot file}
 
 \item{date}{The download date of the data to read; defaults to most recent}
+
+\item{delay}{\code{integer}. The reporting delay of the data; test dates within
+\code{delay} days of \code{date} will be omitted}
 }
 \value{
 A \code{gt_tbl}

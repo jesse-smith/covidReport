@@ -4,6 +4,9 @@
 #'
 #' @param date The download date of the data to read; defaults to most recent
 #'
+#' @param delay `integer`. The reporting delay of the data; test dates within
+#'   `delay` days of `date` will be omitted
+#'
 #' @return A `gt_tbl`
 #'
 #' @export
