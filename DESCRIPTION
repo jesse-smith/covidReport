@@ -23,6 +23,7 @@ Imports:
     covidModel,
     ggsci,
     gt,
+    httr,
     magrittr,
     reactable,
     readr,
