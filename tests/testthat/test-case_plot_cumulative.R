@@ -17,6 +17,10 @@ test_that("`case_plot_cumulative()` returns expected graphic", {
   )
 
   suppressWarnings(
-    vdiffr::expect_doppelganger(title = "cumulative cases", fig = plt)
+    vdiffr::expect_doppelganger(
+      title = "cumulative cases",
+      fig = plt,
+      path = "case-plot-cumulative"
+    )
   )
 })
