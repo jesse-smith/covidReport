@@ -15,6 +15,7 @@ jobs:
     runs-on: macOS-latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      REDCAP_NIT_TOKEN: ${{ secrets.REDCAP_NIT_TOKEN }}
     steps:
       - uses: actions/checkout@v2
 
