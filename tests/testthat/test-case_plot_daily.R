@@ -26,6 +26,10 @@ test_that("`case_plot_daily()` matches doppelganger", {
   plt <- suppressMessages(case_plot_daily(data, date = "2021-04-19"))
 
   suppressWarnings(
-    vdiffr::expect_doppelganger(title = "daily cases", fig = plt)
+    vdiffr::expect_doppelganger(
+      title = "daily cases",
+      fig = plt,
+      path = "case-plot-daily"
+    )
   )
 })
