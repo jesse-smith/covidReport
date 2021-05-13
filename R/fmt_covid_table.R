@@ -1,4 +1,10 @@
-fmt_covid_table <- function(flextable, total = FALSE) {
+fmt_covid_table <- function(
+  flextable,
+  total = FALSE,
+  align_label = c("left", "center", "right")
+) {
+
+  align_label <- rlang::arg_match(align_label)[[1L]]
 
   inner_border <- officer::fp_border("grey60")
   outer_border <- officer::fp_border("grey30", width = 2)
@@ -22,12 +28,16 @@ fmt_covid_table <- function(flextable, total = FALSE) {
     # Borders
     flextable::border_remove() %>%
     flextable::border_inner_h(inner_border) %>%
-    flextable::hline_bottom(border = outer_border)
-
-  if (!total) return(covid_flextable)
-
-  covid_flextable %>%
-    flextable::bold(i = flextable::nrow_part(.)) %>%
-    flextable::hline_top(i = flextable::nrow_part(.), border = outer_border) %>%
-    flextable::hline_bottom(i = flextable::nrow_part(.), border = outer_border)
+    flextable::hline_bottom(border = outer_border) %>%
+    # Alignment label column
+    flextable::align(j = 1L, align = align_label, part = "all") %>%
+    # Format total row
+    purrr::when(
+      total ~ flextable::bold(., i = flextable::nrow_part(.)) %>%
+        flextable::hline(
+          i = c(flextable::nrow_part(.), flextable::nrow_part(.)-1L),
+          border = outer_border
+        ),
+      ~ .
+    )
 }
