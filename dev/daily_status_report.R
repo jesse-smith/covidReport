@@ -44,45 +44,62 @@ pptx <- officer::read_pptx("dev/covid_report_template.pptx")
 
 # Create title slide
 title <- "COVID-19 Daily Status Report"
-pptx <- officer::add_slide(pptx, "Title Slide", master)
-pptx <- officer::ph_with(
-  pptx,
-  value = title,
-  location = officer::ph_location_type("ctrTitle")
-)
-pptx <- officer::ph_with(
-  pptx,
-  value = format(Sys.Date(), "%B %d, %Y"),
-  location = officer::ph_location_type("subTitle")
-)
+date  <- format(Sys.Date(), "%B %d, %Y")
+pptx <- pptx %>%
+  officer::add_slide("Title Slide", master) %>%
+  officer::ph_with(
+    value = title,
+    location = officer::ph_location_type("ctrTitle")
+  ) %>%
+  officer::ph_with(
+    value = date,
+    location = officer::ph_location_type("subTitle")
+  )
 
 # Create cumulative slide
-pptx <- officer::add_slide(pptx, "Picture only", master)
-pptx <- officer::ph_with(
-  pptx,
-  value = case_plt_cumulative,
-  location = officer::ph_location_type("pic")
-)
+pptx <- pptx %>%
+  officer::add_slide("Picture only", master) %>%
+  officer::ph_with(
+    value = case_plt_cumulative,
+    location = officer::ph_location_type("pic")
+  )
 
 # Create daily slide
-pptx <- officer::add_slide(pptx, "Picture only", master)
-pptx <- officer::ph_with(
-  pptx,
-  value = case_plt_daily,
-  location = officer::ph_location_type("pic")
-)
+pptx <- pptx %>%
+  officer::add_slide("Picture only", master) %>%
+  officer::ph_with(
+    value = case_plt_daily,
+    location = officer::ph_location_type("pic")
+  )
 
 # Create confirmed/probable slide
-pptx <- officer::add_slide(pptx, "Title and Content", master)
-pptx <- officer::ph_with(
-  pptx,
-  value = "Confirmed and Probable Cases/Deaths",
-  location = officer::ph_location_type("title")
-)
-pptx <- officer::ph_with(
-  pptx,
-  value = case_tbl_confirmed_probable,
-  location = officer::ph_location_type("body")
-)
+cp_title <- "COVID-19 Cases and Deaths by Status"
+pptx <- pptx %>%
+  officer::add_slide("Title and Content", master) %>%
+  officer::ph_with(
+    value = cp_title,
+    location = officer::ph_location_type("title")
+  ) %>%
+  officer::ph_with(
+    value = case_tbl_confirmed_probable,
+    location = officer::ph_location_type("body")
+  )
+
+# Create deaths slide
+deaths_title <- "COVID-19 Deaths"
+pptx <- pptx %>%
+  officer::add_slide("Title and Content", master) %>%
+  officer::ph_with(
+    value = deaths_title,
+    location = officer::ph_location_type("title")
+  ) %>%
+  officer::ph_with(
+    value = death_tbl_total,
+    location = officer::ph_location_type("body")
+  ) %>%
+  officer::ph_with(
+    value = death_tbl_age,
+    location = officer::ph_location_type("body")
+  )
 
 print(pptx, target = "dev/officer_report.pptx")
