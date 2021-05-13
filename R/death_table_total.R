@@ -5,7 +5,7 @@
 #'
 #' @param date The download data of the data; defaults to most recent
 #'
-#' @return A `gt_tbl`
+#' @return A `flextable`
 #'
 #' @export
 death_table_total <- function(

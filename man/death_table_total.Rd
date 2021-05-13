@@ -16,7 +16,7 @@ death_table_total(
 \item{date}{The download data of the data; defaults to most recent}
 }
 \value{
-A \code{gt_tbl}
+A \code{flextable}
 }
 \description{
 Tabulated Death and Survival Outcomes from COVID-19

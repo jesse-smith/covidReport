@@ -45,7 +45,10 @@ test_that("`void(death_table_total())` matches snapshot", {
     dplyr::slice_sample(prop = 1)
 
 
-  tbl_void <- flextable::void(death_table_total(data, date = "2021-03-27"))
+  tbl_void <- flextable::void(
+    death_table_total(data, date = "2021-03-27"),
+    part = "all"
+  )
 
   expect_snapshot(tbl_void)
 })
