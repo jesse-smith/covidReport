@@ -14,24 +14,24 @@ test_that("`case_table_confirmed_probable()` info matches reference", {
     dplyr::slice_sample(prop = 1)
 
   tbl_ref <- tibble::tribble(
-    ~ `COVID-19`,   ~ Total, ~ Confirmed, ~ Probable,
+             ~ x,   ~ total, ~ confirmed, ~ probable,
          "Cases", "100,000",    "80,000",   "20,000",
         "Deaths",   "9,999",     "7,999",    "2,000"
   )
 
-  tbl_confirmed_probable <- suppressWarnings(
-    case_table_confirmed_probable(data, date = "2021-03-27") %>%
-      gt::as_raw_html() %>%
+  tbl_cp <- case_table_confirmed_probable(data, date = "2021-03-27") %>%
+      flextable::flextable_to_rmd() %>%
       xml2::read_html() %>%
       rvest::html_node("table") %>%
       rvest::html_table() %>%
-      dplyr::as_tibble()
-  )
+      dplyr::as_tibble() %>%
+      set_colnames(janitor::make_clean_names(.[1L,])) %>%
+      dplyr::filter(dplyr::row_number() > 1L)
 
-  expect_equal(tbl_confirmed_probable, tbl_ref)
+  expect_equal(tbl_cp, tbl_ref)
 })
 
-test_that("`case_table_confirmed_probable()` html matches snapshot", {
+test_that("`void(case_table_confirmed_probable())` matches snapshot", {
 
   data <- tibble::tibble(
     inv_case_status = c(rep("C", 8e4L), rep("P", 2e4L)),
@@ -52,11 +52,10 @@ test_that("`case_table_confirmed_probable()` html matches snapshot", {
     "Deaths",   "9,999",     "7,999",    "2,000"
   )
 
-  tbl_html <- suppressWarnings(
-    case_table_confirmed_probable(data, date = "2021-03-27") %>%
-      gt::as_raw_html() %>%
-      xml2::read_html()
+  tbl_style <- flextable::void(
+    case_table_confirmed_probable(data, date = "2021-03-27"),
+    part = "all"
   )
 
-  expect_snapshot(tbl_html)
+  expect_snapshot(tbl_style)
 })
