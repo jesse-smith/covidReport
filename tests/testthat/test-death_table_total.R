@@ -13,9 +13,9 @@ test_that("`death_table_total()` info matches reference", {
 
   tbl_ref <- tibble::tribble(
     ~ `covid_19_deaths`,       ~ n,       ~ percent,
-                  "Yes",   "9,999",  "10.0&percnt;",
-                   "No",  "90,001",  "90.0&percnt;",
-                "Total", "100,000", "100.0&percnt;"
+                  "Yes",   "9,999",  "10.0%",
+                   "No",  "90,001",  "90.0%",
+                "Total", "100,000", "100.0%"
   )
 
 
