@@ -30,7 +30,7 @@ test_that("`inv_table_total()` info matches reference", {
   src <- "Data Source: Shelby County Health Department"
 
   tbl_ref <- tibble::tribble(
-                         ~ `Number of...`,       ~ N,
+                              ~ number_of,       ~ n,
                   "Opened Investigations", "100,000",
                   "Closed Investigations",  "90,000",
             "Contacts Identified to Date",  "48,672",
@@ -38,19 +38,19 @@ test_that("`inv_table_total()` info matches reference", {
                                       src,       src
   )
 
-  tbl_inv <- suppressWarnings(
-    inv_table_total(data, date = "2021-04-19") %>%
-      gt::as_raw_html() %>%
+  tbl_inv <- inv_table_total(data, date = "2021-04-19") %>%
+      flextable::flextable_to_rmd() %>%
       xml2::read_html() %>%
       rvest::html_node("table") %>%
       rvest::html_table() %>%
-      dplyr::as_tibble()
-  )
+      dplyr::as_tibble() %>%
+      set_colnames(janitor::make_clean_names(.[1L,])) %>%
+      dplyr::filter(dplyr::row_number() > 1L)
 
   expect_equal(tbl_inv, tbl_ref)
 })
 
-test_that("`inv_table_total()` html matches snapshot", {
+test_that("`void(inv_table_total())` matches snapshot", {
   data <- tibble::tibble(
     investigation_status_cd = sample(c(
       rep("C", 9e4L),
@@ -79,17 +79,16 @@ test_that("`inv_table_total()` html matches snapshot", {
     redcap_data
   )
 
-  tbl_html <- suppressWarnings(
-    inv_table_total(data, date = "2021-04-19") %>%
-      gt::as_raw_html() %>%
-      xml2::read_html() %>%
-      rvest::html_node("table")
+  tbl_html <- flextable::void(
+    inv_table_total(data, date = "2021-04-19"),
+    part = "all"
   )
 
   expect_snapshot(tbl_html)
 })
 
 test_that("`redcap_contacts()` returns expected output", {
+  skip_if_offline()
   skip_on_covr()
   data <- redcap_contacts(date = as.Date("2021-04-19"))
   ref_dates <- seq(as.Date("2021-02-02"), as.Date("2021-04-19"), by = 1L)

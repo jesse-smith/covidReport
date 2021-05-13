@@ -22,6 +22,9 @@ implementation}
 
 \item{date}{The download date of \code{data}; defaults to most recent}
 }
+\value{
+A \code{flextable}
+}
 \description{
 Tabluate Summary Investigation Numbers
 }

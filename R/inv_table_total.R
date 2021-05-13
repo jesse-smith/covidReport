@@ -10,6 +10,8 @@
 #'
 #' @param date The download date of `data`; defaults to most recent
 #'
+#' @return A `flextable`
+#'
 #' @export
 inv_table_total <- function(
   data = coviData::process_positive_people(date = date),
@@ -38,31 +40,19 @@ inv_table_total <- function(
     sum(na.rm = TRUE)
 
   tibble::tribble(
-                                ~ measure,            ~ n,
+                                ~ measure,            ~ N,
                   "Opened Investigations",     opened_inv,
                   "Closed Investigations",     closed_inv,
             "Contacts Identified to Date", contacts_total,
     "Contacts Identified in Last 14 Days",    contacts_14
   ) %>%
-    gt::gt() %>%
-    fmt_covid_table() %>%
-    gt::cols_label(measure = "Number of...", n = "N") %>%
-    gt::fmt_number("n", decimals = 0) %>%
-    gt::cols_align("right") %>%
-    gt::tab_style(
-      style = gt::cell_text(align = "center"),
-      locations = gt::cells_column_labels("n")
+    flextable::flextable() %>%
+    flextable::set_header_labels(measure = "Number of...") %>%
+    flextable::add_footer_lines(
+      values = "Data Source: Shelby County Health Department"
     ) %>%
-    gt::tab_style(
-      style = gt::cell_text(weight = "bold"),
-      locations = list(
-        gt::cells_column_labels(gt::everything()),
-        gt::cells_body("measure")
-      )
-    ) %>%
-    gt::tab_source_note(
-      gt::md("*Data Source: Shelby County Health Department*")
-    )
+    fmt_covid_table(align_label = "right") %>%
+    flextable::autofit()
 }
 
 #' Download and Summarize REDcap Contacts by Date

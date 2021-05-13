@@ -56,7 +56,7 @@ test_that("`case_table_active()` info matches ref (with active cases)", {
                 ~ status,       ~ n, ~ percent,
                 "Active",     "900",    "0.9%",
               "Deceased",   "9,999",   "10.0%",
-    "Inactive/Recovered",  "89,101",   "89.1%",
+              "Inactive",  "89,101",   "89.1%",
                  "Total", "100,000",  "100.0%"
   )
 
@@ -119,14 +119,14 @@ test_that("`case_table_active()` info matches ref (with no active cases)", {
     ) %>%
     dplyr::slice_sample(prop = 1)
 
-  tbl_active <- suppressWarnings(
-    case_table_active(data, date = "2021-04-01") %>%
-      gt::as_raw_html() %>%
+  tbl_active <- case_table_active(data, date = "2021-04-01") %>%
+      flextable::flextable_to_rmd() %>%
       xml2::read_html() %>%
       rvest::html_node("table") %>%
       rvest::html_table() %>%
-      dplyr::as_tibble()
-  )
+      dplyr::as_tibble() %>%
+      set_colnames(janitor::make_clean_names(.[1L,])) %>%
+      dplyr::filter(dplyr::row_number() > 1L)
 
   tbl_ref <- tibble::tribble(
                 ~ status,       ~ n, ~ percent,
