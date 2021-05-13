@@ -16,7 +16,7 @@ case_table_confirmed_probable(
 \item{date}{The download date of the data; defaults to most recent}
 }
 \value{
-A \code{gt_tbl} object
+A \code{flextable} object
 }
 \description{
 Tabulate Confirmed & Probable Cases/Deaths

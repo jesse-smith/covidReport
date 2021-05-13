@@ -79,13 +79,9 @@ pptx <- officer::ph_with(
   value = "Confirmed and Probable Cases/Deaths",
   location = officer::ph_location_type("title")
 )
-
-tmp <- fs::file_temp(ext = "png")
-gt::gtsave(case_tbl_confirmed_probable, tmp)
-
 pptx <- officer::ph_with(
   pptx,
-  value = officer::external_img(tmp, width = 13.333*2/3),
+  value = case_tbl_confirmed_probable,
   location = officer::ph_location_type("body")
 )
 
