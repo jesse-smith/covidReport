@@ -43,21 +43,21 @@ test_that("`case_table_active()` info matches ref (with active cases)", {
     ) %>%
     dplyr::slice_sample(prop = 1)
 
-  tbl_active <- suppressWarnings(
-    case_table_active(data, date = "2021-04-01") %>%
-      gt::as_raw_html() %>%
+  tbl_active <- case_table_active(data, date = "2021-04-01") %>%
+      flextable::flextable_to_rmd() %>%
       xml2::read_html() %>%
       rvest::html_node("table") %>%
       rvest::html_table() %>%
-      dplyr::as_tibble()
-  )
+      dplyr::as_tibble() %>%
+      set_colnames(janitor::make_clean_names(.[1L,])) %>%
+      dplyr::filter(dplyr::row_number() > 1L)
 
   tbl_ref <- tibble::tribble(
-                ~ Status,       ~ N,           ~ `%`,
-                "Active",     "900",   "0.9&percnt;",
-              "Deceased",   "9,999",  "10.0&percnt;",
-    "Inactive/Recovered",  "89,101",  "89.1&percnt;",
-                 "Total", "100,000", "100.0&percnt;"
+                ~ status,       ~ n, ~ percent,
+                "Active",     "900",    "0.9%",
+              "Deceased",   "9,999",   "10.0%",
+    "Inactive/Recovered",  "89,101",   "89.1%",
+                 "Total", "100,000",  "100.0%"
   )
 
   expect_equal(tbl_active, tbl_ref)
@@ -129,17 +129,17 @@ test_that("`case_table_active()` info matches ref (with no active cases)", {
   )
 
   tbl_ref <- tibble::tribble(
-                ~ Status,       ~ N,           ~ `%`,
-                "Active",       "0",   "0.0&percnt;",
-              "Deceased",   "9,999",  "10.0&percnt;",
-    "Inactive/Recovered",  "90,001",  "90.0&percnt;",
-                 "Total", "100,000", "100.0&percnt;"
+                ~ status,       ~ n, ~ percent,
+                "Active",       "0",    "0.0%",
+              "Deceased",   "9,999",   "10.0%",
+              "Inactive",  "90,001",   "90.0%",
+                 "Total", "100,000",  "100.0%"
   )
 
   expect_equal(tbl_active, tbl_ref)
 })
 
-test_that("`case_table_active()` html matches snapshot", {
+test_that("`void(case_table_active())` matches snapshot", {
 
   path_fn <- function(
     date = NULL,
@@ -184,11 +184,10 @@ test_that("`case_table_active()` html matches snapshot", {
     ) %>%
     dplyr::slice_sample(prop = 1)
 
-  tbl_html <- suppressWarnings(
-    case_table_active(data, date = "2021-04-01") %>%
-      gt::as_raw_html() %>%
-      xml2::read_html()
+  tbl_void <- flextable::void(
+    case_table_active(data, date = "2021-04-01"),
+    part = "all"
   )
 
-  expect_snapshot(tbl_html)
+  expect_snapshot(tbl_void)
 })

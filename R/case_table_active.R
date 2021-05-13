@@ -5,7 +5,7 @@
 #'
 #' @param date Download date of the data; defaults to most recent
 #'
-#' @return A `gt_tbl`
+#' @return A `flextable`
 #'
 #' @export
 case_table_active <- function(
@@ -34,91 +34,52 @@ case_table_active <- function(
       died = .data[[".id_tmp_"]] %in% filter_deaths(.)[[".id_tmp_"]]
     ) %>%
     dplyr::transmute(
-      status = dplyr::case_when(
+      Status = dplyr::case_when(
         .data[["died"]] ~ "Deceased",
         .data[["active"]] ~ "Active",
-        TRUE ~ "Inactive/Recovered"
+        TRUE ~ "Inactive"
       )
     ) %>%
-    janitor::tabyl(.data[["status"]]) %>%
+    janitor::tabyl(.data[["Status"]]) %>%
     purrr::when(
-      "Active" %in% dplyr::pull(., "status") ~ .,
+      "Active" %in% dplyr::pull(., "Status") ~ .,
       ~ dplyr::add_row(
         .,
-        status = "Active",
+        Status = "Active",
         n = 0L,
         percent = 0
       )
     ) %>%
     purrr::when(
-      "Deceased" %in% dplyr::pull(., "status") ~ .,
+      "Deceased" %in% dplyr::pull(., "Status") ~ .,
       ~ dplyr::add_row(
         .,
-        status = "Deceased",
+        Status = "Deceased",
         n = 0L,
         percent = 0
       )
     ) %>%
     purrr::when(
-      "Inactive/Recovered" %in% dplyr::pull(., "status") ~ .,
+      "Inactive" %in% dplyr::pull(., "Status") ~ .,
       ~ dplyr::add_row(
         .,
-        status = "Inactive/Recovered",
+        Status = "Inactive",
         n = 0L,
         percent = 0
       )
     ) %>%
-    dplyr::arrange(.data[["status"]]) %>%
+    dplyr::arrange(.data[["Status"]]) %>%
     dplyr::mutate(
       percent = .data[["percent"]] %>%
         round(digits = 3) %>%
         vec_assign(i = 3L, 1 - vec_slice(., 1L) - vec_slice(., 2L))
     ) %>%
     janitor::adorn_totals() %>%
-    gt::gt() %>%
-    fmt_covid_table() %>%
-    gt::cols_label(status = "Status", n = "N", percent = "%") %>%
-    gt::fmt_number("n", decimals = 0L) %>%
-    gt::fmt_percent("percent", decimals = 1L) %>%
-    gt::cols_align("right") %>%
-    gt::tab_style(
-      style = gt::cell_text(align = "center"),
-      locations = list(
-        gt::cells_column_labels(gt::everything()),
-        gt::cells_body("status")
-      )
-    ) %>%
-    gt::tab_style(
-      style = gt::cell_text(weight = "bold"),
-      locations = list(
-        gt::cells_column_labels(gt::everything()),
-        gt::cells_body(columns = "status"),
-        gt::cells_body(rows = 4L)
-      )
-    ) %>%
-    gt::tab_style(
-      style = gt::cell_borders(sides = c("top", "bottom"), weight = NULL),
-      locations = gt::cells_body(rows = 1:3)
-    ) %>%
-    gt::tab_style(
-      style = gt::cell_borders(sides = c("left", "right"), weight = NULL),
-      locations = list(
-        gt::cells_column_labels("n"),
-        gt::cells_body(columns = "n")
-      )
-    ) %>%
-    gt::tab_style(
-      style = gt::cell_borders(sides = "right", weight = NULL),
-      locations = list(
-        gt::cells_column_labels("status"),
-        gt::cells_body(columns = "status")
-      )
-    ) %>%
-     gt::tab_style(
-       style = gt::cell_borders(sides = "left", weight = NULL),
-       locations = list(
-         gt::cells_column_labels("percent"),
-         gt::cells_body(columns = "percent")
-       )
-     )
+    dplyr::rename(N = "n") %>%
+    dplyr::mutate(percent = 100 * .data[["percent"]]) %>%
+    flextable::flextable() %>%
+    flextable::set_header_labels(percent = "%") %>%
+    fmt_covid_table(total = TRUE, align_label = "center") %>%
+    flextable::colformat_double(j = "percent", digits = 1L, suffix = "%") %>%
+    flextable::autofit()
 }

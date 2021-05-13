@@ -16,7 +16,7 @@ case_table_active(
 \item{date}{Download date of the data; defaults to most recent}
 }
 \value{
-A \code{gt_tbl}
+A \code{flextable}
 }
 \description{
 Tabulate Active, Deceased, and Inactive/Recovered COVID-19 Cases

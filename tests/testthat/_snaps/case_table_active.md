@@ -1,9 +1,16 @@
-# `case_table_active()` html matches snapshot
+# `void(case_table_active())` matches snapshot
 
     Code
-      tbl_html
+      tbl_void
     Output
-      {html_document}
-      <html>
-      [1] <body><table style="font-family: -apple-system, BlinkMacSystemFont, 'Sego ...
+      a flextable object.
+      col_keys: `Status`, `N`, `percent` 
+      header has 1 row(s) 
+      body has 4 row(s) 
+      original dataset sample: 
+         Status      N percent
+         Active    900     0.9
+       Deceased   9999    10.0
+       Inactive  89101    89.1
+          Total 100000   100.0
 
