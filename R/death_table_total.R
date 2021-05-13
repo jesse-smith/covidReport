@@ -20,43 +20,15 @@ death_table_total <- function(
     ) %>%
     janitor::tabyl(.data[["died"]]) %>%
     janitor::adorn_totals() %>%
+    dplyr::mutate(percent = 100 * .data[["percent"]]) %>%
     dplyr::arrange(c(2L, 1L, 3L)) %>%
-    gt::gt() %>%
-    fmt_covid_table() %>%
-    gt::cols_label(died = "COVID-19 Deaths", n = "N", percent = "%") %>%
-    gt::fmt_number("n", decimals = 0L) %>%
-    gt::fmt_percent("percent", decimals = 1L) %>%
-    gt::cols_align("right") %>%
-    gt::tab_style(
-      style = gt::cell_text(weight = "bold", align = "center"),
-      locations = list(
-        gt::cells_column_labels(gt::everything()),
-        gt::cells_body("died")
-      )
+    flextable::flextable() %>%
+    flextable::set_header_labels(
+      died = "COVID-19 Deaths",
+      n = "N",
+      percent = "%"
     ) %>%
-    gt::tab_style(
-      style = gt::cell_borders(sides = c("top", "bottom"), weight = NULL),
-      locations = gt::cells_body(rows = 1:2)
-    ) %>%
-    gt::tab_style(
-      style = gt::cell_borders(sides = c("left", "right"), weight = NULL),
-      locations = list(
-        gt::cells_column_labels("n"),
-        gt::cells_body(columns = "n")
-      )
-    ) %>%
-    gt::tab_style(
-      style = gt::cell_borders(sides = "right", weight = NULL),
-      locations = list(
-        gt::cells_column_labels("died"),
-        gt::cells_body(columns = "died")
-      )
-    ) %>%
-    gt::tab_style(
-      style = gt::cell_borders(sides = "left", weight = NULL),
-      locations = list(
-        gt::cells_column_labels("percent"),
-        gt::cells_body(columns = "percent")
-      )
-    )
+    fmt_covid_table(total = TRUE) %>%
+    flextable::colformat_double(j = "percent", digits = 1L, suffix = "%") %>%
+    flextable::autofit()
 }
