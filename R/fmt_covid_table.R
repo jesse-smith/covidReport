@@ -10,7 +10,7 @@ fmt_covid_table <- function(flextable, total = FALSE) {
     # Font
     flextable::font(fontname = "Arial", part = "all") %>%
     # Font size
-    flextable::fontsize(size = 24, part = "all") %>%
+    flextable::fontsize(size = 20, part = "all") %>%
     flextable::fontsize(size = 14, part = "footer") %>%
     # Font color
     flextable::color(color = "#f0f0f0", part = "header") %>%
