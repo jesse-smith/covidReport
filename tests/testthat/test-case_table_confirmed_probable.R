@@ -52,10 +52,10 @@ test_that("`void(case_table_confirmed_probable())` matches snapshot", {
     "Deaths",   "9,999",     "7,999",    "2,000"
   )
 
-  tbl_style <- flextable::void(
+  tbl_void <- flextable::void(
     case_table_confirmed_probable(data, date = "2021-03-27"),
     part = "all"
   )
 
-  expect_snapshot(tbl_style)
+  expect_snapshot(tbl_void)
 })

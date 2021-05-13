@@ -1,7 +1,7 @@
-# `case_table_confirmed_probable()` style matches snapshot
+# `void(case_table_confirmed_probable())` matches snapshot
 
     Code
-      tbl_style
+      tbl_void
     Output
       a flextable object.
       col_keys: `Type`, `Total`, `C`, `P` 
