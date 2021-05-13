@@ -5,7 +5,7 @@
 #'
 #' @param date The download date of the data; defaults to most recent
 #'
-#' @return A `gt_tbl`
+#' @return A `flextable`
 #'
 #' @export
 death_table_age <- function(
@@ -21,12 +21,10 @@ death_table_age <- function(
     )
 
   age %>%
-    gt::gt() %>%
-    fmt_covid_table() %>%
-    gt::cols_label(median = "Median Age", range = "Age Range") %>%
-    gt::tab_style(
-      style = gt::cell_text(weight = "bold"),
-      locations = gt::cells_column_labels(gt::everything())
-    ) %>%
-    gt::cols_align("center")
+    flextable::flextable() %>%
+    flextable::set_header_labels(median = "Median Age", range = "Age Range") %>%
+    fmt_covid_table(align_label = "center") %>%
+    flextable::align(align = "center", part = "all") %>%
+    flextable::bold(bold = FALSE) %>%
+    flextable::autofit()
 }
