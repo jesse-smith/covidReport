@@ -12,7 +12,7 @@
 #'
 #' @export
 inv_table_total <- function(
-  data = coviData::process_positive_people(date),
+  data = coviData::process_positive_people(date = date),
   nit_token = Sys.getenv("redcap_NIT_token"),
   prior_contacts = 45669L,
   date = NULL
@@ -98,7 +98,7 @@ redcap_contacts <- function(date, nit_token = Sys.getenv("redcap_NIT_token")) {
     url = api_url,
     body = params,
     encode = "form",
-    httr::progress()
+    httr::progress(con = stderr())
   ) %>%
     httr::stop_for_status(paste("RedCAP download:", httr::content(.))) %>%
     httr::content(as = "text") %>%

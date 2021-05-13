@@ -5,7 +5,7 @@
 \title{Tabluate Summary Investigation Numbers}
 \usage{
 inv_table_total(
-  data = coviData::process_positive_people(date),
+  data = coviData::process_positive_people(date = date),
   nit_token = Sys.getenv("redcap_NIT_token"),
   prior_contacts = 45669L,
   date = NULL
