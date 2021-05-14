@@ -38,14 +38,17 @@ test_that("`inv_table_total()` info matches reference", {
                                       src,       src
   )
 
-  tbl_inv <- inv_table_total(data, date = "2021-04-19") %>%
+  capture.output(
+    {tbl_inv <- inv_table_total(data, date = "2021-04-19") %>%
       flextable::flextable_to_rmd() %>%
       xml2::read_html() %>%
       rvest::html_node("table") %>%
       rvest::html_table() %>%
       dplyr::as_tibble() %>%
       set_colnames(janitor::make_clean_names(.[1L,])) %>%
-      dplyr::filter(dplyr::row_number() > 1L)
+      dplyr::filter(dplyr::row_number() > 1L)},
+    file = "NUL"
+  )
 
   expect_equal(tbl_inv, tbl_ref)
 })

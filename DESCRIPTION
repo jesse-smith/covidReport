@@ -31,7 +31,8 @@ Imports:
     rlang,
     tidylog,
     timetk,
-    vctrs
+    vctrs,
+    flextable
 Suggests: 
     covr,
     dplyr,
@@ -50,7 +51,8 @@ Suggests:
     tibble,
     tidyr,
     vdiffr,
-    xml2
+    xml2,
+    officer
 Remotes: 
     jesse-smith/coviData,
     jesse-smith/covidModel

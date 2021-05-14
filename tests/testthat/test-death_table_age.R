@@ -17,14 +17,17 @@ test_that("`death_table_age()` info matches reference", {
               "55",    "10-100"
   )
 
-  tbl_age <- death_table_age(data, date = "2021-03-27") %>%
+  capture.output(
+    {tbl_age <- death_table_age(data, date = "2021-03-27") %>%
       flextable::flextable_to_rmd() %>%
       xml2::read_html() %>%
       rvest::html_node("table") %>%
       rvest::html_table() %>%
       dplyr::as_tibble() %>%
       set_colnames(janitor::make_clean_names(.[1L,])) %>%
-      dplyr::filter(dplyr::row_number() > 1L)
+      dplyr::filter(dplyr::row_number() > 1L)},
+    file = "NUL"
+  )
 
   expect_equal(tbl_age, tbl_ref)
 })

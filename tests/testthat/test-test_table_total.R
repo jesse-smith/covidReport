@@ -16,14 +16,17 @@ test_that("`test_table_total()` info matches reference", {
     tibble::tibble(.rows = 9e5L)
   )
 
-  tbl_test <- test_table_total(data) %>%
+  capture.output(
+    {tbl_test <- test_table_total(data) %>%
       flextable::flextable_to_rmd() %>%
       xml2::read_html() %>%
       rvest::html_node("table") %>%
       rvest::html_table() %>%
       dplyr::as_tibble() %>%
       set_colnames(janitor::make_clean_names(.[1L,])) %>%
-      dplyr::filter(dplyr::row_number() > 1L)
+      dplyr::filter(dplyr::row_number() > 1L)},
+    file = "NUL"
+  )
 
   tbl_ref <- tibble::tribble(
     ~ `pcr_result`,         ~ n, ~ `percent`,

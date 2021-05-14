@@ -19,14 +19,17 @@ test_that("`case_table_confirmed_probable()` info matches reference", {
         "Deaths",   "9,999",     "7,999",    "2,000"
   )
 
-  tbl_cp <- case_table_confirmed_probable(data, date = "2021-03-27") %>%
+  capture.output(
+    {tbl_cp <- case_table_confirmed_probable(data, date = "2021-03-27") %>%
       flextable::flextable_to_rmd() %>%
       xml2::read_html() %>%
       rvest::html_node("table") %>%
       rvest::html_table() %>%
       dplyr::as_tibble() %>%
       set_colnames(janitor::make_clean_names(.[1L,])) %>%
-      dplyr::filter(dplyr::row_number() > 1L)
+      dplyr::filter(dplyr::row_number() > 1L)},
+    file = "NUL"
+  )
 
   expect_equal(tbl_cp, tbl_ref)
 })

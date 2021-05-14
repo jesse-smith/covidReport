@@ -43,14 +43,17 @@ test_that("`case_table_active()` info matches ref (with active cases)", {
     ) %>%
     dplyr::slice_sample(prop = 1)
 
-  tbl_active <- case_table_active(data, date = "2021-04-01") %>%
+  capture.output(
+    {tbl_active <- case_table_active(data, date = "2021-04-01") %>%
       flextable::flextable_to_rmd() %>%
       xml2::read_html() %>%
       rvest::html_node("table") %>%
       rvest::html_table() %>%
       dplyr::as_tibble() %>%
       set_colnames(janitor::make_clean_names(.[1L,])) %>%
-      dplyr::filter(dplyr::row_number() > 1L)
+      dplyr::filter(dplyr::row_number() > 1L)},
+    file = "NUL"
+  )
 
   tbl_ref <- tibble::tribble(
                 ~ status,       ~ n, ~ percent,
@@ -119,14 +122,17 @@ test_that("`case_table_active()` info matches ref (with no active cases)", {
     ) %>%
     dplyr::slice_sample(prop = 1)
 
-  tbl_active <- case_table_active(data, date = "2021-04-01") %>%
-      flextable::flextable_to_rmd() %>%
-      xml2::read_html() %>%
-      rvest::html_node("table") %>%
-      rvest::html_table() %>%
-      dplyr::as_tibble() %>%
-      set_colnames(janitor::make_clean_names(.[1L,])) %>%
-      dplyr::filter(dplyr::row_number() > 1L)
+  capture.output(
+    {tbl_active <- case_table_active(data, date = "2021-04-01") %>%
+        flextable::flextable_to_rmd() %>%
+        xml2::read_html() %>%
+        rvest::html_node("table") %>%
+        rvest::html_table() %>%
+        dplyr::as_tibble() %>%
+        set_colnames(janitor::make_clean_names(.[1L,])) %>%
+        dplyr::filter(dplyr::row_number() > 1L)},
+    file = "NUL"
+  )
 
   tbl_ref <- tibble::tribble(
                 ~ status,       ~ n, ~ percent,

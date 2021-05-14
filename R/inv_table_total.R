@@ -20,7 +20,9 @@ inv_table_total <- function(
   date = NULL
 ) {
   opened_inv <- NROW(data)
-  closed_inv <- NROW(dplyr::filter(data, investigation_status_cd == "C"))
+  closed_inv <- NROW(
+    dplyr::filter(data, .data[["investigation_status_cd"]] == "C")
+  )
 
   if (is.null(date)) {
     date <- coviData::path_inv() %>%

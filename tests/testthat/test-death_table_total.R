@@ -19,14 +19,17 @@ test_that("`death_table_total()` info matches reference", {
   )
 
 
-  tbl_deaths <- death_table_total(data, date = "2021-03-27") %>%
-    flextable::flextable_to_rmd() %>%
-    xml2::read_html() %>%
-    rvest::html_node("table") %>%
-    rvest::html_table() %>%
-    dplyr::as_tibble() %>%
-    set_colnames(janitor::make_clean_names(.[1L,])) %>%
-    dplyr::filter(dplyr::row_number() > 1L)
+  capture.output(
+    {tbl_deaths <- death_table_total(data, date = "2021-03-27") %>%
+      flextable::flextable_to_rmd() %>%
+      xml2::read_html() %>%
+      rvest::html_node("table") %>%
+      rvest::html_table() %>%
+      dplyr::as_tibble() %>%
+      set_colnames(janitor::make_clean_names(.[1L,])) %>%
+      dplyr::filter(dplyr::row_number() > 1L)},
+    file = "NUL"
+  )
 
   expect_equal(tbl_deaths, tbl_ref)
 })
