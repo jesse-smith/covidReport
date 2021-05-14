@@ -122,20 +122,3 @@ ph_location_table <- function(
     id = id
   )
 }
-
-#' Convert a `flextable` to an HTML String
-#'
-#' @param flextable A `flextable` object
-#'
-#' @return A `character` vector of length 1 containing HTML content from a
-#'   `flextable`
-#'
-#' @keywords internal
-ft_as_html <- function(flextable) {
-  capture.output(
-    {ft_html <- flextable::flextable_to_rmd(flextable)},
-    file = "NUL"
-  )
-
-  ft_html
-}
