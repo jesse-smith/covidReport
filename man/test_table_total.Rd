@@ -15,7 +15,7 @@ test_table_total(
 \item{date}{The download date of the data to read; defaults to most recent}
 }
 \value{
-A \code{gt_tbl}
+A \code{flextable}
 }
 \description{
 Tabulate PCR Test Totals
