@@ -22,7 +22,7 @@ test_table_total <- function(
   ) %>%
     flextable::flextable() %>%
     flextable::set_header_labels(result = "PCR Result", percent = "%") %>%
-    fmt_covid_table() %>%
+    fmt_covid_table(total = TRUE) %>%
     flextable::colformat_double(j = "percent", digits = 1L, suffix = "%") %>%
     flextable::autofit()
 }

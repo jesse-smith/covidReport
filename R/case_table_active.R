@@ -79,7 +79,7 @@ case_table_active <- function(
     dplyr::mutate(percent = 100 * .data[["percent"]]) %>%
     flextable::flextable() %>%
     flextable::set_header_labels(percent = "%") %>%
-    fmt_covid_table(total = TRUE, align_label = "center") %>%
+    fmt_covid_table(total = TRUE) %>%
     flextable::colformat_double(j = "percent", digits = 1L, suffix = "%") %>%
     flextable::autofit()
 }

@@ -51,7 +51,7 @@ inv_table_total <- function(
     flextable::add_footer_lines(
       values = "Data Source: Shelby County Health Department"
     ) %>%
-    fmt_covid_table(align_label = "right") %>%
+    fmt_covid_table() %>%
     flextable::autofit()
 }
 
