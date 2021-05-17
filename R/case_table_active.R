@@ -12,6 +12,29 @@ case_table_active <- function(
   data = coviData::process_positive_people(date = date),
   date = NULL
 ) {
+   case_calc_active(data, date = date) %>%
+    janitor::adorn_totals() %>%
+    dplyr::mutate(percent = 100 * .data[["percent"]]) %>%
+    flextable::flextable() %>%
+    flextable::set_header_labels(
+      status = "Status",
+      n = "N",
+      percent = "%"
+    ) %>%
+    fmt_covid_table(total = TRUE) %>%
+    flextable::colformat_double(j = "percent", digits = 1L, suffix = "%") %>%
+    flextable::autofit()
+}
+
+#' Calculate Active, Deceased, and Inactive/Recovered COVID-19 Cases
+#'
+#' @inheritParams case_table_active
+#'
+#' @return A `tibble`
+case_calc_active <- function(
+  data = coviData::process_positive_people(date = date),
+  date = NULL
+) {
   date <- coviData::path_inv(date = date) %>%
     fs::path_file() %>%
     fs::path_ext_remove() %>%
@@ -34,52 +57,45 @@ case_table_active <- function(
       died = .data[[".id_tmp_"]] %in% filter_deaths(.)[[".id_tmp_"]]
     ) %>%
     dplyr::transmute(
-      Status = dplyr::case_when(
+      status = dplyr::case_when(
         .data[["died"]] ~ "Deceased",
         .data[["active"]] ~ "Active",
         TRUE ~ "Inactive"
       )
     ) %>%
-    janitor::tabyl(.data[["Status"]]) %>%
+    janitor::tabyl(.data[["status"]]) %>%
     purrr::when(
-      "Active" %in% dplyr::pull(., "Status") ~ .,
+      "Active" %in% dplyr::pull(., "status") ~ .,
       ~ dplyr::add_row(
         .,
-        Status = "Active",
+        status = "Active",
         n = 0L,
         percent = 0
       )
     ) %>%
     purrr::when(
-      "Deceased" %in% dplyr::pull(., "Status") ~ .,
+      "Deceased" %in% dplyr::pull(., "status") ~ .,
       ~ dplyr::add_row(
         .,
-        Status = "Deceased",
+        status = "Deceased",
         n = 0L,
         percent = 0
       )
     ) %>%
     purrr::when(
-      "Inactive" %in% dplyr::pull(., "Status") ~ .,
+      "Inactive" %in% dplyr::pull(., "status") ~ .,
       ~ dplyr::add_row(
         .,
-        Status = "Inactive",
+        status = "Inactive",
         n = 0L,
         percent = 0
       )
     ) %>%
-    dplyr::arrange(.data[["Status"]]) %>%
+    dplyr::arrange(.data[["status"]]) %>%
     dplyr::mutate(
       percent = .data[["percent"]] %>%
         round(digits = 3) %>%
         vec_assign(i = 3L, 1 - vec_slice(., 1L) - vec_slice(., 2L))
     ) %>%
-    janitor::adorn_totals() %>%
-    dplyr::rename(N = "n") %>%
-    dplyr::mutate(percent = 100 * .data[["percent"]]) %>%
-    flextable::flextable() %>%
-    flextable::set_header_labels(percent = "%") %>%
-    fmt_covid_table(total = TRUE) %>%
-    flextable::colformat_double(j = "percent", digits = 1L, suffix = "%") %>%
-    flextable::autofit()
+    dplyr::as_tibble()
 }
