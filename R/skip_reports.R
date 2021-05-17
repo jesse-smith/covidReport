@@ -1,17 +1,19 @@
 #' Skip Reporting Function Tests
 #'
 #' Reporting functions are time-consuming to run; `skip_reports()` sets an
-#' environment variable that allows the user to skip these tests. Component
-#' functions should be tested separately.
+#' option that allows the user to skip these tests. Component functions should
+#' be tested separately.
 #'
 #' When `skip = NULL`, this is used as a skipping function within a test. When
-#' a value is supplied, it sets the `SKIP_REPORTS` environment variable that
-#' controls behavior during testing.
+#' a value is supplied, it sets the `SKIP_REPORTS` option that controls
+#' behavior during testing.
 #'
-#' @param skip Should the reporting tests be skipped? If `SKIP_REPORTS` is unset
-#'   during testing, `NULL` defaults to `TRUE`.
+#' @param skip Should the reporting tests be skipped? If
+#'   `getOption(SKIP_REPORTS)` is unset during testing, `NULL` defaults to
+#'   `TRUE`.
 #'
-#' @return `NULL`
+#' @return Either the previous value of `SKIP_REPORTS` (if setting the option)
+#'   or a `skip` condition
 #'
 #' @keywords internal
 skip_reports <- function(skip = NULL) {
@@ -21,11 +23,13 @@ skip_reports <- function(skip = NULL) {
       rlang::is_bool(skip),
       message = "`skip` must be a boolean value"
     )
-    Sys.setenv(SKIP_REPORTS = skip)
+    old_skip <- getOption("SKIP_REPORTS")
+    options(SKIP_REPORTS = skip)
+    return(old_skip)
   }
 
   # Get `SKIP_REPORTS`
-  SKIP_REPORTS <- Sys.getenv("SKIP_REPORTS")
+  SKIP_REPORTS <- getOption("SKIP_REPORTS")
   coviData::assert_any(
     rlang::is_bool(SKIP_REPORTS),
     is.null(SKIP_REPORTS),
