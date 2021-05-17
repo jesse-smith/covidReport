@@ -31,6 +31,8 @@ case_table_active <- function(
 #' @inheritParams case_table_active
 #'
 #' @return A `tibble`
+#'
+#' @keywords internal
 case_calc_active <- function(
   data = coviData::process_positive_people(date = date),
   date = NULL

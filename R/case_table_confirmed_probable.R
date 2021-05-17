@@ -12,12 +12,35 @@ case_table_confirmed_probable <- function(
   data = coviData::process_positive_people(date = date),
   date = NULL
 ) {
+  case_calc_confirmed_probable(data, date = date) %>%
+    flextable::flextable() %>%
+    flextable::set_header_labels(
+      type = "",
+      total = "Total",
+      C = "Confirmed",
+      P = "Probable"
+    ) %>%
+    fmt_covid_table() %>%
+    flextable::autofit()
+}
+
+#' Tabulate Confirmed & Probable Cases/Deaths
+#'
+#' @inheritParams case_table_confirmed_probable
+#'
+#' @return A `tibble`
+#'
+#' @keywords internal
+case_calc_confirmed_probable <- function(
+  data = coviData::process_positive_people(date = date),
+  date = NULL
+){
   cases <- data %>%
     dplyr::count(.data[["inv_case_status"]]) %>%
     tidyr::pivot_wider(names_from = "inv_case_status", values_from = "n") %>%
     dplyr::mutate(
-      Type = "Cases",
-      Total = sum(., na.rm = TRUE),
+      type = "Cases",
+      total = sum(., na.rm = TRUE),
       .before = 1L
     )
 
@@ -26,14 +49,10 @@ case_table_confirmed_probable <- function(
     dplyr::count(.data[["inv_case_status"]]) %>%
     tidyr::pivot_wider(names_from = "inv_case_status", values_from = "n") %>%
     dplyr::mutate(
-      Type = "Deaths",
-      Total = sum(., na.rm = TRUE),
+      type = "Deaths",
+      total = sum(., na.rm = TRUE),
       .before = 1L
     )
 
-  dplyr::bind_rows(cases, deaths) %>%
-    flextable::flextable() %>%
-    flextable::set_header_labels(Type = "", C = "Confirmed", P = "Probable") %>%
-    fmt_covid_table() %>%
-    flextable::autofit()
+  dplyr::bind_rows(cases, deaths)
 }
