@@ -259,6 +259,7 @@ rpt_daily_pptx <- function(
       paste0("daily_status_report_", date, ".pptx")
     )
     print(pptx, target = path)
+    attr(pptx, "path") <- path
   }
 
   pptx
