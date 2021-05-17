@@ -5,7 +5,7 @@
 #' @param dir The directory to save the report; set to `NULL` to return without
 #'   saving
 #'
-#' @return A `pptx` object
+#' @return An `rpptx` object
 #'
 #' @export
 rpt_daily_pptx <- function(

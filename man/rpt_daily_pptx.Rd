@@ -12,13 +12,13 @@ rpt_daily_pptx(
 )
 }
 \arguments{
-\item{date}{The date for which to run the report}
+\item{date}{The date for which to run the report; defaults to most recent}
 
 \item{dir}{The directory to save the report; set to \code{NULL} to return without
 saving}
 }
 \value{
-A \code{pptx} object
+An \code{rpptx} object
 }
 \description{
 Create Powerpoint for Daily Status Report
