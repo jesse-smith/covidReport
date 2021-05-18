@@ -1,7 +1,6 @@
 #' Plot Vaccinations by Age Group
 #'
-#' `plot_vac_age()` plots vaccinations by age group in a bar chart. It can
-#' produce 4 distinct figures, depending on the values of `pct` and `by_pop`.
+#' `plot_vac_age()` plots vaccinations by age group in a bar chart.
 #' `plot_vac_age()` is a deprecated wrapper for `vac_plot_age()`.
 #'
 #' When `by_pop = TRUE`,
@@ -9,40 +8,29 @@
 #' of each age group; when `by_pop = FALSE`, the figure does not display
 #' population-related values.
 #'
-#' When `pct = TRUE`, values are displayed as percentages; when `pct = FALSE`,
-#' raw totals are displayed instead.
-#'
-#' The combination `pct = FALSE, by_pop = TRUE` results in the most informative
-#' (but most complex) display. It shows vaccination counts as a fraction of
-#' population totals. Any of the other 3 charts can be build from the
-#' information in this one; however, this also means that the "take-home
-#' message" from this figure is more open-ended than the rest.
-#'
 #' @param .data Vaccination data, as created by
 #'   \code{\link[coviData:vac_prep]{vac_prep()}}
-#'
-#' @param pct Should the resulting graphic display percentages
-#'   (`TRUE`, the default) or totals (`FALSE`)?
 #'
 #' @param by_pop Should the resulting graphic be calculated using age group
 #'   population statistics (`TRUE`, the default) or not (`FALSE`)?
 #'
-#' @param incl_under_15 Should the age group `"0-15"` be included? The default
+#' @param incl_under_12 Should the age group `"0-11"` be included? The default
 #'   is `FALSE`.
+#'
+#' @param pct Deprecated.
+#'
+#' @param incl_under_15 Deprecated.
 #'
 #' @return A `ggplot` object
 #'
 #' @export
 vac_plot_age <- function(
   .data = coviData::vac_load() %>% coviData::vac_prep(),
-  pct = TRUE,
   by_pop = TRUE,
-  incl_under_15 = FALSE
+  incl_under_12 = FALSE
 ) {
-
-  pct <- coviData::assert_bool(pct)
   by_pop <- coviData::assert_bool(by_pop)
-  incl_under_15 <- coviData::assert_bool(incl_under_15)
+  incl_under_12 <- coviData::assert_bool(incl_under_12)
 
   date <- .data %>%
     dplyr::pull("vacc_date") %>%
@@ -51,11 +39,11 @@ vac_plot_age <- function(
 
   gg_data <- .data %>%
     vac_count_age_grp() %>%
-    vac_join_age_pop(incl_under_15 = incl_under_15) %>%
+    vac_join_age_pop(incl_under_12 = incl_under_12) %>%
     vac_age_fct()
 
   gg_data %>%
-    vac_age_ggplot(pct = pct, by_pop = by_pop) %>%
+    vac_age_ggplot(pct = TRUE, by_pop = by_pop) %>%
     set_covid_theme() %>%
     set_vac_age_axis_limits() %>%
     add_vac_age_axis_labels(by_pop = by_pop) %>%
@@ -71,15 +59,15 @@ vac_plot_age <- function(
 #' @export
 plot_vac_age <- function(
   .data = coviData::vac_load() %>% coviData::vac_prep(),
-  pct = TRUE,
+  pct = lifecycle::deprecated(),
   by_pop = TRUE,
-  incl_under_15 = FALSE
+  incl_under_15 = lifecycle::deprecated(),
+  incl_under_12 = FALSE
 ) {
   vac_plot_age(
     .data = .data,
-    pct = pct,
     by_pop = by_pop,
-    incl_under_15 = incl_under_15
+    incl_under_12 = incl_under_15
   )
 }
 
@@ -281,8 +269,18 @@ vac_age_grp <- function(dbl) {
 
   vctrs::vec_assert(dbl, ptype = double())
 
-  breaks <- c(0, seq(15, 75, by = 10), 115)
-  lbls <- c("0-14", "15-24", "25-34", "35-44", "45-54", "55-64", "65-74", "75+")
+  breaks <- c(0, 12, 16, seq(25, 75, by = 10), 115)
+  lbls <- c(
+     "0-11",
+    "12-15",
+    "16-24",
+    "25-34",
+    "35-44",
+    "45-54",
+    "55-64",
+    "65-74",
+    "75+"
+  )
 
   cut(
     dbl,
@@ -293,16 +291,38 @@ vac_age_grp <- function(dbl) {
   ) %>% as.character()
 }
 
-vac_join_age_pop <- function(.data, incl_under_15) {
+vac_join_age_pop <- function(.data, incl_under_12 = FALSE) {
+  pop_age <- covidReport::pop_2019 %>%
+    dplyr::mutate(
+      age_grp = cut(
+        .data[["age"]],
+        breaks = c(0, 12, 16, seq(25, 75, by = 10), 115),
+        labels = c(
+           "0-11",
+          "12-15",
+          "16-24",
+          "25-34",
+          "35-44",
+          "45-54",
+          "55-64",
+          "65-74",
+          "75+"
+        ),
+        right = FALSE,
+        ordered_result = TRUE
+      ) %>% as.character()
+    ) %>%
+    dplyr::group_by(.data[["age_grp"]]) %>%
+    dplyr::summarize(n = sum(.data[["population"]]))
   .data %>%
     dplyr::left_join(
-      covidReport::pop_age_2019,
+      pop_age,
       by = "age_grp",
       suffix = c("_vac", "_pop")
     ) %>%
     purrr::when(
-      incl_under_15 ~ .,
-      ~ dplyr::filter(., .data[["age_grp"]] != "0-14")
+      incl_under_12 ~ .,
+      ~ dplyr::filter(., .data[["age_grp"]] != "0-11")
     )
 }
 

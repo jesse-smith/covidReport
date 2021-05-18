@@ -1,10 +1,17 @@
 #' Shelby County Age Demographics - ACS 2019 1-Year Estimates
 #'
-#' @format A `tibble` with 8 rows and 2 variables:
+#' @format A `tibble` with 1376 rows and 5 variables:
 #'   \describe{
-#'     \item{age_grp}{age group, in years (closed on left, open on right)}
-#'     \item{n}{Number of people in age group}
+#'     \item{age}{age in years}
+#'     \item{sex}{Male or Female}
+#'     \item{race}{
+#'       Black/African American,
+#'       White,
+#'       American Indian/Alaska Native,
+#'       Asian/Pacific Islander
+#'     }
+#'     \item{population}{number of people in group}
 #'   }
 #'
-#' @source US ACS Census Estimates 2019
-"pop_age_2019"
+#' @source Vintage 2019 NCHS Bridged-Race Postcensal Population Estimates
+"pop_2019"
