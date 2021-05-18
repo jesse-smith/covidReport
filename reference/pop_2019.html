@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Plot Vaccinations by Age Group — vac_plot_age • covidReport</title>
+<title>Shelby County Age Demographics - ACS 2019 1-Year Estimates — pop_2019 • covidReport</title>
 
 
 <!-- jquery -->
@@ -39,9 +39,8 @@
 
 
 
-<meta property="og:title" content="Plot Vaccinations by Age Group — vac_plot_age" />
-<meta property="og:description" content="plot_vac_age() plots vaccinations by age group in a bar chart.
-plot_vac_age() is a deprecated wrapper for vac_plot_age()." />
+<meta property="og:title" content="Shelby County Age Demographics - ACS 2019 1-Year Estimates — pop_2019" />
+<meta property="og:description" content="Shelby County Age Demographics - ACS 2019 1-Year Estimates" />
 
 
 
@@ -109,67 +108,34 @@ plot_vac_age() is a deprecated wrapper for vac_plot_age()." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Plot Vaccinations by Age Group</h1>
-    <small class="dont-index">Source: <a href='https://github.com/jesse-smith/covidReport/blob/master/R/vac_plot_age.R'><code>R/vac_plot_age.R</code></a></small>
-    <div class="hidden name"><code>vac_plot_age.Rd</code></div>
+    <h1>Shelby County Age Demographics - ACS 2019 1-Year Estimates</h1>
+    <small class="dont-index">Source: <a href='https://github.com/jesse-smith/covidReport/blob/master/R/pop_age_2019.R'><code>R/pop_age_2019.R</code></a></small>
+    <div class="hidden name"><code>pop_2019.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p><code>plot_vac_age()</code> plots vaccinations by age group in a bar chart.
-<code>plot_vac_age()</code> is a deprecated wrapper for <code>vac_plot_age()</code>.</p>
+    <p>Shelby County Age Demographics - ACS 2019 1-Year Estimates</p>
     </div>
 
-    <pre class="usage"><span class='fu'>vac_plot_age</span><span class='op'>(</span>
-  .data <span class='op'>=</span> <span class='fu'>coviData</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/coviData/man/vac_load.html'>vac_load</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>%&gt;%</span> <span class='fu'>coviData</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/coviData/man/vac_prep.html'>vac_prep</a></span><span class='op'>(</span><span class='op'>)</span>,
-  by_pop <span class='op'>=</span> <span class='cn'>TRUE</span>,
-  incl_under_12 <span class='op'>=</span> <span class='cn'>FALSE</span>
-<span class='op'>)</span>
+    <pre class="usage"><span class='va'>pop_2019</span></pre>
 
-<span class='fu'>plot_vac_age</span><span class='op'>(</span>
-  .data <span class='op'>=</span> <span class='fu'>coviData</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/coviData/man/vac_load.html'>vac_load</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>%&gt;%</span> <span class='fu'>coviData</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/coviData/man/vac_prep.html'>vac_prep</a></span><span class='op'>(</span><span class='op'>)</span>,
-  pct <span class='op'>=</span> <span class='fu'>lifecycle</span><span class='fu'>::</span><span class='fu'><a href='https://lifecycle.r-lib.org/reference/deprecated.html'>deprecated</a></span><span class='op'>(</span><span class='op'>)</span>,
-  by_pop <span class='op'>=</span> <span class='cn'>TRUE</span>,
-  incl_under_15 <span class='op'>=</span> <span class='fu'>lifecycle</span><span class='fu'>::</span><span class='fu'><a href='https://lifecycle.r-lib.org/reference/deprecated.html'>deprecated</a></span><span class='op'>(</span><span class='op'>)</span>,
-  incl_under_12 <span class='op'>=</span> <span class='cn'>FALSE</span>
-<span class='op'>)</span></pre>
 
-    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
-    <table class="ref-arguments">
-    <colgroup><col class="name" /><col class="desc" /></colgroup>
-    <tr>
-      <th>.data</th>
-      <td><p>Vaccination data, as created by
-<code><a href='https://rdrr.io/pkg/coviData/man/vac_prep.html'>vac_prep()</a></code></p></td>
-    </tr>
-    <tr>
-      <th>by_pop</th>
-      <td><p>Should the resulting graphic be calculated using age group
-population statistics (<code>TRUE</code>, the default) or not (<code>FALSE</code>)?</p></td>
-    </tr>
-    <tr>
-      <th>incl_under_12</th>
-      <td><p>Should the age group <code>"0-11"</code> be included? The default
-is <code>FALSE</code>.</p></td>
-    </tr>
-    <tr>
-      <th>pct</th>
-      <td><p>Deprecated.</p></td>
-    </tr>
-    <tr>
-      <th>incl_under_15</th>
-      <td><p>Deprecated.</p></td>
-    </tr>
-    </table>
+    <h2 class="hasAnchor" id="format"><a class="anchor" href="#format"></a>Format</h2>
 
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+    <p>A <code>tibble</code> with 1376 rows and 5 variables:</p><dl>
+<dt>age</dt><dd><p>age in years</p></dd>
+<dt>sex</dt><dd><p>Male or Female</p></dd>
+<dt>race</dt><dd><p>Black/African American,
+White,
+American Indian/Alaska Native,
+Asian/Pacific Islander</p></dd>
+<dt>population</dt><dd><p>number of people in group</p></dd>
 
-    <p>A <code>ggplot</code> object</p>
-    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+</dl>
 
-    <p>When <code>by_pop = TRUE</code>,
-the resulting figure displays vaccinations with reference to the population
-of each age group; when <code>by_pop = FALSE</code>, the figure does not display
-population-related values.</p>
+    <h2 class="hasAnchor" id="source"><a class="anchor" href="#source"></a>Source</h2>
+
+    <p>Vintage 2019 NCHS Bridged-Race Postcensal Population Estimates</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
