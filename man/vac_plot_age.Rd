@@ -7,37 +7,37 @@
 \usage{
 vac_plot_age(
   .data = coviData::vac_load() \%>\% coviData::vac_prep(),
-  pct = TRUE,
   by_pop = TRUE,
-  incl_under_15 = FALSE
+  incl_under_12 = FALSE
 )
 
 plot_vac_age(
   .data = coviData::vac_load() \%>\% coviData::vac_prep(),
-  pct = TRUE,
+  pct = lifecycle::deprecated(),
   by_pop = TRUE,
-  incl_under_15 = FALSE
+  incl_under_15 = lifecycle::deprecated(),
+  incl_under_12 = FALSE
 )
 }
 \arguments{
 \item{.data}{Vaccination data, as created by
 \code{\link[coviData:vac_prep]{vac_prep()}}}
 
-\item{pct}{Should the resulting graphic display percentages
-(\code{TRUE}, the default) or totals (\code{FALSE})?}
-
 \item{by_pop}{Should the resulting graphic be calculated using age group
 population statistics (\code{TRUE}, the default) or not (\code{FALSE})?}
 
-\item{incl_under_15}{Should the age group \code{"0-15"} be included? The default
+\item{incl_under_12}{Should the age group \code{"0-11"} be included? The default
 is \code{FALSE}.}
+
+\item{pct}{Deprecated.}
+
+\item{incl_under_15}{Deprecated.}
 }
 \value{
 A \code{ggplot} object
 }
 \description{
-\code{plot_vac_age()} plots vaccinations by age group in a bar chart. It can
-produce 4 distinct figures, depending on the values of \code{pct} and \code{by_pop}.
+\code{plot_vac_age()} plots vaccinations by age group in a bar chart.
 \code{plot_vac_age()} is a deprecated wrapper for \code{vac_plot_age()}.
 }
 \details{
@@ -45,13 +45,4 @@ When \code{by_pop = TRUE},
 the resulting figure displays vaccinations with reference to the population
 of each age group; when \code{by_pop = FALSE}, the figure does not display
 population-related values.
-
-When \code{pct = TRUE}, values are displayed as percentages; when \code{pct = FALSE},
-raw totals are displayed instead.
-
-The combination \verb{pct = FALSE, by_pop = TRUE} results in the most informative
-(but most complex) display. It shows vaccination counts as a fraction of
-population totals. Any of the other 3 charts can be build from the
-information in this one; however, this also means that the "take-home
-message" from this figure is more open-ended than the rest.
 }
