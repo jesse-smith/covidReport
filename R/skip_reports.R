@@ -38,5 +38,5 @@ skip_reports <- function(skip = NULL) {
   SKIP_REPORTS <- !rlang::is_false(SKIP_REPORTS)
 
   # Skip if `SKIP_REPORTS = TRUE`
-  skip_if(SKIP_REPORTS, "Skipping report tests")
+  testthat::skip_if(SKIP_REPORTS, "Skipping report tests")
 }
