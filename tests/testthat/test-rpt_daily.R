@@ -10,3 +10,11 @@ test_that("`rpt_daily_pptx()` works", {
   expect_s3_class(pptx, "rpptx")
   expect_true(fs::file_exists(pptx_path_attr))
 })
+
+test_that("`rpt_daily_mail()` works", {
+  skip_on_ci()
+  skip_reports()
+  rpt_daily_mail()
+  rpt_sent <- TRUE
+  expect_true(rpt_sent)
+})

@@ -264,3 +264,143 @@ rpt_daily_pptx <- function(
 
   pptx
 }
+
+#' Send Daily COVID-19 Status Summary via Outlook Email
+#'
+#' @param date The date for which to run the report; defaults to most recent
+#'
+#' @param to A `character` vector of recipient email addresses
+#'
+#' @export
+rpt_daily_mail <- function(
+  date = NULL,
+  to = c(
+    "Jesse.Smith@shelbycountytn.gov",
+    "Chaitra.Subramanya@shelbycountytn.gov",
+    "Allison.Plaxco@shelbycountytn.gov"
+  )
+) {
+
+  date <- coviData::path_inv(date) %>%
+    fs::path_file() %>%
+    fs::path_ext_remove() %>%
+    stringr::str_extract("[0-9]{1,4}.?[0-9]{1,2}.?[0-9]{1,4}") %>%
+    lubridate::as_date()
+
+  str_date <- format(date, "%m/%d/%y")
+
+  if (weekdays(date) %in% c("Saturday", "Sunday")) {
+    subject <- paste("COVID-19 Numbers for", str_date)
+    intro <- paste("Below are the COVID-19 numbers for", str_date)
+  } else {
+    subject <- paste("COVID-19 Status Report for", str_date)
+    intro <- paste("Attached is the COVID-19 status report for", str_date)
+  }
+
+  # Test totals
+  test_total_df <- test_calc_total(date = date)
+  gc()
+  test_tbl_total <- test_total_df %>%
+    dplyr::mutate(result = c("+ Test", "- Test", "Total Tests")) %>%
+    dplyr::select(-"percent") %>%
+    gt::gt() %>%
+    fmt_covid_table(total = TRUE) %>%
+    gt::as_raw_html()
+
+  # People totals
+  inv <- coviData::read_file_delim(coviData::path_inv(date))
+  gc()
+  ppl_pos <- coviData::process_positive_people(inv, date = date)
+  gc()
+  n_ppl_pos <- NROW(ppl_pos)
+  n_ppl_neg <- NROW(coviData::process_negative_people(inv, date = date))
+  gc()
+  remove(inv)
+  gc()
+  ppl_tbl_total <- tibble::tibble(
+    result = c("+ People", "- People", "Total People"),
+    n = c(n_ppl_pos, n_ppl_neg, n_ppl_pos + n_ppl_neg)
+  ) %>%
+    gt::gt() %>%
+    fmt_covid_table(total = TRUE) %>%
+    gt::as_raw_html()
+  gc()
+
+  # Confirmed/Probable
+  cp_tbl <- case_calc_confirmed_probable(ppl_pos, date = date) %>%
+    gt::gt() %>%
+    fmt_covid_table() %>%
+    gt::as_raw_html()
+  gc()
+
+  # Active
+  active_tbl <- case_calc_active(ppl_pos, date = date) %>%
+    gt::gt() %>%
+    fmt_covid_table() %>%
+    gt::as_raw_html()
+  gc()
+
+  # Total deaths
+  n_deaths <- NROW(filter_deaths(ppl_pos))
+  gc()
+  remove(ppl_pos)
+  gc()
+
+  # Email body numbers
+  n_test_total <- test_total_df %>%
+    dplyr::filter(tolower(.data[["result"]]) == "total") %>%
+    dplyr::pull("n") %>%
+    format(big.mark = ",")
+  n_ppl_pos <- format(n_ppl_pos, big.mark = ",")
+  n_ppl_new <- subtract(
+    n_ppl_pos,
+    NROW(coviData::process_positive_people(date = date - 1L))
+  ) %>% format(big.mark = ",")
+  gc()
+  n_deaths <- format(n_deaths, big.mark = ",")
+
+  # Vaccination tables
+  vac_data <- coviData::vac_prep(coviData::vac_load(date = date))
+  gc()
+  vac_recent <- vac_table_recent(vac_data, date = date) %>%
+    gt::as_raw_html()
+  gc()
+  vac_ppl <- vac_table_totals(vac_data, date = date) %>%
+    gt::as_raw_html()
+  gc()
+  remove(vac_data)
+  gc()
+
+  body <- paste0(
+    intro,
+    "<br><br>",
+    "Total Tests: ", n_test_total, "<br>",
+    "Total Cases: ", n_ppl_pos, "<br>",
+    "New Cases: ", n_ppl_new, "<br>",
+    "Total Deaths: ", n_deaths,
+    "<br><br>",
+    "Call Center Numbers as of ", str_date, "<br>",
+    "Total Answered: **", "<br>",
+    "Total Calls to Date: *****",
+    "<br><br>",
+    vac_recent, "<br>",
+    vac_ppl,
+    "<br><br>",
+    "Thanks!",
+    "<br><br>",
+    "<h3>Supplementary Numbers: Delete Before Sending</h3>", "<br>",
+    test_tbl_total, "<br>",
+    ppl_tbl_total, "<br>",
+    cp_tbl, "<br>",
+    active_tbl,
+    "<br><br>",
+    "<i>Note: This email was generated automatically</i>"
+  )
+
+  coviData::notify(
+    to = to,
+    subject = subject,
+    body = body,
+    html = TRUE
+  )
+}
