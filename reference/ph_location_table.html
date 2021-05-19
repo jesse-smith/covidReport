@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Tabulated Death and Survival Outcomes from COVID-19 — death_table_total • covidReport</title>
+<title>Create a Location for a Flextable into a Powerpoint — ph_location_table • covidReport</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,8 @@
 
 
 
-<meta property="og:title" content="Tabulated Death and Survival Outcomes from COVID-19 — death_table_total" />
-<meta property="og:description" content="Tabulated Death and Survival Outcomes from COVID-19" />
+<meta property="og:title" content="Create a Location for a Flextable into a Powerpoint — ph_location_table" />
+<meta property="og:description" content="Create a Location for a Flextable into a Powerpoint" />
 
 
 
@@ -108,37 +108,85 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Tabulated Death and Survival Outcomes from COVID-19</h1>
-    <small class="dont-index">Source: <a href='https://github.com/jesse-smith/covidReport/blob/master/R/death_table_total.R'><code>R/death_table_total.R</code></a></small>
-    <div class="hidden name"><code>death_table_total.Rd</code></div>
+    <h1>Create a Location for a Flextable into a Powerpoint</h1>
+    <small class="dont-index">Source: <a href='https://github.com/jesse-smith/covidReport/blob/master/R/flextable.R'><code>R/flextable.R</code></a></small>
+    <div class="hidden name"><code>ph_location_table.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Tabulated Death and Survival Outcomes from COVID-19</p>
+    <p>Create a Location for a Flextable into a Powerpoint</p>
     </div>
 
-    <pre class="usage"><span class='fu'>death_table_total</span><span class='op'>(</span>
-  data <span class='op'>=</span> <span class='fu'>coviData</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/coviData/man/process_nbs.html'>process_positive_people</a></span><span class='op'>(</span>date <span class='op'>=</span> <span class='va'>date</span><span class='op'>)</span>,
-  date <span class='op'>=</span> <span class='cn'>NULL</span>
+    <pre class="usage"><span class='fu'>ph_location_table</span><span class='op'>(</span>
+  <span class='va'>flextable</span>,
+  <span class='va'>pptx</span>,
+  <span class='va'>layout</span>,
+  master <span class='op'>=</span> <span class='cn'>NULL</span>,
+  type <span class='op'>=</span> <span class='st'>"tbl"</span>,
+  pos_h <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  pos_first <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  halign <span class='op'>=</span> <span class='fl'>0.5</span>,
+  valign <span class='op'>=</span> <span class='fl'>0.5</span>,
+  newlabel <span class='op'>=</span> <span class='st'>""</span>,
+  id <span class='op'>=</span> <span class='fl'>1</span>
 <span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>data</th>
-      <td><p>Case data, as output by
-<code><a href='https://rdrr.io/pkg/coviData/man/process_nbs.html'>process_positive_people()</a></code></p></td>
+      <th>flextable</th>
+      <td><p>The flextable to add</p></td>
     </tr>
     <tr>
-      <th>date</th>
-      <td><p>The download data of the data; defaults to most recent</p></td>
+      <th>pptx</th>
+      <td><p>The powerpoint object</p></td>
+    </tr>
+    <tr>
+      <th>layout</th>
+      <td><p>The layout of the slide being added to</p></td>
+    </tr>
+    <tr>
+      <th>master</th>
+      <td><p>The slide master to use, if any</p></td>
+    </tr>
+    <tr>
+      <th>type</th>
+      <td><p>The placeholder type to use</p></td>
+    </tr>
+    <tr>
+      <th>pos_h</th>
+      <td><p>If multiple of the same placeholder <code>type</code> exist, how should
+the placeholder be chosen? <code>TRUE</code> means the horizontal axis will be
+used; <code>FALSE</code> means vertical. See <code>pos_first</code> for more information.</p></td>
+    </tr>
+    <tr>
+      <th>pos_first</th>
+      <td><p>If multiple of the same placeholder <code>type</code> exist, should
+the first (or last) be chosen (along the axis given by <code>pos_h</code>)?</p></td>
+    </tr>
+    <tr>
+      <th>halign</th>
+      <td><p>Horizontal table alignment with placeholder; <code>0</code> aligns left
+borders, <code>1</code> aligns right borders. Defaults to centered (<code>0.5</code>).</p></td>
+    </tr>
+    <tr>
+      <th>valign</th>
+      <td><p>Vertical table alignment with placeholder; <code>0</code> aligns bottom
+borders, <code>1</code> aligns top borders. Defaults to centered (<code>0.5</code>).</p></td>
+    </tr>
+    <tr>
+      <th>newlabel</th>
+      <td><p>a label for the placeholder. See section details.</p></td>
+    </tr>
+    <tr>
+      <th>id</th>
+      <td><p>index of the placeholder template. If two body placeholder, there can be
+two different index: 1 and 2 for the first and second body placeholders defined
+in the layout.</p></td>
     </tr>
     </table>
 
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
-
-    <p>A <code>flextable</code></p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

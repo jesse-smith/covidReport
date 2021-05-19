@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Tabulated Death and Survival Outcomes from COVID-19 — death_table_total • covidReport</title>
+<title>Skip Reporting Function Tests — skip_reports • covidReport</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,10 @@
 
 
 
-<meta property="og:title" content="Tabulated Death and Survival Outcomes from COVID-19 — death_table_total" />
-<meta property="og:description" content="Tabulated Death and Survival Outcomes from COVID-19" />
+<meta property="og:title" content="Skip Reporting Function Tests — skip_reports" />
+<meta property="og:description" content="Reporting functions are time-consuming to run; skip_reports() sets an
+option that allows the user to skip these tests. Component functions should
+be tested separately." />
 
 
 
@@ -108,37 +110,39 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Tabulated Death and Survival Outcomes from COVID-19</h1>
-    <small class="dont-index">Source: <a href='https://github.com/jesse-smith/covidReport/blob/master/R/death_table_total.R'><code>R/death_table_total.R</code></a></small>
-    <div class="hidden name"><code>death_table_total.Rd</code></div>
+    <h1>Skip Reporting Function Tests</h1>
+    <small class="dont-index">Source: <a href='https://github.com/jesse-smith/covidReport/blob/master/R/skip_reports.R'><code>R/skip_reports.R</code></a></small>
+    <div class="hidden name"><code>skip_reports.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Tabulated Death and Survival Outcomes from COVID-19</p>
+    <p>Reporting functions are time-consuming to run; <code>skip_reports()</code> sets an
+option that allows the user to skip these tests. Component functions should
+be tested separately.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>death_table_total</span><span class='op'>(</span>
-  data <span class='op'>=</span> <span class='fu'>coviData</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/coviData/man/process_nbs.html'>process_positive_people</a></span><span class='op'>(</span>date <span class='op'>=</span> <span class='va'>date</span><span class='op'>)</span>,
-  date <span class='op'>=</span> <span class='cn'>NULL</span>
-<span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>skip_reports</span><span class='op'>(</span>skip <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>data</th>
-      <td><p>Case data, as output by
-<code><a href='https://rdrr.io/pkg/coviData/man/process_nbs.html'>process_positive_people()</a></code></p></td>
-    </tr>
-    <tr>
-      <th>date</th>
-      <td><p>The download data of the data; defaults to most recent</p></td>
+      <th>skip</th>
+      <td><p>Should the reporting tests be skipped? If
+<code><a href='https://rdrr.io/r/base/options.html'>getOption(SKIP_REPORTS)</a></code> is unset during testing, <code>NULL</code> defaults to
+<code>TRUE</code>.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A <code>flextable</code></p>
+    <p>Either the previous value of <code>SKIP_REPORTS</code> (if setting the option)
+or a <code>skip</code> condition</p>
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p>When <code>skip = NULL</code>, this is used as a skipping function within a test. When
+a value is supplied, it sets the <code>SKIP_REPORTS</code> option that controls
+behavior during testing.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

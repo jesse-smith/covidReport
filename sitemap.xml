@@ -4,6 +4,12 @@
     <loc>https://jesse-smith.github.io/covidReport//index.html</loc>
   </url>
   <url>
+    <loc>https://jesse-smith.github.io/covidReport//reference/case_calc_active.html</loc>
+  </url>
+  <url>
+    <loc>https://jesse-smith.github.io/covidReport//reference/case_calc_confirmed_probable.html</loc>
+  </url>
+  <url>
     <loc>https://jesse-smith.github.io/covidReport//reference/case_plot_cumulative.html</loc>
   </url>
   <url>
@@ -16,10 +22,13 @@
     <loc>https://jesse-smith.github.io/covidReport//reference/case_table_confirmed_probable.html</loc>
   </url>
   <url>
-    <loc>https://jesse-smith.github.io/covidReport//reference/case_table_summary.html</loc>
+    <loc>https://jesse-smith.github.io/covidReport//reference/coviData-helpers.html</loc>
   </url>
   <url>
-    <loc>https://jesse-smith.github.io/covidReport//reference/coviData-helpers.html</loc>
+    <loc>https://jesse-smith.github.io/covidReport//reference/death_calc_age.html</loc>
+  </url>
+  <url>
+    <loc>https://jesse-smith.github.io/covidReport//reference/death_calc_total.html</loc>
   </url>
   <url>
     <loc>https://jesse-smith.github.io/covidReport//reference/death_table_age.html</loc>
@@ -29,6 +38,9 @@
   </url>
   <url>
     <loc>https://jesse-smith.github.io/covidReport//reference/filter_deaths.html</loc>
+  </url>
+  <url>
+    <loc>https://jesse-smith.github.io/covidReport//reference/fmt_covid_table.html</loc>
   </url>
   <url>
     <loc>https://jesse-smith.github.io/covidReport//reference/insp_archive_table.html</loc>
@@ -64,10 +76,16 @@
     <loc>https://jesse-smith.github.io/covidReport//reference/insp_trim_tables.html</loc>
   </url>
   <url>
+    <loc>https://jesse-smith.github.io/covidReport//reference/inv_calc_total.html</loc>
+  </url>
+  <url>
     <loc>https://jesse-smith.github.io/covidReport//reference/inv_table_total.html</loc>
   </url>
   <url>
     <loc>https://jesse-smith.github.io/covidReport//reference/magrittr-helpers.html</loc>
+  </url>
+  <url>
+    <loc>https://jesse-smith.github.io/covidReport//reference/ph_location_table.html</loc>
   </url>
   <url>
     <loc>https://jesse-smith.github.io/covidReport//reference/pop_2019.html</loc>
@@ -76,13 +94,22 @@
     <loc>https://jesse-smith.github.io/covidReport//reference/reexports.html</loc>
   </url>
   <url>
-    <loc>https://jesse-smith.github.io/covidReport//reference/result_table.html</loc>
+    <loc>https://jesse-smith.github.io/covidReport//reference/rpt_daily_mail.html</loc>
+  </url>
+  <url>
+    <loc>https://jesse-smith.github.io/covidReport//reference/rpt_daily_pptx.html</loc>
   </url>
   <url>
     <loc>https://jesse-smith.github.io/covidReport//reference/save_plot.html</loc>
   </url>
   <url>
     <loc>https://jesse-smith.github.io/covidReport//reference/shelby_poly.html</loc>
+  </url>
+  <url>
+    <loc>https://jesse-smith.github.io/covidReport//reference/skip_reports.html</loc>
+  </url>
+  <url>
+    <loc>https://jesse-smith.github.io/covidReport//reference/test_calc_total.html</loc>
   </url>
   <url>
     <loc>https://jesse-smith.github.io/covidReport//reference/test_plot_positivity.html</loc>

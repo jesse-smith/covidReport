@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Tabulated Death and Survival Outcomes from COVID-19 — death_table_total • covidReport</title>
+<title>Standardize Table Styling for COVID-19 Reports — fmt_covid_table • covidReport</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,8 @@
 
 
 
-<meta property="og:title" content="Tabulated Death and Survival Outcomes from COVID-19 — death_table_total" />
-<meta property="og:description" content="Tabulated Death and Survival Outcomes from COVID-19" />
+<meta property="og:title" content="Standardize Table Styling for COVID-19 Reports — fmt_covid_table" />
+<meta property="og:description" content="fmt_covid_table() standardizes styling for flextable and gt_tbl objects" />
 
 
 
@@ -108,37 +108,55 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Tabulated Death and Survival Outcomes from COVID-19</h1>
-    <small class="dont-index">Source: <a href='https://github.com/jesse-smith/covidReport/blob/master/R/death_table_total.R'><code>R/death_table_total.R</code></a></small>
-    <div class="hidden name"><code>death_table_total.Rd</code></div>
+    <h1>Standardize Table Styling for COVID-19 Reports</h1>
+    <small class="dont-index">Source: <a href='https://github.com/jesse-smith/covidReport/blob/master/R/fmt_covid_table.R'><code>R/fmt_covid_table.R</code></a></small>
+    <div class="hidden name"><code>fmt_covid_table.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Tabulated Death and Survival Outcomes from COVID-19</p>
+    <p><code>fmt_covid_table()</code> standardizes styling for <code>flextable</code> and <code>gt_tbl</code> objects</p>
     </div>
 
-    <pre class="usage"><span class='fu'>death_table_total</span><span class='op'>(</span>
-  data <span class='op'>=</span> <span class='fu'>coviData</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/coviData/man/process_nbs.html'>process_positive_people</a></span><span class='op'>(</span>date <span class='op'>=</span> <span class='va'>date</span><span class='op'>)</span>,
-  date <span class='op'>=</span> <span class='cn'>NULL</span>
+    <pre class="usage"><span class='fu'>fmt_covid_table</span><span class='op'>(</span>
+  <span class='va'>table</span>,
+  total <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  align_label <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"left"</span>, <span class='st'>"center"</span>, <span class='st'>"right"</span><span class='op'>)</span>
+<span class='op'>)</span>
+
+<span class='co'># S3 method for flextable</span>
+<span class='fu'>fmt_covid_table</span><span class='op'>(</span>
+  <span class='va'>table</span>,
+  total <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  align_label <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"left"</span>, <span class='st'>"center"</span>, <span class='st'>"right"</span><span class='op'>)</span>
+<span class='op'>)</span>
+
+<span class='co'># S3 method for gt_tbl</span>
+<span class='fu'>fmt_covid_table</span><span class='op'>(</span>
+  <span class='va'>table</span>,
+  total <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  align_label <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"left"</span>, <span class='st'>"center"</span>, <span class='st'>"right"</span><span class='op'>)</span>
 <span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>data</th>
-      <td><p>Case data, as output by
-<code><a href='https://rdrr.io/pkg/coviData/man/process_nbs.html'>process_positive_people()</a></code></p></td>
+      <th>table</th>
+      <td><p>A <code>flextable</code> or <code>gt_tbl</code> object</p></td>
     </tr>
     <tr>
-      <th>date</th>
-      <td><p>The download data of the data; defaults to most recent</p></td>
+      <th>total</th>
+      <td><p>Does the table contain a "Total" row at the bottom?</p></td>
+    </tr>
+    <tr>
+      <th>align_label</th>
+      <td><p>Alignment for left-most column (labels, by convention)</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A <code>flextable</code></p>
+    <p>A <code>flextable</code> or <code>gt_tbl</code> with modified styling</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

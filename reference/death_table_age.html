@@ -117,7 +117,10 @@
     <p>Tabulate Age Median and Range for COVID-19 Deaths</p>
     </div>
 
-    <pre class="usage"><span class='fu'>death_table_age</span><span class='op'>(</span>data <span class='op'>=</span> <span class='fu'>coviData</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/coviData/man/process_nbs.html'>process_positive_people</a></span><span class='op'>(</span><span class='op'>)</span>, date <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>death_table_age</span><span class='op'>(</span>
+  data <span class='op'>=</span> <span class='fu'>coviData</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/coviData/man/process_nbs.html'>process_positive_people</a></span><span class='op'>(</span>date <span class='op'>=</span> <span class='va'>date</span><span class='op'>)</span>,
+  date <span class='op'>=</span> <span class='cn'>NULL</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -135,7 +138,7 @@
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A <code>gt_tbl</code></p>
+    <p>A <code>flextable</code></p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
