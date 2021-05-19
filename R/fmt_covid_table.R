@@ -110,7 +110,7 @@ fmt_covid_table.gt_tbl <- function(
       column_labels.border.top.width = gt::px(0L),
       column_labels.border.bottom.color = "#00000000",
       column_labels.border.bottom.width = gt::px(0L),
-      # Inner horizonal borders
+      # Inner horizontal borders
       table_body.hlines.color = "grey60",
       # Footer bottom border (delete)
       source_notes.border.bottom.color = "#00000000",
@@ -127,6 +127,7 @@ fmt_covid_table.gt_tbl <- function(
     # Format total row
     purrr::when(
       total ~ gt::tab_style(
+        .,
         style = list(
           gt::cell_text(weight = "bold"),
           gt::cell_borders(
@@ -135,7 +136,8 @@ fmt_covid_table.gt_tbl <- function(
             weight = gt::px(2L)
           )
         ),
-        locations = gt::cells_body(rows = NROW(extract2("_data")))
-      )
+        locations = gt::cells_body(rows = NROW(extract2(., "_data")))
+      ),
+      ~ .
     )
 }
