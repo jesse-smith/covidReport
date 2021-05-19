@@ -11,18 +11,38 @@ test_table_total <- function(
   data = coviData::read_file_delim(coviData::path_pcr(date)),
   date = NULL
 ) {
+  data %>%
+    test_calc_total(date = date) %>%
+    dplyr::mutate(percent = 100 * .data[["percent"]]) %>%
+    flextable::flextable() %>%
+    flextable::set_header_labels(
+      result = "PCR Result",
+      n = "N",
+      percent = "%"
+    ) %>%
+    fmt_covid_table(total = TRUE) %>%
+    flextable::colformat_double(j = "percent", digits = 1L, suffix = "%") %>%
+    flextable::autofit()
+}
+
+#' Calculate PCR Test Totals
+#'
+#' @inheritParams test_table_total
+#'
+#' @return A `tibble`
+#'
+#' @keywords internal
+test_calc_total <- function(
+  data = coviData::read_file_delim(coviData::path_pcr(date)),
+  date = NULL
+) {
   n_positive <- NROW(coviData::process_positive_tests(data, date = date))
   n_negative <- NROW(coviData::process_negative_tests(data, date = date))
   n_total    <- n_positive + n_negative
 
   tibble::tibble(
     result = c("Positive", "Negative", "Total"),
-    N = c(n_positive, n_negative, n_total),
-    percent = 100 * .data[["N"]] / n_total
-  ) %>%
-    flextable::flextable() %>%
-    flextable::set_header_labels(result = "PCR Result", percent = "%") %>%
-    fmt_covid_table(total = TRUE) %>%
-    flextable::colformat_double(j = "percent", digits = 1L, suffix = "%") %>%
-    flextable::autofit()
+    n = c(n_positive, n_negative, n_total),
+    percent = .data[["n"]] / n_total
+  )
 }
