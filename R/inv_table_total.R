@@ -10,8 +10,53 @@
 #'
 #' @param date The download date of `data`; defaults to most recent
 #'
+#' @return A `flextable`
+#'
 #' @export
 inv_table_total <- function(
+  data = coviData::process_positive_people(date = date),
+  nit_token = Sys.getenv("redcap_NIT_token"),
+  prior_contacts = 45669L,
+  date = NULL
+) {
+
+  inv_opened_lbl <- "Opened Investigations"
+  inv_closed_lbl <- "Closed Investigations"
+  contacts_total_lbl <- "Contacts Identified to Date"
+  contacts_14_lbl <- "Contacts Identified in Last 14 Days"
+
+  data %>%
+    inv_calc_total(
+      nit_token = nit_token,
+      prior_contacts = prior_contacts,
+      date = date
+    ) %>%
+    dplyr::mutate(
+      measure = dplyr::case_when(
+        .data[["measure"]] == "inv_opened" ~ {{ inv_opened_lbl }},
+        .data[["measure"]] == "inv_closed" ~ {{ inv_closed_lbl }},
+        .data[["measure"]] == "contacts_total" ~ {{ contacts_total_lbl }},
+        .data[["measure"]] == "contacts_14" ~ contacts_14_lbl,
+        TRUE ~ NA_character_
+      )
+    ) %>%
+    flextable::flextable() %>%
+    flextable::set_header_labels(measure = "Number of...", n = "N") %>%
+    flextable::add_footer_lines(
+      values = "Data Source: Shelby County Health Department"
+    ) %>%
+    fmt_covid_table() %>%
+    flextable::autofit()
+}
+
+#' Calculate Summary Investigation Numbers
+#'
+#' @inheritParams inv_table_total
+#'
+#' @return A `tibble`
+#'
+#' @keywords internal
+inv_calc_total <- function(
   data = coviData::process_positive_people(date = date),
   nit_token = Sys.getenv("redcap_NIT_token"),
   prior_contacts = 45669L,
@@ -40,31 +85,12 @@ inv_table_total <- function(
     sum(na.rm = TRUE)
 
   tibble::tribble(
-                                ~ measure,            ~ n,
-                  "Opened Investigations",     opened_inv,
-                  "Closed Investigations",     closed_inv,
-            "Contacts Identified to Date", contacts_total,
-    "Contacts Identified in Last 14 Days",    contacts_14
-  ) %>%
-    gt::gt() %>%
-    fmt_covid_table() %>%
-    gt::cols_label(measure = "Number of...", n = "N") %>%
-    gt::fmt_number("n", decimals = 0) %>%
-    gt::cols_align("right") %>%
-    gt::tab_style(
-      style = gt::cell_text(align = "center"),
-      locations = gt::cells_column_labels("n")
-    ) %>%
-    gt::tab_style(
-      style = gt::cell_text(weight = "bold"),
-      locations = list(
-        gt::cells_column_labels(gt::everything()),
-        gt::cells_body("measure")
-      )
-    ) %>%
-    gt::tab_source_note(
-      gt::md("*Data Source: Shelby County Health Department*")
-    )
+    ~ measure,            ~ n,
+    "inv_opened",     opened_inv,
+    "inv_closed",     closed_inv,
+    "contacts_total", contacts_total,
+    "contacts_14",    contacts_14
+  )
 }
 
 #' Download and Summarize REDcap Contacts by Date

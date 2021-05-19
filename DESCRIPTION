@@ -21,6 +21,7 @@ Imports:
     base64enc,
     coviData,
     covidModel,
+    flextable,
     ggsci,
     gt,
     httr,
@@ -42,6 +43,7 @@ Suggests:
     jsonlite,
     lubridate,
     mockery,
+    officer,
     purrr,
     rvest,
     scales,
@@ -50,6 +52,7 @@ Suggests:
     tibble,
     tidyr,
     vdiffr,
+    withr,
     xml2
 Remotes: 
     jesse-smith/coviData,

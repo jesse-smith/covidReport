@@ -4,7 +4,10 @@
 \alias{death_table_age}
 \title{Tabulate Age Median and Range for COVID-19 Deaths}
 \usage{
-death_table_age(data = coviData::process_positive_people(), date = NULL)
+death_table_age(
+  data = coviData::process_positive_people(date = date),
+  date = NULL
+)
 }
 \arguments{
 \item{data}{Case data, as output by
@@ -13,7 +16,7 @@ death_table_age(data = coviData::process_positive_people(), date = NULL)
 \item{date}{The download date of the data; defaults to most recent}
 }
 \value{
-A \code{gt_tbl}
+A \code{flextable}
 }
 \description{
 Tabulate Age Median and Range for COVID-19 Deaths

@@ -1,9 +1,13 @@
-# `death_table_age()` html matches snapshot
+# `void(death_table_age())` matches snapshot
 
     Code
-      tbl_html
+      tbl_void
     Output
-      {html_document}
-      <html>
-      [1] <body><table style="font-family: -apple-system, BlinkMacSystemFont, 'Sego ...
+      a flextable object.
+      col_keys: `median`, `range` 
+      header has 1 row(s) 
+      body has 1 row(s) 
+      original dataset sample: 
+        median  range
+      1     55 10-100
 

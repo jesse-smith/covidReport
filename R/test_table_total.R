@@ -4,10 +4,35 @@
 #'
 #' @param date The download date of the data to read; defaults to most recent
 #'
-#' @return A `gt_tbl`
+#' @return A `flextable`
 #'
 #' @export
 test_table_total <- function(
+  data = coviData::read_file_delim(coviData::path_pcr(date)),
+  date = NULL
+) {
+  data %>%
+    test_calc_total(date = date) %>%
+    dplyr::mutate(percent = 100 * .data[["percent"]]) %>%
+    flextable::flextable() %>%
+    flextable::set_header_labels(
+      result = "PCR Result",
+      n = "N",
+      percent = "%"
+    ) %>%
+    fmt_covid_table(total = TRUE) %>%
+    flextable::colformat_double(j = "percent", digits = 1L, suffix = "%") %>%
+    flextable::autofit()
+}
+
+#' Calculate PCR Test Totals
+#'
+#' @inheritParams test_table_total
+#'
+#' @return A `tibble`
+#'
+#' @keywords internal
+test_calc_total <- function(
   data = coviData::read_file_delim(coviData::path_pcr(date)),
   date = NULL
 ) {
@@ -19,22 +44,5 @@ test_table_total <- function(
     result = c("Positive", "Negative", "Total"),
     n = c(n_positive, n_negative, n_total),
     percent = .data[["n"]] / n_total
-  ) %>%
-    gt::gt() %>%
-    fmt_covid_table() %>%
-    gt::cols_label(result = "PCR Result", n = "N", percent = "%") %>%
-    gt::fmt_number("n", decimals = 0L) %>%
-    gt::fmt_percent("percent", decimals = 1L, drop_trailing_zeros = TRUE) %>%
-    gt::cols_align("right") %>%
-    gt::tab_style(
-      style = gt::cell_text(weight = "bold"),
-      locations = list(
-        gt::cells_column_labels(gt::everything()),
-        gt::cells_body(rows = 3L)
-      )
-    ) %>%
-    gt::tab_style(
-      style = gt::cell_text(align = "center"),
-      locations = gt::cells_column_labels(gt::everything())
-    )
+  )
 }

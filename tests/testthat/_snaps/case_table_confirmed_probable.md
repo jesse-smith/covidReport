@@ -1,9 +1,14 @@
-# `case_table_confirmed_probable()` html matches snapshot
+# `void(case_table_confirmed_probable())` matches snapshot
 
     Code
-      tbl_html
+      tbl_void
     Output
-      {html_document}
-      <html>
-      [1] <body><table style="font-family: -apple-system, BlinkMacSystemFont, 'Sego ...
+      a flextable object.
+      col_keys: `type`, `total`, `C`, `P` 
+      header has 1 row(s) 
+      body has 2 row(s) 
+      original dataset sample: 
+          type  total     C     P
+      1  Cases 100000 80000 20000
+      2 Deaths   9999  7999  2000
 

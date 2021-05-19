@@ -5,10 +5,35 @@
 #'
 #' @param date Download date of the data; defaults to most recent
 #'
-#' @return A `gt_tbl`
+#' @return A `flextable`
 #'
 #' @export
 case_table_active <- function(
+  data = coviData::process_positive_people(date = date),
+  date = NULL
+) {
+   case_calc_active(data, date = date) %>%
+    janitor::adorn_totals() %>%
+    dplyr::mutate(percent = 100 * .data[["percent"]]) %>%
+    flextable::flextable() %>%
+    flextable::set_header_labels(
+      status = "Status",
+      n = "N",
+      percent = "%"
+    ) %>%
+    fmt_covid_table(total = TRUE) %>%
+    flextable::colformat_double(j = "percent", digits = 1L, suffix = "%") %>%
+    flextable::autofit()
+}
+
+#' Calculate Active, Deceased, and Inactive/Recovered COVID-19 Cases
+#'
+#' @inheritParams case_table_active
+#'
+#' @return A `tibble`
+#'
+#' @keywords internal
+case_calc_active <- function(
   data = coviData::process_positive_people(date = date),
   date = NULL
 ) {
@@ -37,7 +62,7 @@ case_table_active <- function(
       status = dplyr::case_when(
         .data[["died"]] ~ "Deceased",
         .data[["active"]] ~ "Active",
-        TRUE ~ "Inactive/Recovered"
+        TRUE ~ "Inactive"
       )
     ) %>%
     janitor::tabyl(.data[["status"]]) %>%
@@ -60,10 +85,10 @@ case_table_active <- function(
       )
     ) %>%
     purrr::when(
-      "Inactive/Recovered" %in% dplyr::pull(., "status") ~ .,
+      "Inactive" %in% dplyr::pull(., "status") ~ .,
       ~ dplyr::add_row(
         .,
-        status = "Inactive/Recovered",
+        status = "Inactive",
         n = 0L,
         percent = 0
       )
@@ -74,51 +99,5 @@ case_table_active <- function(
         round(digits = 3) %>%
         vec_assign(i = 3L, 1 - vec_slice(., 1L) - vec_slice(., 2L))
     ) %>%
-    janitor::adorn_totals() %>%
-    gt::gt() %>%
-    fmt_covid_table() %>%
-    gt::cols_label(status = "Status", n = "N", percent = "%") %>%
-    gt::fmt_number("n", decimals = 0L) %>%
-    gt::fmt_percent("percent", decimals = 1L) %>%
-    gt::cols_align("right") %>%
-    gt::tab_style(
-      style = gt::cell_text(align = "center"),
-      locations = list(
-        gt::cells_column_labels(gt::everything()),
-        gt::cells_body("status")
-      )
-    ) %>%
-    gt::tab_style(
-      style = gt::cell_text(weight = "bold"),
-      locations = list(
-        gt::cells_column_labels(gt::everything()),
-        gt::cells_body(columns = "status"),
-        gt::cells_body(rows = 4L)
-      )
-    ) %>%
-    gt::tab_style(
-      style = gt::cell_borders(sides = c("top", "bottom"), weight = NULL),
-      locations = gt::cells_body(rows = 1:3)
-    ) %>%
-    gt::tab_style(
-      style = gt::cell_borders(sides = c("left", "right"), weight = NULL),
-      locations = list(
-        gt::cells_column_labels("n"),
-        gt::cells_body(columns = "n")
-      )
-    ) %>%
-    gt::tab_style(
-      style = gt::cell_borders(sides = "right", weight = NULL),
-      locations = list(
-        gt::cells_column_labels("status"),
-        gt::cells_body(columns = "status")
-      )
-    ) %>%
-     gt::tab_style(
-       style = gt::cell_borders(sides = "left", weight = NULL),
-       locations = list(
-         gt::cells_column_labels("percent"),
-         gt::cells_body(columns = "percent")
-       )
-     )
+    dplyr::as_tibble()
 }
