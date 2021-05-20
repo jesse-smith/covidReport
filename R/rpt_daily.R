@@ -271,6 +271,8 @@ rpt_daily_pptx <- function(
 #'
 #' @param to A `character` vector of recipient email addresses
 #'
+#' @param dir_pptx Directory containing daily status report powerpoint files
+#'
 #' @export
 rpt_daily_mail <- function(
   date = NULL,
@@ -278,6 +280,10 @@ rpt_daily_mail <- function(
     "Jesse.Smith@shelbycountytn.gov",
     "Chaitra.Subramanya@shelbycountytn.gov",
     "Allison.Plaxco@shelbycountytn.gov"
+  ),
+  dir_pptx = coviData::path_create(
+    "V:/EPI DATA ANALYTICS TEAM/COVID SANDBOX REDCAP DATA/Status Report",
+    "automated"
   )
 ) {
 
@@ -347,17 +353,17 @@ rpt_daily_mail <- function(
   gc()
 
   # Email body numbers
-  n_test_total <- test_total_df %>%
+  str_test_total <- test_total_df %>%
     dplyr::filter(tolower(.data[["result"]]) == "total") %>%
     dplyr::pull("n") %>%
     format(big.mark = ",")
-  n_ppl_pos <- format(n_ppl_pos, big.mark = ",")
-  n_ppl_new <- subtract(
+  str_ppl_pos <- format(n_ppl_pos, big.mark = ",")
+  str_ppl_new <- subtract(
     n_ppl_pos,
     NROW(coviData::process_positive_people(date = date - 1L))
   ) %>% format(big.mark = ",")
   gc()
-  n_deaths <- format(n_deaths, big.mark = ",")
+  str_deaths <- format(n_deaths, big.mark = ",")
 
   # Vaccination tables
   vac_data <- coviData::vac_prep(coviData::vac_load(date = date))
@@ -374,10 +380,10 @@ rpt_daily_mail <- function(
   body <- paste0(
     intro,
     "<br><br>",
-    "Total Tests: ", n_test_total, "<br>",
-    "Total Cases: ", n_ppl_pos, "<br>",
-    "New Cases: ", n_ppl_new, "<br>",
-    "Total Deaths: ", n_deaths,
+    "Total Tests: ", str_test_total, "<br>",
+    "Total Cases: ", str_ppl_pos, "<br>",
+    "New Cases: ", str_ppl_new, "<br>",
+    "Total Deaths: ", str_deaths,
     "<br><br>",
     "Call Center Numbers as of ", str_date, "<br>",
     "Total Answered: **", "<br>",
@@ -397,10 +403,20 @@ rpt_daily_mail <- function(
     "<i>Note: This email was generated automatically</i>"
   )
 
+  # Get powerpoint if available
+  ppt_path <- fs::dir_ls(
+    dir_pptx,
+    type = "file",
+    regexp = paste0("daily_status_report_", date, ".pptx", collapse = "")
+  )
+
+  if (vec_is_empty(ppt_path)) ppt_path <- NULL
+
   coviData::notify(
     to = to,
     subject = subject,
     body = body,
-    html = TRUE
+    html = TRUE,
+    attach = ppt_path
   )
 }
