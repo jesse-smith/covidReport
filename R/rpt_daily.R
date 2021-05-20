@@ -430,8 +430,6 @@ rpt_daily_mail <- function(
     regexp = paste0("daily_status_report_", date, ".pptx", collapse = "")
   )
 
-  if (vec_is_empty(ppt_path)) ppt_path <- NULL
-
   coviData::notify(
     to = to,
     subject = subject,
