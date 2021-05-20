@@ -85,14 +85,14 @@ fmt_covid_table.gt_tbl <- function(
   table %>%
     # Background
     gt::tab_options(
-      table.background.color = "#f0f0f0",
+      table.background.color = "white",
       column_labels.background.color = "midnightblue"
     ) %>%
     # Font
     gt::tab_options(table.font.names = c("Arial", "Helvetica")) %>%
     # Font color
     gt::tab_options(table.font.color = "grey30") %>%
-    gt::tab_style(gt::cell_text(color = "#f0f0f0"), location = header) %>%
+    gt::tab_style(gt::cell_text(color = "white"), location = header) %>%
     # Font boldness
     gt::tab_style(
       gt::cell_text(weight = "bold"),
@@ -101,20 +101,28 @@ fmt_covid_table.gt_tbl <- function(
     # Borders
     gt::tab_options(
       # Table top border (delete)
-      table.border.top.color = "#00000000",
-      table.border.top.width = gt::px(0L),
+      table.border.top.style = "hidden",
       # Table bottom border
       table.border.bottom.color = "grey30",
+      # Header top/bottom borders (delete)
+      heading.border.bottom.style = "hidden",
       # Column labels top/bottom borders (delete)
-      column_labels.border.top.color = "#00000000",
-      column_labels.border.top.width = gt::px(0L),
-      column_labels.border.bottom.color = "#00000000",
-      column_labels.border.bottom.width = gt::px(0L),
+      column_labels.border.top.style = "hidden",
+      column_labels.border.bottom.style = "hidden",
+      # Stub borders
+      stub.border.style = "hidden",
       # Inner horizontal borders
       table_body.hlines.color = "grey60",
+      # Inner vertical borders
+      column_labels.vlines.color = "midnightblue",
+      column_labels.vlines.style = "hidden",
       # Footer bottom border (delete)
-      source_notes.border.bottom.color = "#00000000",
-      source_notes.border.bottom.width = gt::px(0L)
+      source_notes.border.bottom.style = "hidden",
+    ) %>%
+    gt::tab_style(
+      # Top body border (delete)
+      gt::cell_borders(sides = "top", color = "white", weight = NULL),
+      locations = gt::cells_body(rows = 1L)
     ) %>%
     # Align label column
     gt::tab_style(

@@ -49,14 +49,10 @@ vac_table_totals <- function(
     gt::gt() %>%
     gt::cols_label(
       total = gt::html("<b>Total</b>"),
-      partial = gt::html("<b>Partial<br</b>"),
+      partial = gt::html("<b>Partial</b>"),
       full = gt::html("<b>Full</b>")
     ) %>%
     gt::tab_header(gt::html("<b>", title, "</b>")) %>%
     gt::fmt_number(gt::everything(), decimals = 0L) %>%
-    fmt_covid_table() %>%
-    gt::tab_style(
-      style = gt::cell_text(weight = "bold"),
-      locations = gt::cells_body(columns = "total")
-    )
+    fmt_covid_table()
 }

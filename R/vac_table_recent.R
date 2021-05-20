@@ -48,5 +48,10 @@ vac_table_recent <- function(
       n_last_week = gt::html("<b>Doses Reported<br>Within Last 7 Days</b>")
     ) %>%
     gt::fmt_number(columns = gt::everything(), decimals = 0L) %>%
-    fmt_covid_table()
+    fmt_covid_table() %>%
+    # Remove bold weighting of labels
+    gt::tab_style(
+      gt::cell_text(weight = "normal"),
+      locations = gt::cells_body(rows = 1L)
+    )
 }
