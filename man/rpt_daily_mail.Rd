@@ -7,13 +7,18 @@
 rpt_daily_mail(
   date = NULL,
   to = c("Jesse.Smith@shelbycountytn.gov", "Chaitra.Subramanya@shelbycountytn.gov",
-    "Allison.Plaxco@shelbycountytn.gov")
+    "Allison.Plaxco@shelbycountytn.gov"),
+ 
+    dir_pptx = coviData::path_create("V:/EPI DATA ANALYTICS TEAM/COVID SANDBOX REDCAP DATA/Status Report",
+    "automated")
 )
 }
 \arguments{
 \item{date}{The date for which to run the report; defaults to most recent}
 
 \item{to}{A \code{character} vector of recipient email addresses}
+
+\item{dir_pptx}{Directory containing daily status report powerpoint files}
 }
 \description{
 Send Daily COVID-19 Status Summary via Outlook Email

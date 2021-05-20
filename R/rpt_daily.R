@@ -311,6 +311,9 @@ rpt_daily_mail <- function(
     dplyr::select(-"percent") %>%
     gt::gt() %>%
     fmt_covid_table(total = TRUE) %>%
+    gt::opt_align_table_header("right") %>%
+    gt::cols_align("right") %>%
+    gt::fmt_number("n", decimals = 0L) %>%
     gt::as_raw_html()
 
   # People totals
@@ -329,6 +332,9 @@ rpt_daily_mail <- function(
   ) %>%
     gt::gt() %>%
     fmt_covid_table(total = TRUE) %>%
+    gt::opt_align_table_header("right") %>%
+    gt::cols_align("right") %>%
+    gt::fmt_number("n", decimals = 0L) %>%
     gt::as_raw_html()
   gc()
 
@@ -336,13 +342,20 @@ rpt_daily_mail <- function(
   cp_tbl <- case_calc_confirmed_probable(ppl_pos, date = date) %>%
     gt::gt() %>%
     fmt_covid_table() %>%
+    gt::opt_align_table_header("right") %>%
+    gt::cols_align("right") %>%
+    gt::fmt_number(c("total", "C", "P"), decimals = 0L) %>%
     gt::as_raw_html()
   gc()
 
   # Active
   active_tbl <- case_calc_active(ppl_pos, date = date) %>%
+    dplyr::select(-"percent") %>%
     gt::gt() %>%
     fmt_covid_table() %>%
+    gt::opt_align_table_header("right") %>%
+    gt::cols_align("right") %>%
+    gt::fmt_number("n", decimals = 0L) %>%
     gt::as_raw_html()
   gc()
 
