@@ -89,7 +89,11 @@ rpt_daily_pptx <- function(
   # Initialize Powerpoint
   master <- "HD Blue and White"
   date_ppt <- format(date, "%B %d, %Y")
-  pptx <- officer::read_pptx("dev/covid_report_template.pptx")
+  pptx <- officer::read_pptx(system.file(
+    "extdata", "covid_report_template.pptx",
+    package = "covidReport",
+    mustWork = TRUE
+  ))
 
   # Create title slide
   title <- "COVID-19 Daily Status Report"
