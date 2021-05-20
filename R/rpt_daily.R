@@ -16,15 +16,23 @@ rpt_daily_pptx <- function(
   )
 ) {
 
-  if (is.null(date)) {
+  # Ensure valid date
+  if (vec_is_empty(date)) {
     date <- coviData::path_inv() %>%
       fs::path_file() %>%
       fs::path_ext_remove() %>%
       stringr::str_extract("[0-9]{1,4}.?[0-9]{1,2}.?[0-9]{1,4}") %>%
       lubridate::as_date()
   }
-
   date <- lubridate::as_date(date)
+
+  # Load powerpoint template
+  pptx <- officer::read_pptx(system.file(
+    "extdata", "covid_report_template.pptx",
+    package = "covidReport",
+    mustWork = TRUE
+  ))
+  gc()
 
   # Data
   pos_ppl <- dplyr::select(
@@ -86,14 +94,9 @@ rpt_daily_pptx <- function(
   remove(pos_ppl, pcr)
   gc()
 
-  # Initialize Powerpoint
+  # Report variables
   master <- "HD Blue and White"
   date_ppt <- format(date, "%B %d, %Y")
-  pptx <- officer::read_pptx(system.file(
-    "extdata", "covid_report_template.pptx",
-    package = "covidReport",
-    mustWork = TRUE
-  ))
 
   # Create title slide
   title <- "COVID-19 Daily Status Report"
