@@ -11,13 +11,21 @@
 #'
 #' @export
 vac_map_pct <- function(
-  data = coviData::vac_prep(coviData::vac_load(date = date)),
+  data = coviData::vac_prep(coviData::read_vac(date = date)),
   date = NULL,
   zip_path = coviData::path_create(
     "O:/EPI/Shapefiles 07.2014/MergedZips",
     "AllZipswithMergedZips_clippedbySCBoundary.shp"
   )
 ) {
+
+  if (!rlang::is_installed("RColorBrewer") || !rlang::is_installed("sf")) {
+    rlang::abort(paste(
+      "The {RColorBrewer} and {sf} packages must be installed",
+      "to use `vac_map_pct()`"
+    ))
+  }
+
   zips <- sf::read_sf(zip_path)
   denoms <- coviData::path_create(
     "V:/EPI DATA ANALYTICS TEAM/COVID SANDBOX REDCAP DATA",
@@ -34,7 +42,7 @@ vac_map_pct <- function(
     )
 
   counts <- data %>%
-    vac_residents() %>%
+    vac_filter_residents() %>%
     vac_distinct() %>%
     dplyr::transmute(
       zip = vac_parse_zip(.data[["address_zip"]]),

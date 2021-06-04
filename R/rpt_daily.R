@@ -386,7 +386,7 @@ rpt_daily_mail <- function(
   str_deaths <- format(n_deaths, big.mark = ",")
 
   # Vaccination tables
-  vac_data <- coviData::vac_prep(coviData::vac_load(date = date))
+  vac_data <- coviData::vac_prep(coviData::read_vac(date = date))
   gc()
   vac_recent <- vac_table_recent(vac_data, date = date) %>%
     gt::as_raw_html()
