@@ -10,7 +10,7 @@
 #'
 #' @export
 vac_table_totals <- function(
-  data = coviData::vac_prep(coviData::vac_load(date = date)),
+  data = coviData::vac_prep(coviData::read_vac(date = date)),
   date = NULL
 ) {
 

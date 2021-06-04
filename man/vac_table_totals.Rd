@@ -5,7 +5,7 @@
 \title{Create a Table of Vaccination Totals}
 \usage{
 vac_table_totals(
-  data = coviData::vac_prep(coviData::vac_load(date = date)),
+  data = coviData::vac_prep(coviData::read_vac(date = date)),
   date = NULL
 )
 }

@@ -17,7 +17,7 @@
 #'
 #' @export
 vac_count <- function(
-  .data = coviData::vac_prep(coviData::vac_load(date = date)),
+  .data = coviData::vac_prep(coviData::read_vac(date = date)),
   by = c("person", "dose"),
   resident_only = TRUE,
   filter_2nd_dose = TRUE,

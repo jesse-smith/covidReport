@@ -2,20 +2,11 @@
 % Please edit documentation in R/vac_plot_age.R
 \name{vac_plot_age}
 \alias{vac_plot_age}
-\alias{plot_vac_age}
 \title{Plot Vaccinations by Age Group}
 \usage{
 vac_plot_age(
-  .data = coviData::vac_load() \%>\% coviData::vac_prep(),
+  .data = coviData::vac_prep(coviData::read_vac()),
   by_pop = TRUE,
-  incl_under_12 = FALSE
-)
-
-plot_vac_age(
-  .data = coviData::vac_load() \%>\% coviData::vac_prep(),
-  pct = lifecycle::deprecated(),
-  by_pop = TRUE,
-  incl_under_15 = lifecycle::deprecated(),
   incl_under_12 = FALSE
 )
 }
@@ -28,17 +19,12 @@ population statistics (\code{TRUE}, the default) or not (\code{FALSE})?}
 
 \item{incl_under_12}{Should the age group \code{"0-11"} be included? The default
 is \code{FALSE}.}
-
-\item{pct}{Deprecated.}
-
-\item{incl_under_15}{Deprecated.}
 }
 \value{
 A \code{ggplot} object
 }
 \description{
-\code{plot_vac_age()} plots vaccinations by age group in a bar chart.
-\code{plot_vac_age()} is a deprecated wrapper for \code{vac_plot_age()}.
+\code{vac_plot_age()} plots vaccinations by age group in a bar chart.
 }
 \details{
 When \code{by_pop = TRUE},

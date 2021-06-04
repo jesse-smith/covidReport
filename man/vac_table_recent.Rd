@@ -5,7 +5,7 @@
 \title{Create Table of Recent and Total Vaccine Doses}
 \usage{
 vac_table_recent(
-  data = coviData::vac_prep(coviData::vac_load(date = date)),
+  data = coviData::vac_prep(coviData::read_vac(date = date)),
   date = NULL
 )
 }

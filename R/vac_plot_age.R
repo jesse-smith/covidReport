@@ -1,7 +1,6 @@
 #' Plot Vaccinations by Age Group
 #'
-#' `plot_vac_age()` plots vaccinations by age group in a bar chart.
-#' `plot_vac_age()` is a deprecated wrapper for `vac_plot_age()`.
+#' `vac_plot_age()` plots vaccinations by age group in a bar chart.
 #'
 #' When `by_pop = TRUE`,
 #' the resulting figure displays vaccinations with reference to the population
@@ -17,15 +16,11 @@
 #' @param incl_under_12 Should the age group `"0-11"` be included? The default
 #'   is `FALSE`.
 #'
-#' @param pct Deprecated.
-#'
-#' @param incl_under_15 Deprecated.
-#'
 #' @return A `ggplot` object
 #'
 #' @export
 vac_plot_age <- function(
-  .data = coviData::vac_load() %>% coviData::vac_prep(),
+  .data = coviData::vac_prep(coviData::read_vac()),
   by_pop = TRUE,
   incl_under_12 = FALSE
 ) {
@@ -52,23 +47,6 @@ vac_plot_age <- function(
     remove_x_grid() %>%
     add_vac_age_scale(by_pop = by_pop) %>%
     add_vac_age_title_caption(by_pop = by_pop, date = date)
-}
-
-#' @rdname vac_plot_age
-#'
-#' @export
-plot_vac_age <- function(
-  .data = coviData::vac_load() %>% coviData::vac_prep(),
-  pct = lifecycle::deprecated(),
-  by_pop = TRUE,
-  incl_under_15 = lifecycle::deprecated(),
-  incl_under_12 = FALSE
-) {
-  vac_plot_age(
-    .data = .data,
-    by_pop = by_pop,
-    incl_under_12 = incl_under_15
-  )
 }
 
 vac_age_ggplot <- function(.data, pct, by_pop) {
