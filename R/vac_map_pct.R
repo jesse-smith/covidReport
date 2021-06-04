@@ -18,6 +18,14 @@ vac_map_pct <- function(
     "AllZipswithMergedZips_clippedbySCBoundary.shp"
   )
 ) {
+
+  if (!rlang::is_installed("RColorBrewer") || !rlang::is_installed("sf")) {
+    rlang::abort(paste(
+      "The {RColorBrewer} and {sf} packages must be installed",
+      "to use `vac_map_pct()`"
+    ))
+  }
+
   zips <- sf::read_sf(zip_path)
   denoms <- coviData::path_create(
     "V:/EPI DATA ANALYTICS TEAM/COVID SANDBOX REDCAP DATA",
