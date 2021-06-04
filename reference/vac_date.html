@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Get Latest Date Contained in Vaccination File — vac_date • covidReport</title>
+<title>Get date of a TennIIS vaccination file — vac_date • covidReport</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,8 @@
 
 
 
-<meta property="og:title" content="Get Latest Date Contained in Vaccination File — vac_date" />
-<meta property="og:description" content="Get Latest Date Contained in Vaccination File" />
+<meta property="og:title" content="Get date of a TennIIS vaccination file — vac_date" />
+<meta property="og:description" content="" />
 
 
 
@@ -108,13 +108,13 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Get Latest Date Contained in Vaccination File</h1>
-    <small class="dont-index">Source: <a href='https://github.com/jesse-smith/covidReport/blob/master/R/vac_date.R'><code>R/vac_date.R</code></a></small>
+    <h1>Get date of a TennIIS vaccination file</h1>
+    <small class="dont-index">Source: <a href='https://github.com/jesse-smith/covidReport/blob/master/R/deprecated.R'><code>R/deprecated.R</code></a></small>
     <div class="hidden name"><code>vac_date.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Get Latest Date Contained in Vaccination File</p>
+    <p><img src='figures/lifecycle-deprecated.svg' alt='Deprecated lifecycle' /></p>
     </div>
 
     <pre class="usage"><span class='fu'>vac_date</span><span class='op'>(</span>date <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span></pre>
@@ -124,12 +124,18 @@
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>date</th>
-      <td><p>The date of the file to use; defaults to most recent. If you
-know this, you don't actually need this function; it's here for
-compatiblity reasons only.</p></td>
+      <td><p>A date (as a <code>Date</code> or <code>"%Y-%m-%d"</code> string)</p></td>
     </tr>
     </table>
 
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>A <code>Date</code> (or errors if data does not exist)</p>
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p>This function is deprecated. Please use the
+<code><a href='https://rdrr.io/pkg/coviData/man/date-data.html'>date_vac()</a></code> function, which is now the
+backend for this function.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

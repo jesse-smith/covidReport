@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Plot Vaccinations by Age Group — plot_vac_age • covidReport</title>
+<title>Plot Vaccinations by Age — plot_vac_age • covidReport</title>
 
 
 <!-- jquery -->
@@ -39,9 +39,8 @@
 
 
 
-<meta property="og:title" content="Plot Vaccinations by Age Group — plot_vac_age" />
-<meta property="og:description" content="plot_vac_age() plots vaccinations by age group in a bar chart. It can
-produce 4 distinct figures, depending on the values of pct and by_pop." />
+<meta property="og:title" content="Plot Vaccinations by Age — plot_vac_age" />
+<meta property="og:description" content="" />
 
 
 
@@ -73,7 +72,7 @@ produce 4 distinct figures, depending on the values of pct and by_pop." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">covidReport</a>
-        <span class="version label label-danger" data-toggle="tooltip" data-placement="bottom" title="Unreleased version">0.0.0.9000</span>
+        <span class="version label label-danger" data-toggle="tooltip" data-placement="bottom" title="Unreleased version">0.0.0.9001</span>
       </span>
     </div>
 
@@ -109,21 +108,21 @@ produce 4 distinct figures, depending on the values of pct and by_pop." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Plot Vaccinations by Age Group</h1>
-    <small class="dont-index">Source: <a href='https://github.com/jesse-smith/covidReport/blob/master/R/plot_vac_age.R'><code>R/plot_vac_age.R</code></a></small>
+    <h1>Plot Vaccinations by Age</h1>
+    <small class="dont-index">Source: <a href='https://github.com/jesse-smith/covidReport/blob/master/R/deprecated.R'><code>R/deprecated.R</code></a></small>
     <div class="hidden name"><code>plot_vac_age.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p><code>plot_vac_age()</code> plots vaccinations by age group in a bar chart. It can
-produce 4 distinct figures, depending on the values of <code>pct</code> and <code>by_pop</code>.</p>
+    <p><img src='figures/lifecycle-deprecated.svg' alt='Deprecated lifecycle' /></p>
     </div>
 
     <pre class="usage"><span class='fu'>plot_vac_age</span><span class='op'>(</span>
-  .data <span class='op'>=</span> <span class='fu'>coviData</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/coviData/man/vac_load.html'>vac_load</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>%&gt;%</span> <span class='fu'>coviData</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/coviData/man/vac_prep.html'>vac_prep</a></span><span class='op'>(</span><span class='op'>)</span>,
+  .data <span class='op'>=</span> <span class='fu'>coviData</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/coviData/man/vac_prep.html'>vac_prep</a></span><span class='op'>(</span><span class='fu'>coviData</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/coviData/man/read_vac.html'>read_vac</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span>,
   pct <span class='op'>=</span> <span class='cn'>TRUE</span>,
   by_pop <span class='op'>=</span> <span class='cn'>TRUE</span>,
-  incl_under_15 <span class='op'>=</span> <span class='cn'>FALSE</span>
+  incl_under_15 <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  incl_under_12 <span class='op'>=</span> <span class='va'>incl_under_15</span>
 <span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -136,8 +135,7 @@ produce 4 distinct figures, depending on the values of <code>pct</code> and <cod
     </tr>
     <tr>
       <th>pct</th>
-      <td><p>Should the resulting graphic display percentages
-(<code>TRUE</code>, the default) or totals (<code>FALSE</code>)?</p></td>
+      <td><p>Deprecated.</p></td>
     </tr>
     <tr>
       <th>by_pop</th>
@@ -146,7 +144,11 @@ population statistics (<code>TRUE</code>, the default) or not (<code>FALSE</code
     </tr>
     <tr>
       <th>incl_under_15</th>
-      <td><p>Should the age group <code>"0-15"</code> be included? The default
+      <td><p>Deprecated.</p></td>
+    </tr>
+    <tr>
+      <th>incl_under_12</th>
+      <td><p>Should the age group <code>"0-11"</code> be included? The default
 is <code>FALSE</code>.</p></td>
     </tr>
     </table>
@@ -156,17 +158,9 @@ is <code>FALSE</code>.</p></td>
     <p>A <code>ggplot</code> object</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>When <code>by_pop = TRUE</code>,
-the resulting figure displays vaccinations with reference to the population
-of each age group; when <code>by_pop = FALSE</code>, the figure does not display
-population-related values.</p>
-<p>When <code>pct = TRUE</code>, values are displayed as percentages; when <code>pct = FALSE</code>,
-raw totals are displayed instead.</p>
-<p>The combination <code>pct = FALSE, by_pop = TRUE</code> results in the most informative
-(but most complex) display. It shows vaccination counts as a fraction of
-population totals. Any of the other 3 charts can be build from the
-information in this one; however, this also means that the "take-home
-message" from this figure is more open-ended than the rest.</p>
+    <p>This function is deprecated. Please use the
+<code><a href='vac_plot_age.html'>vac_plot_age()</a></code> function, which is now
+the backend for this function.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

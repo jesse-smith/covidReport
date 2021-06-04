@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Plot Vaccination Totals Figure — plot_vaccinations • covidReport</title>
+<title>Plot Vaccination Goal — plot_vaccinations • covidReport</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,8 @@
 
 
 
-<meta property="og:title" content="Plot Vaccination Totals Figure — plot_vaccinations" />
-<meta property="og:description" content="Plot Vaccination Totals Figure" />
+<meta property="og:title" content="Plot Vaccination Goal — plot_vaccinations" />
+<meta property="og:description" content="" />
 
 
 
@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">covidReport</a>
-        <span class="version label label-danger" data-toggle="tooltip" data-placement="bottom" title="Unreleased version">0.0.0.9000</span>
+        <span class="version label label-danger" data-toggle="tooltip" data-placement="bottom" title="Unreleased version">0.0.0.9001</span>
       </span>
     </div>
 
@@ -108,20 +108,22 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Plot Vaccination Totals Figure</h1>
-    <small class="dont-index">Source: <a href='https://github.com/jesse-smith/covidReport/blob/master/R/plot_vaccinations.R'><code>R/plot_vaccinations.R</code></a></small>
+    <h1>Plot Vaccination Goal</h1>
+    <small class="dont-index">Source: <a href='https://github.com/jesse-smith/covidReport/blob/master/R/deprecated.R'><code>R/deprecated.R</code></a></small>
     <div class="hidden name"><code>plot_vaccinations.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Plot Vaccination Totals Figure</p>
+    <p><img src='figures/lifecycle-deprecated.svg' alt='Deprecated lifecycle' /></p>
     </div>
 
     <pre class="usage"><span class='fu'>plot_vaccinations</span><span class='op'>(</span>
+  data <span class='op'>=</span> <span class='fu'>coviData</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/coviData/man/vac_prep.html'>vac_prep</a></span><span class='op'>(</span><span class='fu'>coviData</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/coviData/man/read_vac.html'>read_vac</a></span><span class='op'>(</span>date <span class='op'>=</span> <span class='va'>date</span><span class='op'>)</span><span class='op'>)</span>,
   date <span class='op'>=</span> <span class='cn'>NULL</span>,
+  n_vaccinated <span class='op'>=</span> <span class='cn'>NULL</span>,
   n_first <span class='op'>=</span> <span class='cn'>NULL</span>,
   n_second <span class='op'>=</span> <span class='cn'>NULL</span>,
-  n_goal <span class='op'>=</span> <span class='fl'>656016</span>,
+  n_goal <span class='op'>=</span> <span class='fl'>7e+05</span>,
   n_max <span class='op'>=</span> <span class='fl'>937166</span>,
   date_updated <span class='op'>=</span> <span class='cn'>NULL</span>,
   resident_only <span class='op'>=</span> <span class='cn'>TRUE</span>
@@ -131,16 +133,24 @@
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
+      <th>data</th>
+      <td><p>Vaccination date from <code><a href='https://rdrr.io/pkg/coviData/man/vac_prep.html'>vac_prep()</a></code></p></td>
+    </tr>
+    <tr>
       <th>date</th>
       <td><p>Date of file to pull; defaults to most recent</p></td>
     </tr>
     <tr>
+      <th>n_vaccinated</th>
+      <td><p>Number of people vaccinated</p></td>
+    </tr>
+    <tr>
       <th>n_first</th>
-      <td><p>Number of first doses given</p></td>
+      <td><p>Deprecated (use <code>n_vaccinated</code>). Number of first doses given</p></td>
     </tr>
     <tr>
       <th>n_second</th>
-      <td><p>Number of second doses given</p></td>
+      <td><p>Deprecate (no longer used). Number of second doses given</p></td>
     </tr>
     <tr>
       <th>n_goal</th>
@@ -164,6 +174,11 @@ updated date in the file</p></td>
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>A <code>ggplot</code> object</p>
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p>This function is deprecated. Please use the
+<code><a href='vac_plot_goal.html'>vac_plot_goal()</a></code> function, which is
+now the backend for this function.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

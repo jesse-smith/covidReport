@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Plot Daily New Cases by Specimen Collection Date — case_plot_daily • covidReport</title>
+<title>Filter Vaccination Data to Possible Shelby County Residents — vac_residents • covidReport</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,8 @@
 
 
 
-<meta property="og:title" content="Plot Daily New Cases by Specimen Collection Date — case_plot_daily" />
-<meta property="og:description" content="Plot Daily New Cases by Specimen Collection Date" />
+<meta property="og:title" content="Filter Vaccination Data to Possible Shelby County Residents — vac_residents" />
+<meta property="og:description" content="" />
 
 
 
@@ -108,19 +108,18 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Plot Daily New Cases by Specimen Collection Date</h1>
-    <small class="dont-index">Source: <a href='https://github.com/jesse-smith/covidReport/blob/master/R/case_plot_daily.R'><code>R/case_plot_daily.R</code></a></small>
-    <div class="hidden name"><code>case_plot_daily.Rd</code></div>
+    <h1>Filter Vaccination Data to Possible Shelby County Residents</h1>
+    <small class="dont-index">Source: <a href='https://github.com/jesse-smith/covidReport/blob/master/R/deprecated.R'><code>R/deprecated.R</code></a></small>
+    <div class="hidden name"><code>vac_residents.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Plot Daily New Cases by Specimen Collection Date</p>
+    <p><img src='figures/lifecycle-deprecated.svg' alt='Deprecated lifecycle' /></p>
     </div>
 
-    <pre class="usage"><span class='fu'>case_plot_daily</span><span class='op'>(</span>
-  data <span class='op'>=</span> <span class='fu'>coviData</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/coviData/man/process-nbs.html'>process_positive_people</a></span><span class='op'>(</span>date <span class='op'>=</span> <span class='va'>date</span><span class='op'>)</span>,
-  date <span class='op'>=</span> <span class='cn'>NULL</span>,
-  delay <span class='op'>=</span> <span class='cn'>NULL</span>
+    <pre class="usage"><span class='fu'>vac_residents</span><span class='op'>(</span>
+  data <span class='op'>=</span> <span class='fu'>coviData</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/coviData/man/vac_prep.html'>vac_prep</a></span><span class='op'>(</span><span class='fu'>coviData</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/coviData/man/read_vac.html'>read_vac</a></span><span class='op'>(</span>date <span class='op'>=</span> <span class='va'>date</span><span class='op'>)</span><span class='op'>)</span>,
+  date <span class='op'>=</span> <span class='cn'>NULL</span>
 <span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -128,24 +127,22 @@
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>data</th>
-      <td><p>Case data, as output by
-<code><a href='https://rdrr.io/pkg/coviData/man/process-nbs.html'>process_positive_people()</a></code></p></td>
+      <td><p>Vaccination data with <code>logical</code> <code>resident</code> column</p></td>
     </tr>
     <tr>
       <th>date</th>
-      <td><p>The report date of the data; defaults to the most recent date</p></td>
-    </tr>
-    <tr>
-      <th>delay</th>
-      <td><p>Number of days to ignore 7 day average (due to incomplete data);
-default is calculated using
-<code><a href='https://rdrr.io/pkg/covidModel/man/estimate_delay.html'>estimate_delay()</a></code></p></td>
+      <td><p>The download date of the data; defaults to most recent</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A <code>ggplot</code> object</p>
+    <p><code>data</code> filtered to potential residents</p>
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p>This function is deprecated. Please use the
+<code><a href='https://rdrr.io/pkg/coviData/man/vac_filter_residents.html'>vac_filter_residents()</a></code> function,
+which is now the backend for this function.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

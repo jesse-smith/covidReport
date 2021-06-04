@@ -88,6 +88,12 @@
     <loc>https://jesse-smith.github.io/covidReport//reference/ph_location_table.html</loc>
   </url>
   <url>
+    <loc>https://jesse-smith.github.io/covidReport//reference/plot_vac_age.html</loc>
+  </url>
+  <url>
+    <loc>https://jesse-smith.github.io/covidReport//reference/plot_vaccinations.html</loc>
+  </url>
+  <url>
     <loc>https://jesse-smith.github.io/covidReport//reference/pop_2019.html</loc>
   </url>
   <url>
@@ -136,7 +142,7 @@
     <loc>https://jesse-smith.github.io/covidReport//reference/vac_plot_goal.html</loc>
   </url>
   <url>
-    <loc>https://jesse-smith.github.io/covidReport//reference/vac_table_doses.html</loc>
+    <loc>https://jesse-smith.github.io/covidReport//reference/vac_residents.html</loc>
   </url>
   <url>
     <loc>https://jesse-smith.github.io/covidReport//reference/vac_table_recent.html</loc>
