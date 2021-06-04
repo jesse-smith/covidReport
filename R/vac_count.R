@@ -27,38 +27,8 @@ vac_count <- function(
   by <- rlang::arg_match(by)[[1L]]
 
   .data %>%
-    purrr::when(
-      resident_only ~ dplyr::filter(
-        .,
-        .data[["resident"]] | is.na(.data[["resident"]])
-      ),
-      ~ .
-    ) %>%
-    dplyr::mutate(
-      max_doses = dplyr::case_when(
-        .data[["cvx_code"]] %in% c("210", "212") ~ 1L,
-        .data[["cvx_code"]] %in% c("207", "208") ~ 2L,
-        TRUE ~ NA_integer_
-      ),
-      recip_fully_vacc = .data[["dose_count"]] == .data[["max_doses"]]
-    ) %>%
-    purrr::when(
-      filter_2nd_dose ~ dplyr::filter(
-        .,
-        .data[["dose_count"]] <= .data[["max_doses"]] |
-          is.na(.data[["max_doses"]])
-      ),
-      ~ .
-    ) %>%
-    purrr::when(by == "person" ~ vac_distinct(.), ~ .) %>%
+    purrr::when(resident_only ~ coviData::vac_filter_residents(.), ~ .) %>%
+    purrr::when(filter_2nd_dose ~ coviData::vac_filter_doses(.), ~ .) %>%
+    purrr::when(by == "person" ~ coviData::vac_distinct(.), ~ .) %>%
     dplyr::count(.data[["recip_fully_vacc"]], .data[["dose_count"]])
-}
-
-vac_distinct <- function(data) {
-  data %>%
-    dplyr::mutate(.row_id_tmp_ = dplyr::row_number()) %>%
-    dplyr::arrange(.data[["asiis_pat_id_ptr"]], dplyr::desc(.data[["dose_count"]])) %>%
-    dplyr::distinct(.data[["asiis_pat_id_ptr"]], .keep_all = TRUE) %>%
-    dplyr::arrange(.data[[".row_id_tmp_"]]) %>%
-    dplyr::select(-".row_id_tmp_")
 }
