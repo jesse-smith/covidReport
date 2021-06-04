@@ -26,8 +26,6 @@ vac_date <- function(date = NULL) coviData::date_vac(date = date)
 #'
 #' @param date The download date of the data; defaults to most recent
 #'
-#' @export
-#'
 #' @keywords internal
 vac_residents <- function(
   data = coviData::vac_prep(coviData::read_vac(date = date)),
