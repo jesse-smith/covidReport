@@ -43,7 +43,6 @@ vac_map_pct <- function(
 
   counts <- data %>%
     vac_filter_residents() %>%
-    vac_filter_doses() %>%
     vac_distinct() %>%
     dplyr::transmute(
       zip = vac_parse_zip(.data[["address_zip"]]),
