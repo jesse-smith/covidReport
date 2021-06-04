@@ -5,13 +5,13 @@
 \title{Plot Cumulative Case Time Series}
 \usage{
 case_plot_cumulative(
-  data = coviData::process_positive_people(date = date),
+  data = pos(process_inv(read_inv(date = date))),
   date = NULL
 )
 }
 \arguments{
 \item{data}{Case data (by person) from NBS, as output by
-\code{\link[coviData:process_positive_people]{process_positive_people()}}}
+\code{\link[coviData:process-nbs]{pos(process_inv())}}}
 
 \item{date}{The download date of \code{data}; the default is the most recent}
 }

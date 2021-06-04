@@ -1,7 +1,7 @@
 #' Tabulate Active, Deceased, and Inactive/Recovered COVID-19 Cases
 #'
 #' @param data Case data, as output by
-#'   \code{\link[coviData:process_positive_people]{process_positive_people()}}
+#'   \code{\link[coviData:process-nbs]{pos(process_inv())}}
 #'
 #' @param date Download date of the data; defaults to most recent
 #'
@@ -9,7 +9,7 @@
 #'
 #' @export
 case_table_active <- function(
-  data = coviData::process_positive_people(date = date),
+  data = pos(process_inv(read_inv(date = date))),
   date = NULL
 ) {
    case_calc_active(data, date = date) %>%
@@ -34,14 +34,10 @@ case_table_active <- function(
 #'
 #' @keywords internal
 case_calc_active <- function(
-  data = coviData::process_positive_people(date = date),
+  data = pos(process_inv(read_inv(date = date))),
   date = NULL
 ) {
-  date <- coviData::path_inv(date = date) %>%
-    fs::path_file() %>%
-    fs::path_ext_remove() %>%
-    stringr::str_extract("[0-9]{1,4}.?[0-9]{1,2}.?[0-9]{1,4}") %>%
-    coviData::std_dates(orders = "ymd", force = "dt")
+  date <- date_inv(date)
 
   a_cols <- c("illness_onset_dt", "specimen_coll_dt", "inv_start_dt")
 

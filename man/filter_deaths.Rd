@@ -8,7 +8,7 @@ filter_deaths(data, col = "die_from_illness_ind", cols_check = "inv_death_dt")
 }
 \arguments{
 \item{data}{Case data, as output by
-\code{\link[coviData:process_positive_people]{process_positive_people()}}}
+\code{\link[coviData:process-nbs]{pos(process_inv())}}}
 
 \item{col}{\verb{<tidy-select>} A single, \code{character} indicator column for
 COVID-19 deaths. Deaths should be labeled \code{"Y"}.}

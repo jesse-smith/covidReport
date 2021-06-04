@@ -29,7 +29,7 @@ rpt_daily_pptx <- function(
 
   # Data
   pos_ppl <- dplyr::select(
-    coviData::process_positive_people(date = date),
+    pos(process_inv(read_inv(date = date))),
     "inv_local_id",
     "inv_case_status",
     "specimen_coll_dt",
@@ -317,14 +317,12 @@ rpt_daily_mail <- function(
     gt::as_raw_html()
 
   # People totals
-  inv <- coviData::read_file_delim(coviData::path_inv(date))
+  ppl <- process_inv(read_inv(date = date))
   gc()
-  ppl_pos <- coviData::process_positive_people(inv, date = date)
+  ppl_pos  <- pos(ppl)
   gc()
   n_ppl_pos <- NROW(ppl_pos)
-  n_ppl_neg <- NROW(coviData::process_negative_people(inv, date = date))
-  gc()
-  remove(inv)
+  n_ppl_neg <- NROW(neg(ppl))
   gc()
   ppl_tbl_total <- tibble::tibble(
     result = c("+ People", "- People", "Total People"),

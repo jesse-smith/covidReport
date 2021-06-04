@@ -1,8 +1,10 @@
 # Load and process data from 4/19/21 and extract investigation local ID
-test_cumulative_data <- dplyr::transmute(
-  coviData::process_positive_people(date = "2021-04-19"),
-  inv_local_id = as.character(digest::digest2int(inv_local_id))
-)
+test_cumulative_data <- coviData::read_inv(date = "2021-04-19") %>%
+  coviData::process_inv() %>%
+  coviData::pos() %>%
+  dplyr::transmute(
+    inv_local_id = as.character(digest::digest2int(inv_local_id))
+  )
 
 # Get report dates for data in `test_cumulative_data`
 test_report_data <- dplyr::mutate(

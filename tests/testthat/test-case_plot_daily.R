@@ -1,7 +1,7 @@
 test_that("`case_plot_daily()` matches doppelganger", {
   mockery::stub(
     case_plot_daily,
-    "coviData::process_positive_people",
+    "coviData::pos",
     tibble::tibble(.rows = 93895L)
   )
 

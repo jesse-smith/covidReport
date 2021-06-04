@@ -1,7 +1,7 @@
 #' Tabulated Death and Survival Outcomes from COVID-19
 #'
 #' @param data Case data, as output by
-#'   \code{\link[coviData:process_positive_people]{process_positive_people()}}
+#'   \code{\link[coviData:process-nbs]{pos(process_inv())}}
 #'
 #' @param date The download data of the data; defaults to most recent
 #'
@@ -9,7 +9,7 @@
 #'
 #' @export
 death_table_total <- function(
-  data = coviData::process_positive_people(date = date),
+  data = pos(process_inv(read_inv(date = date))),
   date = NULL
 ) {
   data %>%
@@ -34,7 +34,7 @@ death_table_total <- function(
 #'
 #' @keywords internal
 death_calc_total <- function(
-  data = coviData::process_positive_people(date = date),
+  data = pos(process_inv(read_inv(date = date))),
   date = NULL
 ) {
   data %>%
