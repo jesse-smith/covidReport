@@ -17,14 +17,7 @@ rpt_daily_pptx <- function(
 ) {
 
   # Ensure valid date
-  if (vec_is_empty(date)) {
-    date <- coviData::path_inv() %>%
-      fs::path_file() %>%
-      fs::path_ext_remove() %>%
-      stringr::str_extract("[0-9]{1,4}.?[0-9]{1,2}.?[0-9]{1,4}") %>%
-      lubridate::as_date()
-  }
-  date <- lubridate::as_date(date)
+  date <- coviData::date_inv(date)
 
   # Load powerpoint template
   pptx <- officer::read_pptx(system.file(
@@ -372,6 +365,41 @@ rpt_daily_mail <- function(
   remove(ppl_pos)
   gc()
 
+  # Vaccination tables
+  vac_data <- coviData::vac_prep(coviData::read_vac(date = date))
+  gc()
+  vac_recent <- vac_table_recent(vac_data, date = date) %>%
+    gt::as_raw_html()
+  gc()
+  vac_ppl <- vac_table_totals(vac_data, date = date) %>%
+    gt::as_raw_html()
+  gc()
+  remove(vac_data)
+  gc()
+
+  # Vaccination numbers
+  n_ppl_vac <- vac_ppl %>%
+    as_tbl() %>%
+    dplyr::mutate(
+      dplyr::across(.fns = ~ as.integer(stringr::str_remove_all(.x, "[^0-9]")))
+    ) %>%
+    dplyr::pull("Total")
+  n_pct_vac <- round(100*n_ppl_vac/7e5L, 1L)
+  n_avg_vac <- vac_recent %>%
+    as_tbl() %>%
+    dplyr::mutate(
+      dplyr::across(.fns = ~ as.integer(stringr::str_remove_all(.x, "[^0-9]")))
+    ) %>%
+    dplyr::pull(2L) %>%
+    divide_by(7) %>%
+    round()
+  n_avg_case <- sort(date - 0:7) %>%
+    purrr::map_int(~ NROW(coviData::read_inv_id(.x))) %>%
+    diff() %>%
+    mean() %>%
+    round()
+
+
   # Email body numbers
   str_test_total <- test_total_df %>%
     dplyr::filter(tolower(.data[["result"]]) == "total") %>%
@@ -385,17 +413,10 @@ rpt_daily_mail <- function(
   gc()
   str_deaths <- format(n_deaths, big.mark = ",")
 
-  # Vaccination tables
-  vac_data <- coviData::vac_prep(coviData::read_vac(date = date))
-  gc()
-  vac_recent <- vac_table_recent(vac_data, date = date) %>%
-    gt::as_raw_html()
-  gc()
-  vac_ppl <- vac_table_totals(vac_data, date = date) %>%
-    gt::as_raw_html()
-  gc()
-  remove(vac_data)
-  gc()
+  str_pct_vac <- paste0(n_pct_vac, "%")
+  str_ppl_vac <- format(n_ppl_vac, big.mark = ",")
+  str_avg_vac <- format(n_avg_vac, big.mark = ",")
+  str_avg_case <- format(n_avg_case, big.mark = ",")
 
   body <- paste0(
     intro,
@@ -405,9 +426,10 @@ rpt_daily_mail <- function(
     "New Cases: ", str_ppl_new, "<br>",
     "Total Deaths: ", str_deaths,
     "<br><br>",
-    "Call Center Numbers as of ", str_date, "<br>",
-    "Total Answered: **", "<br>",
-    "Total Calls to Date: *****",
+    "% Vaccinated of Goal: ", str_pct_vac, "<br>",
+    "Total People Vaccinated: ", str_ppl_vac, "<br>",
+    "Vaccinations per day (7-day average): ", str_avg_vac, "<br>",
+    "Reported cases per day (7-day average): ", str_avg_case,
     "<br><br>",
     vac_recent, "<br>",
     vac_ppl,

@@ -30,9 +30,11 @@ Imports:
     readr,
     readxl,
     rlang,
+    rvest,
     tidylog,
     timetk,
-    vctrs
+    vctrs,
+    xml2
 Suggests: 
     covr,
     dplyr,
@@ -46,7 +48,6 @@ Suggests:
     officer,
     purrr,
     RColorBrewer,
-    rvest,
     scales,
     sf,
     stringr,
@@ -54,8 +55,7 @@ Suggests:
     tibble,
     tidyr,
     vdiffr,
-    withr,
-    xml2
+    withr
 Remotes: 
     jesse-smith/coviData,
     jesse-smith/covidModel
