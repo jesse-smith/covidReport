@@ -366,12 +366,29 @@ rpt_daily_mail <- function(
   gc()
 
   # Vaccination tables
-  vac_data <- coviData::vac_prep(coviData::read_vac(date = date))
+  vac_date <- lubridate::Date()
+  i <- 0L
+  while(vec_is_empty(vac_date)) {
+    vac_date <- date_vac(date - i)
+    i <- i + 1L
+  }
+  if (vec_is_empty(date_vac(date))) {
+    vac_msg <- paste0(
+      "<br>",
+      "Vaccination data has not yet been updated today; ",
+      "the most recent data (", format(vac_date, "%m/%d/%Y"), ") ",
+      "is shown below. If vaccination data is posted, ",
+      "please update these numbers before sending."
+    )
+  } else {
+    vac_msg <- ""
+  }
+  vac_data <- coviData::vac_prep(coviData::read_vac(date = vac_date))
   gc()
-  vac_recent <- vac_table_recent(vac_data, date = date) %>%
+  vac_recent <- vac_table_recent(vac_data, date = vac_date) %>%
     gt::as_raw_html()
   gc()
-  vac_ppl <- vac_table_totals(vac_data, date = date) %>%
+  vac_ppl <- vac_table_totals(vac_data, date = vac_date) %>%
     gt::as_raw_html()
   gc()
   remove(vac_data)
@@ -420,6 +437,7 @@ rpt_daily_mail <- function(
 
   body <- paste0(
     intro,
+    vac_msg,
     "<br><br>",
     "Total Tests: ", str_test_total, "<br>",
     "Total Cases: ", str_ppl_pos, "<br>",
