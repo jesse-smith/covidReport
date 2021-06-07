@@ -49,14 +49,12 @@ rpt_daily_pptx <- function(
     "age_in_years",
     "investigation_status_cd"
   )
-  remove(inv)
-  gc()
   pcr_cols <- c("inv_local_id", "specimen_coll_dt", "lab_result")
   pcr_subset <- dplyr::mutate(
     pcr,
-    data = purrr::map(.data[["data"]], dplyr::select(.x, {{ pcr_cols }}))
+    data = list_of(dplyr::select(.data[["data"]], {{ pcr_cols }}))
   )
-  remove(pcr)
+  remove(pcr, inv)
   gc()
 
   # Cumulative case slide
@@ -323,38 +321,23 @@ rpt_daily_mail <- function(
     "age_in_years",
     "investigation_status_cd"
   )
-  ppl <- dplyr::mutate(
-    inv,
-    data = purrr::map(.data[["data"]], dplyr::select(.x, {{ inv_cols }}))
-  )
-  remove(inv)
-  gc()
   pcr_cols <- c("inv_local_id", "specimen_coll_dt", "lab_result")
+  inv_subset <- dplyr::mutate(
+    inv,
+    data = list_of(dplyr::select(.data[["data"]], {{ inv_cols }}))
+  )
   pcr_subset <- dplyr::mutate(
     pcr,
-    data = purrr::map(.data[["data"]], dplyr::select(.x, {{ pcr_cols }}))
+    data = list_of(dplyr::select(.data[["data"]], {{ pcr_cols }}))
   )
-  remove(pcr)
-  gc()
-
-  # Test totals
-  test_total_df <- test_calc_total(pcr, date = date)
-  test_tbl_total <- test_total_df %>%
-    dplyr::mutate(result = c("+ Test", "- Test", "Total Tests")) %>%
-    dplyr::select(-"percent") %>%
-    gt::gt() %>%
-    fmt_covid_table(total = TRUE) %>%
-    gt::opt_align_table_header("right") %>%
-    gt::cols_align("right") %>%
-    gt::fmt_number("n", decimals = 0L) %>%
-    gt::as_raw_html()
+  remove(pcr, inv)
   gc()
 
   # People totals
-  pos_ppl  <- pos(ppl)
-  n_ppl_pos <- NROW(ppl_pos)
-  n_ppl_neg <- NROW(neg(ppl))
-  remove(ppl)
+  pos_inv  <- pos(inv_subset)
+  n_ppl_pos <- NROW(pos_inv)
+  n_ppl_neg <- NROW(neg(inv_subset))
+  remove(inv_subset)
   gc()
 
   ppl_tbl_total <- tibble::tibble(
@@ -369,8 +352,24 @@ rpt_daily_mail <- function(
     gt::as_raw_html()
   gc()
 
+  # Test totals
+  test_total_df <- test_calc_total(pcr_subset, date = date)
+  rm(pcr_subset)
+  gc()
+
+  test_tbl_total <- test_total_df %>%
+    dplyr::mutate(result = c("+ Test", "- Test", "Total Tests")) %>%
+    dplyr::select(-"percent") %>%
+    gt::gt() %>%
+    fmt_covid_table(total = TRUE) %>%
+    gt::opt_align_table_header("right") %>%
+    gt::cols_align("right") %>%
+    gt::fmt_number("n", decimals = 0L) %>%
+    gt::as_raw_html()
+  gc()
+
   # Confirmed/Probable
-  cp_tbl <- case_calc_confirmed_probable(pos_ppl, date = date) %>%
+  cp_tbl <- case_calc_confirmed_probable(pos_inv, date = date) %>%
     gt::gt() %>%
     fmt_covid_table() %>%
     gt::opt_align_table_header("right") %>%
@@ -380,7 +379,7 @@ rpt_daily_mail <- function(
   gc()
 
   # Active
-  active_tbl <- case_calc_active(ppl_pos, date = date) %>%
+  active_tbl <- case_calc_active(pos_inv, date = date) %>%
     dplyr::select(-"percent") %>%
     gt::gt() %>%
     fmt_covid_table() %>%
@@ -391,10 +390,10 @@ rpt_daily_mail <- function(
   gc()
 
   # Total deaths
-  n_deaths <- NROW(filter_deaths(ppl_pos))
+  n_deaths <- NROW(filter_deaths(pos_inv))
   gc()
 
-  remove(pos_ppl)
+  remove(pos_inv)
   gc()
 
   # Vaccination tables
@@ -437,10 +436,9 @@ rpt_daily_mail <- function(
     dplyr::pull("n") %>%
     format(big.mark = ",")
   str_ppl_pos <- format(n_ppl_pos, big.mark = ",")
-  str_ppl_new <- subtract(
-    n_ppl_pos,
-    NROW(coviData::process_positive_people(date = date - 1L))
-  ) %>% format(big.mark = ",")
+  str_ppl_new <- n_ppl_pos %>%
+    subtract(NROW(coviData::read_inv_id(date = date - 1L))) %>%
+    format(big.mark = ",")
   gc()
   str_deaths <- format(n_deaths, big.mark = ",")
 
