@@ -28,21 +28,9 @@ test_that("`void(test_table_total())` matches snapshot", {
 
 test_that("`test_calc_total()` matches reference", {
   # Make fake data to pass to function
-  data <- tibble::tibble(.rows = 1e6L)
-
-  # Stub `process_tests_*` functions
-
-  mockery::stub(
-    test_calc_total,
-    "coviData::process_positive_tests",
-    tibble::tibble(.rows = 1e5L)
-  )
-
-  mockery::stub(
-    test_calc_total,
-    "coviData::process_negative_tests",
-    tibble::tibble(.rows = 9e5L)
-  )
+  data <- tibble::tibble(positive = c(rep(TRUE, 1e5L), rep(FALSE, 9e5L))) %>%
+    dplyr::nest_by(.data[["positive"]]) %>%
+    dplyr::arrange(dplyr::desc(.data[["positive"]]))
 
   tbl_test <- test_calc_total(data, date = "2021-04-19")
 
