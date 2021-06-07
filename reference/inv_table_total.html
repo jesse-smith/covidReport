@@ -118,7 +118,7 @@
     </div>
 
     <pre class="usage"><span class='fu'>inv_table_total</span><span class='op'>(</span>
-  data <span class='op'>=</span> <span class='fu'>coviData</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/coviData/man/process-nbs.html'>process_positive_people</a></span><span class='op'>(</span>date <span class='op'>=</span> <span class='va'>date</span><span class='op'>)</span>,
+  data <span class='op'>=</span> <span class='fu'>pos</span><span class='op'>(</span><span class='fu'>process_inv</span><span class='op'>(</span><span class='fu'>read_inv</span><span class='op'>(</span>date <span class='op'>=</span> <span class='va'>date</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span>,
   nit_token <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Sys.getenv.html'>Sys.getenv</a></span><span class='op'>(</span><span class='st'>"redcap_NIT_token"</span><span class='op'>)</span>,
   prior_contacts <span class='op'>=</span> <span class='fl'>45669L</span>,
   date <span class='op'>=</span> <span class='cn'>NULL</span>
@@ -130,7 +130,7 @@
     <tr>
       <th>data</th>
       <td><p>Case data, as output by
-<code><a href='https://rdrr.io/pkg/coviData/man/process-nbs.html'>process_positive_people()</a></code></p></td>
+<code><a href='https://rdrr.io/pkg/coviData/man/process-nbs.html'>pos(process_inv())</a></code></p></td>
     </tr>
     <tr>
       <th>nit_token</th>

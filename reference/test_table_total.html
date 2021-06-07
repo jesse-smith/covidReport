@@ -117,10 +117,7 @@
     <p>Tabulate PCR Test Totals</p>
     </div>
 
-    <pre class="usage"><span class='fu'>test_table_total</span><span class='op'>(</span>
-  data <span class='op'>=</span> <span class='fu'>coviData</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/coviData/man/read_file_delim.html'>read_file_delim</a></span><span class='op'>(</span><span class='fu'>coviData</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/coviData/man/path_by_date.html'>path_pcr</a></span><span class='op'>(</span><span class='va'>date</span><span class='op'>)</span><span class='op'>)</span>,
-  date <span class='op'>=</span> <span class='cn'>NULL</span>
-<span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>test_table_total</span><span class='op'>(</span>data <span class='op'>=</span> <span class='fu'>process_pcr</span><span class='op'>(</span><span class='fu'>read_pcr</span><span class='op'>(</span><span class='va'>date</span><span class='op'>)</span><span class='op'>)</span>, date <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">

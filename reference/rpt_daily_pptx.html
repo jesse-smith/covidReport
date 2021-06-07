@@ -121,7 +121,9 @@
   date <span class='op'>=</span> <span class='cn'>NULL</span>,
  
     dir <span class='op'>=</span> <span class='fu'>coviData</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/coviData/man/path_create.html'>path_create</a></span><span class='op'>(</span><span class='st'>"V:/EPI DATA ANALYTICS TEAM/COVID SANDBOX REDCAP DATA/Status Report"</span>,
-    <span class='st'>"automated"</span><span class='op'>)</span>
+    <span class='st'>"automated"</span><span class='op'>)</span>,
+  inv <span class='op'>=</span> <span class='fu'>process_inv</span><span class='op'>(</span><span class='fu'>read_inv</span><span class='op'>(</span><span class='va'>date</span><span class='op'>)</span><span class='op'>)</span>,
+  pcr <span class='op'>=</span> <span class='fu'>process_pcr</span><span class='op'>(</span><span class='fu'>read_pcr</span><span class='op'>(</span><span class='va'>date</span><span class='op'>)</span>, inv <span class='op'>=</span> <span class='va'>inv</span><span class='op'>)</span>
 <span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -135,6 +137,16 @@
       <th>dir</th>
       <td><p>The directory to save the report; set to <code>NULL</code> to return without
 saving</p></td>
+    </tr>
+    <tr>
+      <th>inv</th>
+      <td><p>Investigation data from
+<code><a href='https://rdrr.io/pkg/coviData/man/process-nbs.html'>process_inv()</a></code></p></td>
+    </tr>
+    <tr>
+      <th>pcr</th>
+      <td><p>PCR test data from
+<code><a href='https://rdrr.io/pkg/coviData/man/process-nbs.html'>process_pcr()</a></code></p></td>
     </tr>
     </table>
 
