@@ -280,6 +280,12 @@ rpt_daily_pptx <- function(
 #'
 #' @param dir_pptx Directory containing daily status report powerpoint files
 #'
+#' @param inv Investigation data from
+#'   \code{\link[coviData:process-nbs]{process_inv()}}
+#'
+#' @param pcr PCR test data from
+#'   \code{\link[coviData:process-nbs]{process_pcr()}}
+#'
 #' @export
 rpt_daily_mail <- function(
   date = NULL,

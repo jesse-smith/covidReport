@@ -10,7 +10,9 @@ rpt_daily_mail(
     "Allison.Plaxco@shelbycountytn.gov"),
  
     dir_pptx = coviData::path_create("V:/EPI DATA ANALYTICS TEAM/COVID SANDBOX REDCAP DATA/Status Report",
-    "automated")
+    "automated"),
+  inv = process_inv(read_inv(date)),
+  pcr = process_pcr(read_pcr(date), inv = inv)
 )
 }
 \arguments{
@@ -19,6 +21,12 @@ rpt_daily_mail(
 \item{to}{A \code{character} vector of recipient email addresses}
 
 \item{dir_pptx}{Directory containing daily status report powerpoint files}
+
+\item{inv}{Investigation data from
+\code{\link[coviData:process-nbs]{process_inv()}}}
+
+\item{pcr}{PCR test data from
+\code{\link[coviData:process-nbs]{process_pcr()}}}
 }
 \description{
 Send Daily COVID-19 Status Summary via Outlook Email

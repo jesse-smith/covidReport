@@ -8,7 +8,9 @@ rpt_daily_pptx(
   date = NULL,
  
     dir = coviData::path_create("V:/EPI DATA ANALYTICS TEAM/COVID SANDBOX REDCAP DATA/Status Report",
-    "automated")
+    "automated"),
+  inv = process_inv(read_inv(date)),
+  pcr = process_pcr(read_pcr(date), inv = inv)
 )
 }
 \arguments{
@@ -16,6 +18,12 @@ rpt_daily_pptx(
 
 \item{dir}{The directory to save the report; set to \code{NULL} to return without
 saving}
+
+\item{inv}{Investigation data from
+\code{\link[coviData:process-nbs]{process_inv()}}}
+
+\item{pcr}{PCR test data from
+\code{\link[coviData:process-nbs]{process_pcr()}}}
 }
 \value{
 An \code{rpptx} object
