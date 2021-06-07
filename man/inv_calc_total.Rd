@@ -5,7 +5,7 @@
 \title{Calculate Summary Investigation Numbers}
 \usage{
 inv_calc_total(
-  data = coviData::process_positive_people(date = date),
+  data = pos(process_inv(read_inv(date = date))),
   nit_token = Sys.getenv("redcap_NIT_token"),
   prior_contacts = 45669L,
   date = NULL
@@ -13,7 +13,7 @@ inv_calc_total(
 }
 \arguments{
 \item{data}{Case data, as output by
-\code{\link[coviData:process_positive_people]{process_positive_people()}}}
+\code{\link[coviData:process-nbs]{pos(process_inv())}}}
 
 \item{nit_token}{API token/key for accessing the NIT REDcap project}
 

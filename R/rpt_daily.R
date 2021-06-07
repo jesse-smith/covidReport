@@ -5,6 +5,12 @@
 #' @param dir The directory to save the report; set to `NULL` to return without
 #'   saving
 #'
+#' @param inv Investigation data from
+#'   \code{\link[coviData:process-nbs]{process_inv()}}
+#'
+#' @param pcr PCR test data from
+#'   \code{\link[coviData:process-nbs]{process_pcr()}}
+#'
 #' @return An `rpptx` object
 #'
 #' @export
@@ -13,7 +19,9 @@ rpt_daily_pptx <- function(
   dir = coviData::path_create(
     "V:/EPI DATA ANALYTICS TEAM/COVID SANDBOX REDCAP DATA/Status Report",
     "automated"
-  )
+  ),
+  inv = process_inv(read_inv(date)),
+  pcr = process_pcr(read_pcr(date), inv = inv)
 ) {
 
   # Ensure valid date
@@ -29,7 +37,7 @@ rpt_daily_pptx <- function(
 
   # Data
   pos_ppl <- dplyr::select(
-    coviData::process_positive_people(date = date),
+    pos(inv),
     "inv_local_id",
     "inv_case_status",
     "specimen_coll_dt",
@@ -41,13 +49,12 @@ rpt_daily_pptx <- function(
     "age_in_years",
     "investigation_status_cd"
   )
-  gc()
-  pcr <- dplyr::select(
-    janitor::clean_names(coviData::read_file_delim(coviData::path_pcr(date))),
-    "inv_local_id",
-    "specimen_coll_dt",
-    "lab_result"
+  pcr_cols <- c("inv_local_id", "specimen_coll_dt", "lab_result")
+  pcr_subset <- dplyr::mutate(
+    pcr,
+    data = list_of(dplyr::select(.data[["data"]], {{ pcr_cols }}))
   )
+  remove(pcr, inv)
   gc()
 
   # Cumulative case slide
@@ -73,18 +80,18 @@ rpt_daily_pptx <- function(
   gc()
 
   # Test slide
-  test_tbl_total <- test_table_total(pcr, date = date)
+  test_tbl_total <- test_table_total(pcr_subset, date = date)
   gc()
 
   # Positivity slide
-  test_plt_pos <- test_plot_positivity(pcr, date = date)
+  test_plt_pos <- test_plot_positivity(pcr_subset, date = date)
   gc()
 
   # Investigations slide
   inv_tbl_total <- inv_table_total(pos_ppl, date = date)
   gc()
 
-  remove(pos_ppl, pcr)
+  remove(pos_ppl, pcr_subset)
   gc()
 
   # Report variables
@@ -273,6 +280,12 @@ rpt_daily_pptx <- function(
 #'
 #' @param dir_pptx Directory containing daily status report powerpoint files
 #'
+#' @param inv Investigation data from
+#'   \code{\link[coviData:process-nbs]{process_inv()}}
+#'
+#' @param pcr PCR test data from
+#'   \code{\link[coviData:process-nbs]{process_pcr()}}
+#'
 #' @export
 rpt_daily_mail <- function(
   date = NULL,
@@ -284,14 +297,12 @@ rpt_daily_mail <- function(
   dir_pptx = coviData::path_create(
     "V:/EPI DATA ANALYTICS TEAM/COVID SANDBOX REDCAP DATA/Status Report",
     "automated"
-  )
+  ),
+  inv = process_inv(read_inv(date)),
+  pcr = process_pcr(read_pcr(date), inv = inv)
 ) {
 
-  date <- coviData::path_inv(date) %>%
-    fs::path_file() %>%
-    fs::path_ext_remove() %>%
-    stringr::str_extract("[0-9]{1,4}.?[0-9]{1,2}.?[0-9]{1,4}") %>%
-    lubridate::as_date()
+  date <- date_inv(date)
 
   str_date <- format(date, "%m/%d/%y")
 
@@ -303,29 +314,38 @@ rpt_daily_mail <- function(
     intro <- paste("Attached is the COVID-19 status report for", str_date)
   }
 
-  # Test totals
-  test_total_df <- test_calc_total(date = date)
+  # Data
+  inv_cols <- c(
+    "inv_local_id",
+    "inv_case_status",
+    "specimen_coll_dt",
+    "patient_dob",
+    "die_from_illness_ind",
+    "illness_onset_dt",
+    "inv_start_dt",
+    "inv_death_dt",
+    "age_in_years",
+    "investigation_status_cd"
+  )
+  pcr_cols <- c("inv_local_id", "specimen_coll_dt", "lab_result")
+  inv_subset <- dplyr::mutate(
+    inv,
+    data = list_of(dplyr::select(.data[["data"]], {{ inv_cols }}))
+  )
+  pcr_subset <- dplyr::mutate(
+    pcr,
+    data = list_of(dplyr::select(.data[["data"]], {{ pcr_cols }}))
+  )
+  remove(pcr, inv)
   gc()
-  test_tbl_total <- test_total_df %>%
-    dplyr::mutate(result = c("+ Test", "- Test", "Total Tests")) %>%
-    dplyr::select(-"percent") %>%
-    gt::gt() %>%
-    fmt_covid_table(total = TRUE) %>%
-    gt::opt_align_table_header("right") %>%
-    gt::cols_align("right") %>%
-    gt::fmt_number("n", decimals = 0L) %>%
-    gt::as_raw_html()
 
   # People totals
-  inv <- coviData::read_file_delim(coviData::path_inv(date))
+  pos_inv  <- pos(inv_subset)
+  n_ppl_pos <- NROW(pos_inv)
+  n_ppl_neg <- NROW(neg(inv_subset))
+  remove(inv_subset)
   gc()
-  ppl_pos <- coviData::process_positive_people(inv, date = date)
-  gc()
-  n_ppl_pos <- NROW(ppl_pos)
-  n_ppl_neg <- NROW(coviData::process_negative_people(inv, date = date))
-  gc()
-  remove(inv)
-  gc()
+
   ppl_tbl_total <- tibble::tibble(
     result = c("+ People", "- People", "Total People"),
     n = c(n_ppl_pos, n_ppl_neg, n_ppl_pos + n_ppl_neg)
@@ -338,8 +358,24 @@ rpt_daily_mail <- function(
     gt::as_raw_html()
   gc()
 
+  # Test totals
+  test_total_df <- test_calc_total(pcr_subset, date = date)
+  rm(pcr_subset)
+  gc()
+
+  test_tbl_total <- test_total_df %>%
+    dplyr::mutate(result = c("+ Test", "- Test", "Total Tests")) %>%
+    dplyr::select(-"percent") %>%
+    gt::gt() %>%
+    fmt_covid_table(total = TRUE) %>%
+    gt::opt_align_table_header("right") %>%
+    gt::cols_align("right") %>%
+    gt::fmt_number("n", decimals = 0L) %>%
+    gt::as_raw_html()
+  gc()
+
   # Confirmed/Probable
-  cp_tbl <- case_calc_confirmed_probable(ppl_pos, date = date) %>%
+  cp_tbl <- case_calc_confirmed_probable(pos_inv, date = date) %>%
     gt::gt() %>%
     fmt_covid_table() %>%
     gt::opt_align_table_header("right") %>%
@@ -349,7 +385,7 @@ rpt_daily_mail <- function(
   gc()
 
   # Active
-  active_tbl <- case_calc_active(ppl_pos, date = date) %>%
+  active_tbl <- case_calc_active(pos_inv, date = date) %>%
     dplyr::select(-"percent") %>%
     gt::gt() %>%
     fmt_covid_table() %>%
@@ -360,9 +396,10 @@ rpt_daily_mail <- function(
   gc()
 
   # Total deaths
-  n_deaths <- NROW(filter_deaths(ppl_pos))
+  n_deaths <- NROW(filter_deaths(pos_inv))
   gc()
-  remove(ppl_pos)
+
+  remove(pos_inv)
   gc()
 
   # Vaccination tables
@@ -385,12 +422,12 @@ rpt_daily_mail <- function(
   }
   vac_data <- coviData::vac_prep(coviData::read_vac(date = vac_date))
   gc()
-  vac_recent <- vac_table_recent(vac_data, date = vac_date) %>%
-    gt::as_raw_html()
+
+  vac_recent <- gt::as_raw_html(vac_table_recent(vac_data, date = date))
   gc()
-  vac_ppl <- vac_table_totals(vac_data, date = vac_date) %>%
-    gt::as_raw_html()
+  vac_ppl <- gt::as_raw_html(vac_table_totals(vac_data, date = date))
   gc()
+
   remove(vac_data)
   gc()
 
@@ -423,10 +460,9 @@ rpt_daily_mail <- function(
     dplyr::pull("n") %>%
     format(big.mark = ",")
   str_ppl_pos <- format(n_ppl_pos, big.mark = ",")
-  str_ppl_new <- subtract(
-    n_ppl_pos,
-    NROW(coviData::process_positive_people(date = date - 1L))
-  ) %>% format(big.mark = ",")
+  str_ppl_new <- n_ppl_pos %>%
+    subtract(NROW(coviData::read_inv_id(date = date - 1L))) %>%
+    format(big.mark = ",")
   gc()
   str_deaths <- format(n_deaths, big.mark = ",")
 

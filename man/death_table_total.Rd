@@ -4,14 +4,11 @@
 \alias{death_table_total}
 \title{Tabulated Death and Survival Outcomes from COVID-19}
 \usage{
-death_table_total(
-  data = coviData::process_positive_people(date = date),
-  date = NULL
-)
+death_table_total(data = pos(process_inv(read_inv(date = date))), date = NULL)
 }
 \arguments{
 \item{data}{Case data, as output by
-\code{\link[coviData:process_positive_people]{process_positive_people()}}}
+\code{\link[coviData:process-nbs]{pos(process_inv())}}}
 
 \item{date}{The download data of the data; defaults to most recent}
 }

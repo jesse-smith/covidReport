@@ -1,7 +1,7 @@
 test_that("`case_plot_cumulative()` returns expected graphic", {
   mockery::stub(
     case_plot_cumulative,
-    "coviData::process_positive_people",
+    "coviData::pos",
     tibble::tibble(.rows = 93895L)
   )
 
@@ -9,6 +9,18 @@ test_that("`case_plot_cumulative()` returns expected graphic", {
     case_plot_cumulative,
     "coviData::load_report_date",
     readRDS(testthat::test_path("../data/test_report_data.rds"))
+  )
+
+  mockery::stub(
+    case_plot_cumulative,
+    "read_inv_id",
+    tibble::tibble(.rows = 93960L - 65L)
+  )
+
+  mockery::stub(
+    case_plot_cumulative,
+    "date_inv",
+    lubridate::as_date
   )
 
   plt <- case_plot_cumulative(

@@ -1,62 +1,16 @@
 test_that("`test_plot_positivity()` matches doppelganger", {
-  # Stub `path_pcr()`
   mockery::stub(
     test_plot_positivity,
-    "coviData::path_pcr",
-    fs::path(
-      "V:/EPI DATA ANALYTICS TEAM/COVID SANDBOX REDCAP DATA/MSR PCR",
-      "MSR - All PCRs_04192021.csv"
-    )
+    "date_pcr",
+    lubridate::as_date
   )
 
   # Stub processing functions
-  data <- readRDS(test_path("../data/test_positivity_data.rds"))
-
-  mockery::stub(
-    prep_test_ts,
-    "coviData::process_positive_tests",
-    dplyr::filter(data, .data[["inv_case_status"]] %in% c("C", "P"))
-  )
-
-  mockery::stub(
-    prep_test_ts,
-    "coviData::process_negative_tests",
-    dplyr::filter(data, .data[["inv_case_status"]] == "N")
-  )
-
-  positive_ts <- prep_test_ts(
-    data,
-    date = lubridate::as_date("2021-04-19"),
-    result = "positive"
-  )
-
-  negative_ts <- prep_test_ts(
-    data,
-    date = lubridate::as_date("2021-04-19"),
-    result = "negative"
-  )
-
-  prep_test_fn <- function(
-    data,
-    date = NULL,
-    result = c("positive", "negative")
-  ) {
-    result <- rlang::arg_match(result)[[1L]]
-    if (result == "positive") positive_ts else negative_ts
-  }
-  mockery::stub(
-    prep_test_pos,
-    "prep_test_ts",
-    prep_test_fn
-  )
-
-  test_pos <- prep_test_pos(data, date = as.Date("2021-04-19"), delay = 7L)
-
-  mockery::stub(
-    test_plot_positivity,
-    "prep_test_pos",
-    test_pos
-  )
+  data <- readRDS(test_path("../data/test_positivity_data.rds")) %>%
+    dplyr::mutate(positive = .data[["inv_case_status"]] %in% c("C", "P")) %>%
+    dplyr::nest_by(.data[["positive"]]) %>%
+    dplyr::arrange(dplyr::desc(.data[["positive"]])) %>%
+    set_attr("date", as.Date("2021-04-19"))
 
   vdiffr::expect_doppelganger(
     title = "test positivity",
@@ -73,25 +27,23 @@ test_that("`prep_test_ts()` output is correct for positive tests", {
     ) %>%
       append(rep(NA_character_, 800L)) %>%
       format("%Y-%m-%dTH:M:SZ")
-  ) %>% dplyr::slice_sample(prop = 1)
-
-  mockery::stub(
-    prep_test_ts,
-    "coviData::process_positive_tests",
-    data
-  )
+  ) %>%
+    dplyr::mutate(positive = c(rep(TRUE, NROW(.)-1L), FALSE)) %>%
+    dplyr::slice_sample(prop = 1) %>%
+    dplyr::nest_by(.data[["positive"]]) %>%
+    dplyr::arrange(dplyr::desc(.data[["positive"]]))
 
   positive_ts <- prep_test_ts(
     data,
     date = lubridate::as_date("2021-04-19"),
-    result = "positive"
+    status = "+"
   )
 
   expect_s3_class(positive_ts, "n_tbl")
   expect_vector(positive_ts[["test_date"]], lubridate::Date())
   expect_vector(positive_ts[["positive"]], integer())
-  expect_equal(attr(positive_ts, "n_obs", exact = TRUE), 84000L)
-  expect_equal(attr(positive_ts, "n_missing", exact = TRUE), 1800L)
+  expect_equal(attr(positive_ts, "n_obs", exact = TRUE), 83999L)
+  expect_equal(attr(positive_ts, "n_missing", exact = TRUE), 1799L)
   expect_equal(min(positive_ts[["test_date"]]), as.Date("2020-03-05"))
   expect_equal(max(positive_ts[["test_date"]]), as.Date("2021-04-19"))
 })
@@ -104,18 +56,16 @@ test_that("`prep_test_ts()` output is correct for negative tests", {
     ) %>%
       append(rep(NA_character_, 800L)) %>%
       format("%Y-%m-%dTH:M:SZ")
-  ) %>% dplyr::slice_sample(prop = 1)
-
-  mockery::stub(
-    prep_test_ts,
-    "coviData::process_negative_tests",
-    data
-  )
+  ) %>%
+    dplyr::mutate(positive = c(rep(FALSE, NROW(.)-1L), TRUE)) %>%
+    dplyr::slice_sample(prop = 1) %>%
+    dplyr::nest_by(.data[["positive"]]) %>%
+    dplyr::arrange(dplyr::desc(.data[["positive"]]))
 
   negative_ts <- prep_test_ts(
     data,
     date = lubridate::as_date("2021-04-19"),
-    result = "negative"
+    status = "-"
   )
 
   n_03_05 <- negative_ts %>%
@@ -125,8 +75,8 @@ test_that("`prep_test_ts()` output is correct for negative tests", {
   expect_s3_class(negative_ts, "n_tbl")
   expect_vector(negative_ts[["test_date"]], lubridate::Date())
   expect_vector(negative_ts[["negative"]], integer())
-  expect_equal(attr(negative_ts, "n_obs", exact = TRUE), 84000L)
-  expect_equal(attr(negative_ts, "n_missing", exact = TRUE), 2000L)
+  expect_equal(attr(negative_ts, "n_obs", exact = TRUE), 83999L)
+  expect_equal(attr(negative_ts, "n_missing", exact = TRUE), 1999L)
   expect_equal(as.character(min(negative_ts[["test_date"]])), "2020-03-05")
   expect_equal(as.character(max(negative_ts[["test_date"]])), "2021-04-19")
   expect_equal(n_03_05, 0L)
@@ -140,46 +90,16 @@ test_that("`prep_test_pos()` output is correct", {
     ) %>%
       append(rep(NA_character_, 800L)) %>%
       format("%Y-%m-%dTH:M:SZ")
-  ) %>% dplyr::slice_sample(prop = 1)
+  ) %>%
+    dplyr::mutate(positive = TRUE) %>%
+    dplyr::slice_sample(prop = 1) %>%
+    dplyr::nest_by(.data[["positive"]]) %>%
+    vec_rep(2L) %>%
+    dplyr::ungroup() %>%
+    dplyr::mutate(positive = c(TRUE, FALSE)) %>%
+    dplyr::rowwise(.data[["positive"]])
 
-  mockery::stub(
-    prep_test_ts,
-    "coviData::process_positive_tests",
-    data
-  )
-  mockery::stub(
-    prep_test_ts,
-    "coviData::process_negative_tests",
-    data
-  )
-
-  positive_ts <- prep_test_ts(
-    data,
-    date = lubridate::as_date("2021-04-19"),
-    result = "positive"
-  )
-
-  negative_ts <- prep_test_ts(
-    data,
-    date = lubridate::as_date("2021-04-19"),
-    result = "negative"
-  )
-
-  prep_test_fn <- function(
-    data,
-    date = NULL,
-    result = c("positive", "negative")
-  ) {
-    result <- rlang::arg_match(result)[[1L]]
-    if (result == "positive") positive_ts else negative_ts
-  }
-  mockery::stub(
-    prep_test_pos,
-    "prep_test_ts",
-    prep_test_fn
-  )
-
-  test_pos <- prep_test_pos(data, date = as.Date("2021-04-19"), delay = 7L)
+  test_pos <- prep_test_pos(data, date = as.Date("2021-04-19"), delay = 5L)
 
   expect_s3_class(test_pos, "n_tbl")
   expect_vector(test_pos[["test_date"]], lubridate::Date())
@@ -191,5 +111,5 @@ test_that("`prep_test_pos()` output is correct", {
   expect_equal(attr(test_pos, "n_obs", exact = TRUE), 2L*84000L)
   expect_equal(attr(test_pos, "n_missing", exact = TRUE), 3800L)
   expect_equal(as.character(min(test_pos[["test_date"]])), "2020-03-14")
-  expect_equal(as.character(max(test_pos[["test_date"]])), "2021-04-12")
+  expect_equal(as.character(max(test_pos[["test_date"]])), "2021-04-14")
 })

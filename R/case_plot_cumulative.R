@@ -1,7 +1,7 @@
 #' Plot Cumulative Case Time Series
 #'
 #' @param data Case data (by person) from NBS, as output by
-#'   \code{\link[coviData:process_positive_people]{process_positive_people()}}
+#'   \code{\link[coviData:process-nbs]{pos(process_inv())}}
 #'
 #' @param date The download date of `data`; the default is the most recent
 #'
@@ -9,7 +9,7 @@
 #'
 #' @export
 case_plot_cumulative <- function(
-  data = coviData::process_positive_people(date = date),
+  data = pos(process_inv(read_inv(date = date))),
   date = NULL
 ) {
 
@@ -17,19 +17,11 @@ case_plot_cumulative <- function(
   min_date <- lubridate::as_date("2020-03-08")
 
   # Date for current (and previous) counts
-  if (is.null(date)) {
-    date <- coviData::path_inv() %>%
-      fs::path_file() %>%
-      fs::path_ext_remove() %>%
-      stringr::str_extract("[0-9]{1,4}.?[0-9]{1,2}.?[0-9]{1,4}") %>%
-      lubridate::as_date()
-  } else {
-    date <- lubridate::as_date(date)
-  }
+  date <- date_inv(date)
 
   # Label numbers
   n_total <- NROW(data)
-  n_prev <- NROW(coviData::process_positive_people(date = date - 1L))
+  n_prev <- NROW(read_inv_id(date = date - 1L))
   n_new <- n_total - n_prev
 
   # Loading report dates in `case_plot_cumulative()` rather than

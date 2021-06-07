@@ -1,7 +1,7 @@
 #' Plot Daily New Cases by Specimen Collection Date
 #'
 #' @param data Case data, as output by
-#'   \code{\link[coviData:process_positive_people]{process_positive_people()}}
+#'   \code{\link[coviData:process-nbs]{pos(process_inv())}}
 #'
 #' @param date The report date of the data; defaults to the most recent date
 #'
@@ -13,7 +13,7 @@
 #'
 #' @export
 case_plot_daily <- function(
-  data = coviData::process_positive_people(date = date),
+  data = pos(process_inv(read_inv(date = date))),
   date = NULL,
   delay = NULL
 ) {
@@ -21,15 +21,7 @@ case_plot_daily <- function(
   min_date <- lubridate::as_date("2020-03-08")
 
   # Date for current (and previous) counts
-  if (is.null(date)) {
-    date <- coviData::path_inv() %>%
-      fs::path_file() %>%
-      fs::path_ext_remove() %>%
-      stringr::str_extract("[0-9]{1,4}.?[0-9]{1,2}.?[0-9]{1,4}") %>%
-      lubridate::as_date()
-  } else {
-    date <- lubridate::as_date(date)
-  }
+  date <- date_inv(date)
 
   if (is.null(delay)) {
     rpt_data <- dplyr::as_tibble(coviData::load_report_date())
@@ -47,10 +39,15 @@ case_plot_daily <- function(
 
   # Label numbers
   n_total <- NROW(data)
-  n_prev <- NROW(coviData::process_positive_people(date = date - 1L))
+  n_prev <- NROW(read_inv_id(date = date - 1L))
   n_new <- n_total - n_prev
 
-  gg_data <- prep_daily_data(data, min_date = min_date, date = date, delay = delay)
+  gg_data <- prep_daily_data(
+    data,
+    min_date = min_date,
+    date = date,
+    delay = delay
+  )
 
   n_plotted <- sum(gg_data[["n"]], na.rm = TRUE)
   n_missing <- n_total - n_plotted
@@ -71,7 +68,7 @@ case_plot_daily <- function(
 #' Prepare Data for Plotting Daily New Cases
 #'
 #' @param data Case data, as output by
-#'   \code{\link[coviData:process_positive_people]{process_positive_people()}}
+#'   \code{\link[coviData:process-nbs]{pos(process_inv())}}
 #'
 #' @param min_date Minimum plotting date
 #'

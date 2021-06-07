@@ -4,14 +4,11 @@
 \alias{case_table_active}
 \title{Tabulate Active, Deceased, and Inactive/Recovered COVID-19 Cases}
 \usage{
-case_table_active(
-  data = coviData::process_positive_people(date = date),
-  date = NULL
-)
+case_table_active(data = pos(process_inv(read_inv(date = date))), date = NULL)
 }
 \arguments{
 \item{data}{Case data, as output by
-\code{\link[coviData:process_positive_people]{process_positive_people()}}}
+\code{\link[coviData:process-nbs]{pos(process_inv())}}}
 
 \item{date}{Download date of the data; defaults to most recent}
 }

@@ -5,7 +5,7 @@
 \title{Plot 7-Day Rolling Test Positivity Rate}
 \usage{
 test_plot_positivity(
-  data = coviData::read_file_delim(coviData::path_pcr(date)),
+  data = process_pcr(read_pcr(date)),
   date = NULL,
   delay = 5L
 )

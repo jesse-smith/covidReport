@@ -1,19 +1,10 @@
 test_that("`void(case_table_active())` matches snapshot", {
 
-  path_fn <- function(
-    date = NULL,
-    dir = fs::path(
-      "V:/EPI DATA ANALYTICS TEAM/COVID SANDBOX REDCAP DATA",
-      "Sandbox data pull Final"
-    ),
-    ext = c("csv", "xlsx", "fst")
-  ) {
-    ext <- rlang::arg_match(ext)[[1L]]
-    if (is.null(date)) date <- as.character(lubridate::today()-1L)
-    date <- as.character(lubridate::as_date(date))
-
-    fs::path(dir, paste0(date, " Final Data Pull.", ext))
-  }
+  mockery::stub(
+    case_table_active,
+    "date_inv",
+    lubridate::as_date
+  )
 
   tbl_calc <- tibble::tribble(
       ~ status,       ~ n, ~ percent,
@@ -60,25 +51,10 @@ test_that("`void(case_table_active())` matches snapshot", {
 
 test_that("`case_calc_active()` matches reference (with active cases)", {
 
-  path_fn <- function(
-    date = NULL,
-    dir = fs::path(
-      "V:/EPI DATA ANALYTICS TEAM/COVID SANDBOX REDCAP DATA",
-      "Sandbox data pull Final"
-    ),
-    ext = c("csv", "xlsx", "fst")
-  ) {
-    ext <- rlang::arg_match(ext)[[1L]]
-    if (is.null(date)) date <- as.character(lubridate::today()-1L)
-    date <- as.character(lubridate::as_date(date))
-
-    fs::path(dir, paste0(date, " Final Data Pull.", ext))
-  }
-
   mockery::stub(
     case_calc_active,
-    "coviData::path_inv",
-    path_fn
+    "date_inv",
+    lubridate::as_date
   )
 
   data <- tibble::tibble(
@@ -119,25 +95,10 @@ test_that("`case_calc_active()` matches reference (with active cases)", {
 
 test_that("`case_calc_active()` matches reference (with no active cases)", {
 
-  path_fn <- function(
-    date = NULL,
-    dir = fs::path(
-      "V:/EPI DATA ANALYTICS TEAM/COVID SANDBOX REDCAP DATA",
-      "Sandbox data pull Final"
-    ),
-    ext = c("csv", "xlsx", "fst")
-  ) {
-    ext <- rlang::arg_match(ext)[[1L]]
-    if (is.null(date)) date <- as.character(lubridate::today()-1L)
-    date <- as.character(lubridate::as_date(date))
-
-    fs::path(dir, paste0(date, " Final Data Pull.", ext))
-  }
-
   mockery::stub(
     case_calc_active,
-    "coviData::path_inv",
-    path_fn
+    "date_inv",
+    lubridate::as_date
   )
 
   data <- tibble::tibble(

@@ -4,10 +4,7 @@
 \alias{test_calc_total}
 \title{Calculate PCR Test Totals}
 \usage{
-test_calc_total(
-  data = coviData::read_file_delim(coviData::path_pcr(date)),
-  date = NULL
-)
+test_calc_total(data = process_pcr(read_pcr(date)), date = NULL)
 }
 \arguments{
 \item{data}{PCR test data, read from an NBS snapshot file}

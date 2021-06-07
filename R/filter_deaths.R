@@ -1,7 +1,7 @@
 #' Filter Case Data to COVID-19 Deaths
 #'
 #' @param data Case data, as output by
-#'   \code{\link[coviData:process_positive_people]{process_positive_people()}}
+#'   \code{\link[coviData:process-nbs]{pos(process_inv())}}
 #'
 #' @param col `<tidy-select>` A single, `character` indicator column for
 #'   COVID-19 deaths. Deaths should be labeled `"Y"`.

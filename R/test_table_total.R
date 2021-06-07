@@ -8,7 +8,7 @@
 #'
 #' @export
 test_table_total <- function(
-  data = coviData::read_file_delim(coviData::path_pcr(date)),
+  data = process_pcr(read_pcr(date)),
   date = NULL
 ) {
   data %>%
@@ -33,11 +33,11 @@ test_table_total <- function(
 #'
 #' @keywords internal
 test_calc_total <- function(
-  data = coviData::read_file_delim(coviData::path_pcr(date)),
+  data = process_pcr(read_pcr(date)),
   date = NULL
 ) {
-  n_positive <- NROW(coviData::process_positive_tests(data, date = date))
-  n_negative <- NROW(coviData::process_negative_tests(data, date = date))
+  n_positive <- NROW(pos(data))
+  n_negative <- NROW(neg(data))
   n_total    <- n_positive + n_negative
 
   tibble::tibble(

@@ -1,7 +1,7 @@
 #' Tabluate Summary Investigation Numbers
 #'
 #' @param data Case data, as output by
-#'   \code{\link[coviData:process_positive_people]{process_positive_people()}}
+#'   \code{\link[coviData:process-nbs]{pos(process_inv())}}
 #'
 #' @param nit_token API token/key for accessing the NIT REDcap project
 #'
@@ -14,7 +14,7 @@
 #'
 #' @export
 inv_table_total <- function(
-  data = coviData::process_positive_people(date = date),
+  data = pos(process_inv(read_inv(date = date))),
   nit_token = Sys.getenv("redcap_NIT_token"),
   prior_contacts = 45669L,
   date = NULL
@@ -57,7 +57,7 @@ inv_table_total <- function(
 #'
 #' @keywords internal
 inv_calc_total <- function(
-  data = coviData::process_positive_people(date = date),
+  data = pos(process_inv(read_inv(date = date))),
   nit_token = Sys.getenv("redcap_NIT_token"),
   prior_contacts = 45669L,
   date = NULL
@@ -68,10 +68,7 @@ inv_calc_total <- function(
   )
 
   if (is.null(date)) {
-    date <- coviData::path_inv() %>%
-      fs::path_file() %>%
-      fs::path_ext_remove() %>%
-      stringr::str_extract("[0-9]{1,4}.?[0-9]{1,2}.?[0-9]{1,4}")
+    date <- date_inv(date)
   }
 
   date <- lubridate::as_date(date)

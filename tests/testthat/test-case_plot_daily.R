@@ -1,7 +1,7 @@
 test_that("`case_plot_daily()` matches doppelganger", {
   mockery::stub(
     case_plot_daily,
-    "coviData::process_positive_people",
+    "coviData::pos",
     tibble::tibble(.rows = 93895L)
   )
 
@@ -11,6 +11,18 @@ test_that("`case_plot_daily()` matches doppelganger", {
     case_plot_daily,
     "coviData::load_report_date",
     report_date
+  )
+
+  mockery::stub(
+    case_plot_daily,
+    "read_inv_id",
+    tibble::tibble(.rows = 93960L - 65L)
+  )
+
+  mockery::stub(
+    case_plot_daily,
+    "date_inv",
+    lubridate::as_date
   )
 
   data <- dplyr::left_join(
