@@ -13,6 +13,12 @@ test_that("`case_plot_daily()` matches doppelganger", {
     report_date
   )
 
+  mockery::stub(
+    case_plot_daily,
+    "coviData::date_inv",
+    lubridate::as_date
+  )
+
   data <- dplyr::left_join(
     readRDS(testthat::test_path("../data/test_cumulative_data.rds")),
     report_date,

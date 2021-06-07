@@ -11,6 +11,12 @@ test_that("`case_plot_cumulative()` returns expected graphic", {
     readRDS(testthat::test_path("../data/test_report_data.rds"))
   )
 
+  mockery::stub(
+    case_plot_cumulative,
+    "coviData::date_inv",
+    lubridate::as_date
+  )
+
   plt <- case_plot_cumulative(
     readRDS(testthat::test_path("../data/test_cumulative_data.rds")),
     date = "2021-04-19"
