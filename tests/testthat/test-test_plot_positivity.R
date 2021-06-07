@@ -1,17 +1,7 @@
 test_that("`test_plot_positivity()` matches doppelganger", {
-  # Stub `path_pcr()`
   mockery::stub(
     test_plot_positivity,
-    "coviData::path_pcr",
-    fs::path(
-      "V:/EPI DATA ANALYTICS TEAM/COVID SANDBOX REDCAP DATA/MSR PCR",
-      "MSR - All PCRs_04192021.csv"
-    )
-  )
-
-  mockery::stub(
-    test_plot_positivity,
-    "coviData::date_pcr",
+    "date_pcr",
     lubridate::as_date
   )
 

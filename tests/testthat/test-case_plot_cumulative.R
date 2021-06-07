@@ -13,7 +13,13 @@ test_that("`case_plot_cumulative()` returns expected graphic", {
 
   mockery::stub(
     case_plot_cumulative,
-    "coviData::date_inv",
+    "read_inv_id",
+    tibble::tibble(.rows = 93960L - 65L)
+  )
+
+  mockery::stub(
+    case_plot_cumulative,
+    "date_inv",
     lubridate::as_date
   )
 

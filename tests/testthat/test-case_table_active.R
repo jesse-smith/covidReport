@@ -2,7 +2,7 @@ test_that("`void(case_table_active())` matches snapshot", {
 
   mockery::stub(
     case_table_active,
-    "coviData::date_inv",
+    "date_inv",
     lubridate::as_date
   )
 
@@ -53,7 +53,7 @@ test_that("`case_calc_active()` matches reference (with active cases)", {
 
   mockery::stub(
     case_calc_active,
-    "coviData::date_inv",
+    "date_inv",
     lubridate::as_date
   )
 
@@ -97,7 +97,7 @@ test_that("`case_calc_active()` matches reference (with no active cases)", {
 
   mockery::stub(
     case_calc_active,
-    "coviData::date_inv",
+    "date_inv",
     lubridate::as_date
   )
 

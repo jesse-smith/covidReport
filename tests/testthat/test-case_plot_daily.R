@@ -15,7 +15,13 @@ test_that("`case_plot_daily()` matches doppelganger", {
 
   mockery::stub(
     case_plot_daily,
-    "coviData::date_inv",
+    "read_inv_id",
+    tibble::tibble(.rows = 93960L - 65L)
+  )
+
+  mockery::stub(
+    case_plot_daily,
+    "date_inv",
     lubridate::as_date
   )
 
