@@ -11,17 +11,13 @@
 #'
 #' @export
 test_plot_positivity <- function(
-  data = coviData::read_file_delim(coviData::path_pcr(date)),
+  data = process_pcr(read_pcr(date)),
   date = NULL,
   delay = 5L
 ) {
 
   # Get report date
-  date <- coviData::path_pcr(date) %>%
-    fs::path_file() %>%
-    fs::path_ext_remove() %>%
-    stringr::str_extract("[0-9]{1,4}.?[0-9]{1,2}.?[0-9]{1,4}") %>%
-    lubridate::mdy()
+  date <- date_pcr(date)
 
   gg_data <- prep_test_pos(data, date = date, delay = delay)
 
@@ -46,32 +42,35 @@ test_plot_positivity <- function(
 #'
 #' @inheritParams test_plot_positivity
 #'
-#' @param result Should positive or negative test counts be returned?
+#' @param status Should positive or negative test counts be returned?
 #'
 #' @return A `tibble` with columns `test_date` (`Date`) and `n` (`int`), as well
 #'   as attributes `n_obs` (total positive/negative observations) and
 #'   `n_missing` (missing `test_date`s)
 #'
 #' @noRd
-prep_test_ts <- function(data, date, result = c("positive", "negative")) {
+prep_test_ts <- function(data, date, status = c("+", "-")) {
 
-  result <- rlang::arg_match(result)[[1L]]
+  status <- rlang::arg_match(status)[[1L]]
 
-  if (result == "positive") {
+  if (status == "+") {
+    status_full <- "positive"
     min_dt <- lubridate::as_date("2020-03-05")
   } else {
+    status_full <- "negative"
     min_dt <- lubridate::as_date("2020-03-06")
   }
 
-  data_processed <- purrr::when(
+  data_status <- purrr::when(
     data,
-    result == "positive" ~ coviData::process_positive_tests(., date = date),
-    result == "negative" ~ coviData::process_negative_tests(., date = date),
-    ~ rlang::abort("`result` must be positive or negative")
+    status == "+" ~ pos(data),
+    status == "-" ~ neg(data),
+    ~ rlang::abort("`status` must be '+' or '-'")
   )
   remove(data)
+  gc(verbose = FALSE)
 
-  data_dt <- data_processed %>%
+  data_dt <- data_status %>%
     dplyr::transmute(
       test_date = coviData::std_dates(
         .data[["specimen_coll_dt"]],
@@ -85,9 +84,10 @@ prep_test_ts <- function(data, date, result = c("positive", "negative")) {
       .data[["test_date"]] <= lubridate::as_date({{ date }})
     )
 
-  n_obs     <- vec_size(data_processed)
+  n_obs     <- vec_size(data_status)
   n_missing <- n_obs - vec_size(data_dt)
-  remove(data_processed)
+  remove(data_status)
+  gc(verbose = FALSE)
 
   data_dt %>%
     dplyr::count(.data[["test_date"]]) %>%
@@ -99,7 +99,7 @@ prep_test_ts <- function(data, date, result = c("positive", "negative")) {
       ),
       fill = list(n = 0L)
     ) %>%
-    dplyr::rename({{ result }} := "n") %>%
+    dplyr::rename({{ status_full }} := "n") %>%
     tibble::new_tibble(
       n_obs = n_obs,
       n_missing = n_missing,
@@ -120,8 +120,10 @@ prep_test_ts <- function(data, date, result = c("positive", "negative")) {
 #'
 #' @noRd
 prep_test_pos <- function(data, date, delay) {
-  positive <- prep_test_ts(data, date = date, result = "positive")
-  negative <- prep_test_ts(data, date = date, result = "negative")
+  positive <- prep_test_ts(data, date = date, status = "+")
+  negative <- prep_test_ts(data, date = date, status = "-")
+  remove(data)
+  gc(verbose = FALSE)
 
   n_obs   <- attr(positive, "n_obs")     + attr(negative, "n_obs")
   n_missing <- attr(positive, "n_missing") + attr(negative, "n_missing")
