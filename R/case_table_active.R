@@ -37,14 +37,13 @@ case_calc_active <- function(
   data = pos(process_inv(read_inv(date = date))),
   date = NULL
 ) {
-  date <- date_inv(date)
 
   a_cols <- c("illness_onset_dt", "specimen_coll_dt", "inv_start_dt")
 
   data %>%
     dplyr::mutate(.id_tmp_ = dplyr::row_number()) %>%
     dplyr::mutate(
-      active = .data[[".id_tmp_"]] %in% filter_active(.)[[".id_tmp_"]],
+      active = .data[[".id_tmp_"]] %in% filter_active(., date = date)[[".id_tmp_"]],
       died = .data[[".id_tmp_"]] %in% filter_deaths(.)[[".id_tmp_"]]
     ) %>%
     dplyr::transmute(
