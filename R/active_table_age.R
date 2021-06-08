@@ -46,7 +46,6 @@ active_calc_age <- function(
   data = pos(process_inv(read_inv(date))),
   date = NULL
 ) {
-  date <- date_inv(date)
   data %>%
     filter_active(date = date) %>%
     dplyr::transmute(
