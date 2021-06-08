@@ -1,0 +1,131 @@
+#' Tabluate Active Cases by Age
+#'
+#' @param data NBS case data, as returned by
+#'   \code{\link[coviData:read-nbs]{pos(process_inv())}}
+#'
+#' @param date The download date of the data; defaults to most recent
+#'
+#' @return A `flextable`
+#'
+#' @export
+active_table_age <- function(
+  data = pos(process_inv(read_inv(date))),
+  date = NULL
+) {
+  data %>%
+    active_calc_age(date = date) %>%
+    janitor::adorn_totals() %>%
+    dplyr::mutate(
+      percent = 100 * .data[["percent"]],
+      rate = 1e5 * .data[["rate"]],
+      rate = vec_assign(.data[["rate"]], i = vec_size(.), value = NA_real_)
+    ) %>%
+    flextable::flextable() %>%
+    flextable::set_header_labels(
+      age_grp = "Age",
+      n = "N",
+      rate = "Rate per 100k",
+      percent = "% Total"
+    ) %>%
+    fmt_covid_table(total = TRUE) %>%
+    flextable::colformat_double(j = "rate", digits = 1L) %>%
+    flextable::colformat_double(j = "percent", digits = 1L, suffix = "%") %>%
+    flextable::autofit()
+}
+
+#' Calculate Active Case Rates and Percentages by Age
+#'
+#' @inheritParams active_table_age
+#'
+#' @return A `tibble`
+#'
+#' @export
+#'
+#' @keywords internal
+active_calc_age <- function(
+  data = pos(process_inv(read_inv(date))),
+  date = NULL
+) {
+  date <- date_inv(date)
+  data %>%
+    filter_active(date = date) %>%
+    dplyr::transmute(
+      inv_start_dt = std_dates(
+        .data[["inv_start_dt"]],
+        orders = "ymdT",
+        force = "dt"
+      ),
+      specimen_coll_dt,
+      inv_start_dt,
+      patient_dob,
+      age_in_years = as.double(.data[["age_in_years"]]),
+      age_test = divide_by(
+        lubridate::as.duration(specimen_coll_dt - patient_dob),
+        lubridate::dyears(1L)
+      ),
+      age_start_dt = divide_by(
+        lubridate::as.duration(inv_start_dt - patient_dob),
+        lubridate::dyears(1L)
+      ),
+      # `std_age()` is defined in vac_plot_age.R
+      dplyr::across(dplyr::starts_with("'age_"), std_age)
+    ) %>%
+    dplyr::transmute(
+      age_yrs = dplyr::coalesce(
+        .data[["age_in_years"]],
+        .data[["age_test"]],
+        .data[["age_start_dt"]]
+      ),
+      age_grp = active_age_grp(.data[["age_yrs"]])
+    ) %>%
+    dplyr::count(.data[["age_grp"]]) %>%
+    active_join_age_pop() %>%
+    dplyr::transmute(
+      .data[["age_grp"]],
+      n = .data[["n_active"]],
+      percent = .data[["n"]] / sum(.data[["n"]], na.rm = TRUE),
+      rate = .data[["n"]] / .data[["n_pop"]]
+    ) %>%
+    dplyr::as_tibble()
+}
+
+active_age_grp <- function(dbl) {
+  vctrs::vec_assert(dbl, ptype = double())
+  breaks <- c(0, 18, seq(25, 85, by = 10), 115)
+  lbls <- c(
+    "0-17",
+    "18-24",
+    "25-34",
+    "35-44",
+    "45-54",
+    "55-64",
+    "65-74",
+    "75-84",
+    "85+"
+  )
+
+  cut(
+    dbl,
+    breaks = breaks,
+    labels = lbls,
+    right = FALSE,
+    ordered_result = TRUE
+  ) %>% as.character()
+}
+
+active_join_age_pop <- function(data) {
+  pop_age <- covidReport::pop_2019 %>%
+    dplyr::mutate(
+      age_grp = .data[["age"]] %>%
+        as.double() %>%
+        active_age_grp()
+    ) %>%
+    dplyr::group_by(.data[["age_grp"]]) %>%
+    dplyr::summarize(n = sum(.data[["population"]]))
+  data %>%
+    dplyr::left_join(
+      pop_age,
+      by = "age_grp",
+      suffix = c("_active", "_pop")
+    )
+}
