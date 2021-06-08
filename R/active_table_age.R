@@ -55,18 +55,13 @@ active_calc_age <- function(
         orders = "ymdT",
         force = "dt"
       ),
-      specimen_coll_dt,
-      inv_start_dt,
-      patient_dob,
       age_in_years = as.double(.data[["age_in_years"]]),
-      age_test = divide_by(
-        lubridate::as.duration(specimen_coll_dt - patient_dob),
-        lubridate::dyears(1L)
-      ),
-      age_start_dt = divide_by(
-        lubridate::as.duration(inv_start_dt - patient_dob),
-        lubridate::dyears(1L)
-      ),
+      age_test = (.data[["specimen_coll_dt"]] - .data[["patient_dob"]]) %>%
+        lubridate::as.duration() %>%
+        divide_by(lubridate::dyears(1L)),
+      age_start_dt = (.data[["inv_start_dt"]] - .data[["patient_dob"]]) %>%
+        lubridate::as.duration() %>%
+        divide_by(lubridate::dyears(1L)),
       # `std_age()` is defined in vac_plot_age.R
       dplyr::across(dplyr::starts_with("'age_"), std_age)
     ) %>%
