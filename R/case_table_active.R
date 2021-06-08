@@ -44,14 +44,7 @@ case_calc_active <- function(
   data %>%
     dplyr::mutate(.id_tmp_ = dplyr::row_number()) %>%
     dplyr::mutate(
-      active_dt = dplyr::across(
-        {{ a_cols }},
-        ~ coviData::std_dates(.x, orders = "ymdT", train = FALSE, force = "dt")
-      ) %>%
-        dplyr::transmute(dt = coviData::coalesce_across({{ a_cols }})) %>%
-        dplyr::pull("dt"),
-      active_days = as.integer({{ date }} - .data[["active_dt"]]),
-      active = dplyr::between(.data[["active_days"]], 0L, 14L),
+      active = .data[[".id_tmp_"]] %in% filter_active(.)[[".id_tmp_"]],
       died = .data[[".id_tmp_"]] %in% filter_deaths(.)[[".id_tmp_"]]
     ) %>%
     dplyr::transmute(
