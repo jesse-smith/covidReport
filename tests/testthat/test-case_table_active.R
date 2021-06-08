@@ -1,22 +1,16 @@
 test_that("`void(case_table_active())` matches snapshot", {
 
-  mockery::stub(
-    case_table_active,
-    "date_inv",
-    lubridate::as_date
-  )
-
-  tbl_calc <- tibble::tribble(
-      ~ status,       ~ n, ~ percent,
-      "Active",       900,     0.009,
+  tbl_mock <- mockery::mock(tibble::tribble(
+    ~ status,       ~ n, ~ percent,
+    "Active",       900,     0.009,
     "Deceased",      9999,     0.100,
     "Inactive",     89101,     0.891
-  )
+  ))
 
   mockery::stub(
     case_table_active,
     "case_calc_active",
-    tbl_calc
+    tbl_mock
   )
 
   data <- tibble::tibble(
@@ -46,16 +40,11 @@ test_that("`void(case_table_active())` matches snapshot", {
     part = "all"
   )
 
+  mockery::expect_called(tbl_mock, n = 1L)
   expect_snapshot(tbl_void)
 })
 
 test_that("`case_calc_active()` matches reference (with active cases)", {
-
-  mockery::stub(
-    case_calc_active,
-    "date_inv",
-    lubridate::as_date
-  )
 
   data <- tibble::tibble(
     die_from_illness_ind = rep(
@@ -79,6 +68,23 @@ test_that("`case_calc_active()` matches reference (with active cases)", {
     ) %>%
     dplyr::slice_sample(prop = 1)
 
+  mockery::stub(
+    filter_active,
+    "date_inv",
+    lubridate::as_date
+  )
+
+  data_mock <- data %>%
+    dplyr::mutate(.id_tmp_ = dplyr::row_number()) %>%
+    filter_active(date = "2021-04-01") %>%
+    mockery::mock(cycle = TRUE)
+
+  mockery::stub(
+    case_calc_active,
+    "filter_active",
+    data_mock
+  )
+
   tbl_active <- case_calc_active(data, date = "2021-04-01") %>%
     set_attr("tabyl_type", NULL) %>%
     set_attr("core", NULL)
@@ -90,16 +96,11 @@ test_that("`case_calc_active()` matches reference (with active cases)", {
     "Inactive",     89101,     0.891
   )
 
+  mockery::expect_called(data_mock, n = 1L)
   expect_equal(tbl_active, tbl_ref)
 })
 
 test_that("`case_calc_active()` matches reference (with no active cases)", {
-
-  mockery::stub(
-    case_calc_active,
-    "date_inv",
-    lubridate::as_date
-  )
 
   data <- tibble::tibble(
     die_from_illness_ind = rep(
@@ -134,6 +135,23 @@ test_that("`case_calc_active()` matches reference (with no active cases)", {
     ) %>%
     dplyr::slice_sample(prop = 1)
 
+  mockery::stub(
+    filter_active,
+    "date_inv",
+    lubridate::as_date
+  )
+
+  data_mock <- data %>%
+    dplyr::mutate(.id_tmp_ = dplyr::row_number()) %>%
+    filter_active(date = "2021-04-01") %>%
+    mockery::mock(cycle = TRUE)
+
+  mockery::stub(
+    case_calc_active,
+    "filter_active",
+    data_mock
+  )
+
   tbl_active <- case_calc_active(data, date = "2021-04-01") %>%
     set_attr("tabyl_type", NULL) %>%
     set_attr("core", NULL)
@@ -145,5 +163,6 @@ test_that("`case_calc_active()` matches reference (with no active cases)", {
     "Inactive",  90001,       0.9
   )
 
+  mockery::expect_called(data_mock, n = 1L)
   expect_equal(tbl_active, tbl_ref)
 })
