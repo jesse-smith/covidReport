@@ -26,27 +26,12 @@ vac_map_pct <- function(
     ))
   }
 
-  zips <- sf::read_sf(zip_path)
-  denoms <- coviData::path_create(
-    "V:/EPI DATA ANALYTICS TEAM/COVID SANDBOX REDCAP DATA",
-    "Confirmed COVID-19 SC cases 03312020_10AM_Zipcode.xlsx"
-  ) %>%
-    readxl::read_excel(
-      range = readxl::cell_cols("A:D"),
-      col_types = rep("text", 4L)
-    ) %>%
-    dplyr::select(1L, pop = 4L) %>%
-    dplyr::mutate(
-      pop = as.integer(.data[["pop"]]),
-      ZIP = stringr::str_remove_all(.data[["ZipCode"]], "[^0-9]")
-    )
-
   counts <- data %>%
     vac_filter_residents() %>%
     vac_distinct() %>%
     dplyr::transmute(
       zip = vac_parse_zip(.data[["address_zip"]]),
-      ZipCode = dplyr::case_when(
+      zip_mrg = dplyr::case_when(
         zip == "" ~ NA_character_,
         zip %in% c('38018','38028') ~ '38018+38028',
         zip %in% c('38103','38104','38105') ~ '38103+38104+38105',
@@ -64,23 +49,22 @@ vac_map_pct <- function(
         TRUE ~ zip
       )
     ) %>%
-    dplyr::count(.data[["ZipCode"]]) %>%
+    dplyr::count(zip = .data[["zip_mrg"]]) %>%
     dplyr::mutate(
-      n = dplyr::if_else(.data[["n"]] == 0L, NA_integer_, .data[["n"]]),
-      ZIP = stringr::str_remove_all(.data[["ZipCode"]], "[^0-9]")
+      n = dplyr::if_else(.data[["n"]] == 0L, NA_integer_, .data[["n"]])
     )
 
   n_total <- sum(counts[["n"]], na.rm = TRUE)
 
   gg_data <- counts %>%
-    dplyr::right_join(zips, by = "ZIP") %>%
-    dplyr::left_join(denoms, by = "ZIP", suffix = c("", "_denoms")) %>%
+    dplyr::full_join(covidReport::zip_shape, by = "zip") %>%
     dplyr::mutate(
-      vac_pct = 100 * .data[["n"]] / .data[["pop"]],
+      vac_pct = 100 * .data[["n"]] / .data[["pop_2019"]],
+      zip = dplyr::if_else(is.na(.data[["vac_pct"]]), NA_character_, .data[["zip"]]),
       zip_pct_lbl = dplyr::if_else(
-        !is.na(.data[["ZipCode"]]) & !is.na(.data[["vac_pct"]]),
+        !is.na(.data[["zip"]]) & !is.na(.data[["vac_pct"]]),
         paste0(
-          .data[["ZipCode"]], "\n",
+          .data[["zip"]], "\n",
           round(.data[["vac_pct"]]), "%"
         ),
         NA_character_
@@ -88,7 +72,7 @@ vac_map_pct <- function(
     )
 
   n_mapped_all <-  gg_data %>%
-    dplyr::filter(.data[["ZIP"]] != "Other", !is.na(.data[["ZIP"]])) %>%
+    dplyr::filter(.data[["zip"]] != "Other", !is.na(.data[["zip"]])) %>%
     dplyr::pull("n")
 
   n_mapped <- sum(n_mapped_all, na.rm = TRUE)
@@ -134,7 +118,7 @@ vac_map_pct <- function(
   ) +
     ggplot2::geom_sf() +
     ggplot2::geom_sf_text(
-      ggplot2::aes(label = .data[["ZipCode"]]),
+      ggplot2::aes(label = .data[["zip"]]),
       color = "grey30",
       fontface = "bold"
     ) +
