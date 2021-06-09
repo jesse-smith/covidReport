@@ -32,7 +32,12 @@ active_table_ <- function(
 
 active_join_pop_ <- function(data, grp = c("age", "sex", "race", "ethnicity")) {
   g <- rlang::arg_match(grp)[[1L]]
-  pop_cnt <- purrr::when(count_pop(g), g=="age" ~ active_collapse_age_(.), ~ .)
+  pop_cnt <- purrr::when(
+    count_pop(g),
+    g == "age"  ~ active_collapse_age_(.),
+    g == "race" ~ active_collapse_race_(.),
+    ~ .
+  )
   pop <- dplyr::transmute(
     pop_cnt,
     grp = if (is.factor(.data[[g]])) as.character(.data[[g]]) else .data[[g]],
@@ -56,7 +61,11 @@ active_calc_ <- function(data, grp = c("age", "sex", "race", "ethnicity")) {
   grp <- rlang::arg_match(grp)[[1L]]
   data %>%
     dplyr::count(.data[["grp"]]) %>%
-    purrr::when(grp == "age" ~ active_collapse_age_(.), ~ .) %>%
+    purrr::when(
+      grp == "age"  ~ active_collapse_age_(.),
+      grp == "race" ~ active_collapse_race_(.),
+      ~ .
+    ) %>%
     active_join_pop_(grp) %>%
     dplyr::transmute(
       grp = .data[["grp"]] %>%
@@ -66,13 +75,13 @@ active_calc_ <- function(data, grp = c("age", "sex", "race", "ethnicity")) {
       percent = .data[["n"]] / sum(.data[["n"]], na.rm = TRUE),
       rate = .data[["n"]] / .data[["n_pop"]]
     ) %>%
+    dplyr::arrange(.data[["grp"]]) %>%
     dplyr::as_tibble()
 }
 
 #' Collapse Age Groupings
 #'
-#' @param data Age-grouped data from
-#'   \code{\link[covidReport:active_join_pop_]{active_join_pop_()}}
+#' @param data Data with `numeric` ages
 #'
 #' @return `data` with age groups collapsed
 #'
@@ -90,6 +99,29 @@ active_collapse_age_ <- function(data) {
         active_age_grp_()
     ) %>%
     dplyr::group_by(.data[[age_var]]) %>%
+    dplyr::summarize(n = sum(.data[["n"]], na.rm = TRUE)) %>%
+    dplyr::ungroup()
+}
+
+#' Collapse Race Groupings
+#'
+#' @param data Data with `character` race variable
+#'
+#' @return A `tibble` with collapsed race variable
+#'
+#' @keywords internal
+active_collapse_race_ <- function(data) {
+  v <- c("race", "grp")
+  race_var <- v[v %in% colnames(data)]
+  vec_assert(race_var, ptype = character(), size = 1L)
+
+  data %>%
+    dplyr::mutate(
+      {{ race_var }} := .data[[race_var]] %>%
+        as.character() %>%
+        active_race_grp_()
+    ) %>%
+    dplyr::group_by(.data[[race_var]]) %>%
     dplyr::summarize(n = sum(.data[["n"]], na.rm = TRUE)) %>%
     dplyr::ungroup()
 }
@@ -123,4 +155,31 @@ active_age_grp_ <- function(dbl) {
     right = FALSE,
     ordered_result = TRUE
   ) %>% as.character()
+}
+
+#' Calculate Race Grouping
+#'
+#' @param dbl A `character` vector of race
+#'
+#' @return A `factor` of racial groups
+#'
+#' @keywords internal
+active_race_grp_ <- function(chr) {
+  chr <- chr %>%
+    stringr::str_to_upper() %>%
+    stringr::str_squish()
+
+  baa <- "Black/African American"
+  w <- "White"
+  # api <- "Asian/Pacific Islander"
+  # aian <- "American Indian/Alaskan Native"
+
+  dplyr::case_when(
+    stringr::str_detect(chr, "(BLACK)|(AFRICAN)") ~ baa,
+    stringr::str_detect(chr, "(WHITE)|(CAUCASIAN)") ~ w,
+    stringr::str_detect(chr, "(ASIAN)|(PACIFIC)") ~ "Other",
+    stringr::str_detect(chr, "(INDIAN)|(NATIVE)") ~ "Other",
+    chr == "OTHER" ~ "Other",
+    TRUE ~ NA_character_
+  )
 }
