@@ -1,4 +1,4 @@
-test_that("`vac_map_pct()` matches doppelganger", {
+test_that("`vac_map_pct()` matches snapshot", {
 
   zips <- coviData::shelby_zip %>%
     rep(times = 5e5L %/% NROW(.)) %>%
@@ -19,11 +19,14 @@ test_that("`vac_map_pct()` matches doppelganger", {
 
   plt <- vac_map_pct(data, date = "2021-04-01")
 
-  suppressWarnings(
-    vdiffr::expect_doppelganger(
-      title = "percent zip vaccinated",
-      fig = plt,
-      path = "vac-map-pct"
-    )
-  )
+  # sf plots can't be tested with {vdiffr} due to external dependencies
+  # Just snapshot the object instead - harder to debug changes, but workable
+  expect_snapshot(plt[["data"]])
+  expect_snapshot(plt[["layers"]])
+  expect_snapshot(plt[["scales"]])
+  expect_snapshot(plt[["mapping"]])
+  expect_snapshot(plt[["theme"]])
+  expect_snapshot(plt[["coordinates"]])
+  expect_snapshot(plt[["facet"]])
+  expect_snapshot(plt[["labels"]])
 })
