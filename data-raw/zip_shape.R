@@ -4,7 +4,7 @@ zip_path <- coviData::path_create(
   "AllZipswithMergedZips_clippedbySCBoundary.shp"
 )
 zip <- sf::read_sf(zip_path) %>%
-  dplyr::select(object_id = OBJECTID, ZIP, zip = ZIPCODEMRG, geometry)
+  dplyr::select(ZIP, zip = ZIPCODEMRG, geometry)
 
 denoms <- coviData::path_create(
   "V:/EPI DATA ANALYTICS TEAM/COVID SANDBOX REDCAP DATA",
@@ -21,7 +21,6 @@ denoms <- coviData::path_create(
   )
 
 zip_shape <- dplyr::left_join(zip, denoms, by = "ZIP") %>%
-  dplyr::select(object_id, zip, pop_2019 = pop, geometry) %>%
-  print(n = Inf)
+  dplyr::select(zip, pop_2019 = pop, geometry)
 
 usethis::use_data(zip_shape, overwrite = TRUE)
