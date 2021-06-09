@@ -18,7 +18,7 @@ active_table_sex <- function(
     flextable::autofit()
 }
 
-#' Calculate Active Case Rates and Percentages by Age
+#' Calculate Active Case Rates and Percentages by Sex
 #'
 #' @inheritParams active_table_sex
 #'
@@ -47,8 +47,6 @@ active_trans_sex <- function(data) {
     grp = dplyr::case_when(
       .data[["grp"]] == "F" ~ "Female",
       .data[["grp"]] == "M" ~ "Male"
-    ) %>%
-      factor() %>%
-      forcats::fct_explicit_na("Missing")
+    )
   )
 }

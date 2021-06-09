@@ -2,7 +2,7 @@
 % Please edit documentation in R/active_table_sex.R
 \name{active_calc_sex}
 \alias{active_calc_sex}
-\title{Calculate Active Case Rates and Percentages by Age}
+\title{Calculate Active Case Rates and Percentages by Sex}
 \usage{
 active_calc_sex(data = pos(process_inv(read_inv(date))), date = NULL)
 }
@@ -16,6 +16,6 @@ active_calc_sex(data = pos(process_inv(read_inv(date))), date = NULL)
 A \code{tibble}
 }
 \description{
-Calculate Active Case Rates and Percentages by Age
+Calculate Active Case Rates and Percentages by Sex
 }
 \keyword{internal}
