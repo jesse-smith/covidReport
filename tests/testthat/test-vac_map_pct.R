@@ -1,9 +1,8 @@
 test_that("`vac_map_pct()` matches doppelganger", {
 
-  zips <- withr::with_seed(
-    200L,
-    sample(coviData::shelby_zip, size = 5e5L, replace = TRUE)
-  )
+  zips <- coviData::shelby_zip %>%
+    rep(times = 5e5L %/% NROW(.)) %>%
+    append(rep(NA_character_, times = 5e5L - NROW(.)))
 
   data <- tibble::tibble(
     asiis_pat_id_ptr = 1:5e5,
