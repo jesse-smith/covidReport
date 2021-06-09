@@ -2,7 +2,7 @@
 % Please edit documentation in R/active_table_age.R
 \name{active_table_age}
 \alias{active_table_age}
-\title{Tabluate Active Cases by Age}
+\title{Tabulate Active Cases by Age}
 \usage{
 active_table_age(data = pos(process_inv(read_inv(date))), date = NULL)
 }
@@ -16,5 +16,5 @@ active_table_age(data = pos(process_inv(read_inv(date))), date = NULL)
 A \code{flextable}
 }
 \description{
-Tabluate Active Cases by Age
+Tabulate Active Cases by Age
 }
