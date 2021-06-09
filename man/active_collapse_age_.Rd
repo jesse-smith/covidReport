@@ -7,8 +7,7 @@
 active_collapse_age_(data)
 }
 \arguments{
-\item{data}{Age-grouped data from
-\code{\link[covidReport:active_join_pop_]{active_join_pop_()}}}
+\item{data}{Data with \code{numeric} ages}
 }
 \value{
 \code{data} with age groups collapsed
