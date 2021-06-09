@@ -29,3 +29,98 @@ active_table_ <- function(
     flextable::colformat_double(j = "rate", digits = 1L) %>%
     flextable::colformat_double(j = "percent", digits = 1L, suffix = "%")
 }
+
+active_join_pop_ <- function(data, grp = c("age", "sex", "race", "ethnicity")) {
+  g <- rlang::arg_match(grp)[[1L]]
+  pop_cnt <- purrr::when(count_pop(g), g=="age" ~ active_collapse_age_(.), ~ .)
+  pop <- dplyr::transmute(
+    pop_cnt,
+    grp = if (is.factor(.data[[g]])) as.character(.data[[g]]) else .data[[g]],
+    .data[["n"]]
+  )
+  dplyr::left_join(data, pop, by = "grp", suffix = c("_active", "_pop"))
+}
+
+#' Calculate Active Cases by A Categorical Variable
+#'
+#' @inheritParams active_table_
+#'
+#' @param grp The grouping structure to use; only single-variable grouping is
+#'   currently supported
+#'
+#' @return A `tibble` with columns `grp` (`fct`), `n` (`int`),
+#'   `percent` (`dbl`), and `rate` (`dbl`)
+#'
+#' @keywords internal
+active_calc_ <- function(data, grp = c("age", "sex", "race", "ethnicity")) {
+  grp <- rlang::arg_match(grp)[[1L]]
+  data %>%
+    dplyr::count(.data[["grp"]]) %>%
+    purrr::when(grp == "age" ~ active_collapse_age_(.), ~ .) %>%
+    active_join_pop_(grp) %>%
+    dplyr::transmute(
+      grp = .data[["grp"]] %>%
+        factor() %>%
+        forcats::fct_explicit_na("Missing"),
+      n = .data[["n_active"]],
+      percent = .data[["n"]] / sum(.data[["n"]], na.rm = TRUE),
+      rate = .data[["n"]] / .data[["n_pop"]]
+    ) %>%
+    dplyr::as_tibble()
+}
+
+#' Collapse Age Groupings
+#'
+#' @param data Age-grouped data from
+#'   \code{\link[covidReport:active_join_pop_]{active_join_pop_()}}
+#'
+#' @return `data` with age groups collapsed
+#'
+#' @keywords internal
+active_collapse_age_ <- function(data) {
+
+  v <- c("age", "grp")
+  age_var <- v[v %in% colnames(data)]
+  vec_assert(age_var, ptype = character(), size = 1L)
+
+  data %>%
+    dplyr::mutate(
+      {{ age_var }} := .data[[age_var]] %>%
+        as.double() %>%
+        active_age_grp_()
+    ) %>%
+    dplyr::group_by(.data[[age_var]]) %>%
+    dplyr::summarize(n = sum(.data[["n"]], na.rm = TRUE)) %>%
+    dplyr::ungroup()
+}
+
+#' Calculate Age Grouping
+#'
+#' @param dbl A `double` vector of ages
+#'
+#' @return A `factor` of age groups
+#'
+#' @keywords internal
+active_age_grp_ <- function(dbl) {
+  vctrs::vec_assert(dbl, ptype = double())
+  breaks <- c(0, 18, seq(25, 85, by = 10), 115)
+  lbls <- c(
+    "0-17",
+    "18-24",
+    "25-34",
+    "35-44",
+    "45-54",
+    "55-64",
+    "65-74",
+    "75-84",
+    "85+"
+  )
+
+  cut(
+    dbl,
+    breaks = breaks,
+    labels = lbls,
+    right = FALSE,
+    ordered_result = TRUE
+  ) %>% as.character()
+}
