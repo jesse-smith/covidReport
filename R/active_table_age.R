@@ -14,22 +14,7 @@ active_table_age <- function(
 ) {
   data %>%
     active_calc_age(date = date) %>%
-    janitor::adorn_totals() %>%
-    dplyr::mutate(
-      percent = 100 * .data[["percent"]],
-      rate = 1e5 * .data[["rate"]],
-      rate = vec_assign(.data[["rate"]], i = vec_size(.), value = NA_real_)
-    ) %>%
-    flextable::flextable() %>%
-    flextable::set_header_labels(
-      age_grp = "Age",
-      n = "N",
-      rate = "Rate per 100k",
-      percent = "% Total"
-    ) %>%
-    fmt_covid_table(total = TRUE) %>%
-    flextable::colformat_double(j = "rate", digits = 1L) %>%
-    flextable::colformat_double(j = "percent", digits = 1L, suffix = "%") %>%
+    active_table_(grp_lbl = "Age") %>%
     flextable::autofit()
 }
 
@@ -70,12 +55,12 @@ active_calc_age <- function(
         .data[["age_test"]],
         .data[["age_start_dt"]]
       ),
-      age_grp = active_age_grp(.data[["age_yrs"]])
+      grp = active_age_grp(.data[["age_yrs"]])
     ) %>%
-    dplyr::count(.data[["age_grp"]]) %>%
+    dplyr::count(.data[["grp"]]) %>%
     active_join_age_pop() %>%
     dplyr::transmute(
-      .data[["age_grp"]],
+      .data[["grp"]],
       n = .data[["n_active"]],
       percent = .data[["n"]] / sum(.data[["n"]], na.rm = TRUE),
       rate = .data[["n"]] / .data[["n_pop"]]
@@ -110,16 +95,16 @@ active_age_grp <- function(dbl) {
 active_join_age_pop <- function(data) {
   pop_age <- covidReport::pop_2019 %>%
     dplyr::mutate(
-      age_grp = .data[["age"]] %>%
+      grp = .data[["age"]] %>%
         as.double() %>%
         active_age_grp()
     ) %>%
-    dplyr::group_by(.data[["age_grp"]]) %>%
+    dplyr::group_by(.data[["grp"]]) %>%
     dplyr::summarize(n = sum(.data[["population"]]))
   data %>%
     dplyr::left_join(
       pop_age,
-      by = "age_grp",
+      by = "grp",
       suffix = c("_active", "_pop")
     )
 }
