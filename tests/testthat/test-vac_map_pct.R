@@ -1,4 +1,4 @@
-test_that("`zip_map_pct()` matches doppelganger", {
+test_that("`vac_map_pct()` matches doppelganger", {
 
   zips <- withr::with_seed(
     200L,
