@@ -12,6 +12,12 @@ test_that("`zip_map_pct()` matches doppelganger", {
     address_zip = {{ zips }}
   ) %>% dplyr::slice_sample(prop = 1)
 
+  mockery::stub(
+    vac_map_pct,
+    "date_vac",
+    lubridate::as_date
+  )
+
   plt <- vac_map_pct(data, date = "2021-04-01")
 
   suppressWarnings(

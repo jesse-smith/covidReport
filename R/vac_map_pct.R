@@ -158,7 +158,7 @@ vac_map_pct <- function(
   set_covid_theme(zip_plt) %>%
     add_title_caption(
       title = "% Population Vaccinated by ZIP Code",
-      subtitle = paste("12/16/2020 -", format(vac_date(date), "%m/%d/%Y")),
+      subtitle = paste("12/16/2020 -", format(date_vac(date), "%m/%d/%Y")),
       caption = caption
     ) %>%
     {. + theme_mods}
