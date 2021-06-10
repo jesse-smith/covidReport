@@ -12,15 +12,16 @@ test_that("`active_plot_ethnicity()` matches doppelganger", {
     tbl_mock
   )
 
+  m_dt <- mockery::mock(as.Date("2021-04-01"), cycle = TRUE)
   mockery::stub(
     active_plot_ethnicity,
     "date_inv",
-    lubridate::as_date,
-    depth = 2L
+    m_dt
   )
 
   plt <- active_plot_ethnicity(tibble::tibble(), date = "2021-04-01")
 
+  mockery::expect_called(m_dt, n = 1L)
   suppressWarnings(
     vdiffr::expect_doppelganger(
       title = "active case rate by ethnicity",

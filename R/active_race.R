@@ -12,6 +12,7 @@ active_plot_race <- function(
   data = pos(process_inv(read_inv(date))),
   date = NULL
 ) {
+  date <- date_inv(date)
   data %>%
     active_calc_race(date = date) %>%
     active_plot_("race", date = date)

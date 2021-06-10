@@ -12,7 +12,6 @@ active_plot_ <- function(
   grp = c("age", "sex", "race", "ethnicity"),
   date = NULL
 ) {
-  date <- date_inv(date)
   grp <- rlang::arg_match(grp)[[1L]]
 
   data %>%

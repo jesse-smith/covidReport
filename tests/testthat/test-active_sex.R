@@ -1,4 +1,4 @@
-test_that("`active_plot_age()` matches doppelganger", {
+test_that("`active_plot_sex()` matches doppelganger", {
   tbl_mock <- mockery::mock(tibble::tribble(
         ~ grp, ~ n, ~ percent, ~ rate,
      "Female", 500,       0.5,    0.1,
@@ -12,15 +12,16 @@ test_that("`active_plot_age()` matches doppelganger", {
     tbl_mock
   )
 
+  m_dt <- mockery::mock(as.Date("2021-04-01"), cycle = TRUE)
   mockery::stub(
-    active_plot_age,
+    active_plot_sex,
     "date_inv",
-    lubridate::as_date,
-    depth = 2L
+    m_dt
   )
 
   plt <- active_plot_sex(tibble::tibble(), date = "2021-04-01")
 
+  mockery::expect_called(m_dt, n = 1L)
   suppressWarnings(
     vdiffr::expect_doppelganger(
       title = "active case rate by sex",
