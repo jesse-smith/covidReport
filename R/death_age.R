@@ -15,7 +15,7 @@ death_plot_age <- function(
   date <- date_inv(date)
   data %>%
     death_calc_age(date = date) %>%
-    demog_plot_("Active Cases", grp = "age", date = date)
+    demog_plot_("Death Rates", grp = "age", date = date)
 }
 
 #' Tabulate Active Cases by Age

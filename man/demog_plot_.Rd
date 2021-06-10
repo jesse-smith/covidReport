@@ -8,7 +8,7 @@ demog_plot_(
   data,
   unit,
   grp = c("age", "sex", "race", "ethnicity"),
-  fill = "midnightblue",
+  color = "midnightblue",
   date = NULL
 )
 }
