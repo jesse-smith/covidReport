@@ -1,3 +1,35 @@
+test_that("`active_plot_age()` matches doppelganger", {
+  tbl_mock <- mockery::mock(tibble::tribble(
+        ~ grp, ~ n, ~ percent, ~ rate,
+     "Female", 500,       0.5,    0.1,
+       "Male", 400,       0.4,    0.1,
+    "Missing", 100,       0.1,    0.1,
+  ))
+
+  mockery::stub(
+    active_plot_sex,
+    "active_calc_sex",
+    tbl_mock
+  )
+
+  mockery::stub(
+    active_plot_age,
+    "date_inv",
+    lubridate::as_date,
+    depth = 2L
+  )
+
+  plt <- active_plot_sex(tibble::tibble(), date = "2021-04-01")
+
+  suppressWarnings(
+    vdiffr::expect_doppelganger(
+      title = "active case rate by sex",
+      fig = plt,
+      path = "active-plot-sex"
+    )
+  )
+})
+
 test_that("`void(active_table_sex())` matches snapshot", {
   tbl_mock <- mockery::mock(tibble::tribble(
         ~ grp, ~ n, ~ percent, ~ rate,

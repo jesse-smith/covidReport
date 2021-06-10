@@ -1,4 +1,23 @@
-#' Tabluate Active Cases by Race
+#' Plot Active Case Rates by Ethnicity
+#'
+#' @param data NBS case data, as returned by
+#'   \code{\link[coviData:read-nbs]{pos(process_inv())}}
+#'
+#' @param date The download date of the data; defaults to most recent
+#'
+#' @return A `ggplot`
+#'
+#' @export
+active_plot_ethnicity <- function(
+  data = pos(process_inv(read_inv(date))),
+  date = NULL
+) {
+  data %>%
+    active_calc_ethnicity(date = date) %>%
+    active_plot_("ethnicity", date = date)
+}
+
+#' Tabluate Active Cases by Ethnicity
 #'
 #' @param data NBS case data, as returned by
 #'   \code{\link[coviData:read-nbs]{pos(process_inv())}}
@@ -18,7 +37,7 @@ active_table_ethnicity <- function(
     flextable::autofit()
 }
 
-#' Calculate Active Case Rates and Percentages by Race
+#' Calculate Active Case Rates and Percentages by Ethnicity
 #'
 #' @inheritParams active_table_sex
 #'

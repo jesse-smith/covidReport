@@ -1,3 +1,35 @@
+test_that("`active_plot_ethnicity()` matches doppelganger", {
+  tbl_mock <- mockery::mock(tibble::tribble(
+                    ~ grp, ~ n, ~ percent, ~ rate,
+        "Hispanic/Latino", 700,       0.7,    0.1,
+    "Not Hispanic/Latino", 100,       0.1,    0.1,
+                "Missing", 200,       0.2,    NA_real_
+  ))
+
+  mockery::stub(
+    active_plot_ethnicity,
+    "active_calc_ethnicity",
+    tbl_mock
+  )
+
+  mockery::stub(
+    active_plot_ethnicity,
+    "date_inv",
+    lubridate::as_date,
+    depth = 2L
+  )
+
+  plt <- active_plot_ethnicity(tibble::tibble(), date = "2021-04-01")
+
+  suppressWarnings(
+    vdiffr::expect_doppelganger(
+      title = "active case rate by ethnicity",
+      fig = plt,
+      path = "active-plot-ethnicity"
+    )
+  )
+})
+
 test_that("`void(active_table_ethnicity())` matches snapshot", {
   tbl_mock <- mockery::mock(tibble::tribble(
                     ~ grp, ~ n, ~ percent, ~ rate,

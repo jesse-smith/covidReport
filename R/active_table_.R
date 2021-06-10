@@ -167,7 +167,8 @@ active_age_grp_ <- function(dbl) {
 active_race_grp_ <- function(chr) {
   chr <- chr %>%
     stringr::str_to_upper() %>%
-    stringr::str_squish()
+    stringr::str_squish() %>%
+    stringr::str_extract("[A-Z ]+()")
 
   baa <- "Black/African American"
   w <- "White"
@@ -175,10 +176,10 @@ active_race_grp_ <- function(chr) {
   # aian <- "American Indian/Alaskan Native"
 
   dplyr::case_when(
+    stringr::str_detect(chr, "(INDIAN)|(NATIVE)") ~ "Other",
+    stringr::str_detect(chr, "(ASIAN)|(PACIFIC)") ~ "Other",
     stringr::str_detect(chr, "(BLACK)|(AFRICAN)") ~ baa,
     stringr::str_detect(chr, "(WHITE)|(CAUCASIAN)") ~ w,
-    stringr::str_detect(chr, "(ASIAN)|(PACIFIC)") ~ "Other",
-    stringr::str_detect(chr, "(INDIAN)|(NATIVE)") ~ "Other",
     chr == "OTHER" ~ "Other",
     TRUE ~ NA_character_
   )

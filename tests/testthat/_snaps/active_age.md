@@ -4,16 +4,16 @@
       tbl_void
     Output
       a flextable object.
-      col_keys: `age_grp`, `n`, `rate`, `percent` 
+      col_keys: `grp`, `n`, `rate`, `percent` 
       header has 1 row(s) 
-      body has 10 row(s) 
+      body has 11 row(s) 
       original dataset sample: 
-        age_grp   n  rate percent
-      1    0-17 100 20000      10
-      2   18-24 100 10000      10
-      3   25-34 100 10000      10
-      4   35-44 100 10000      10
-      5   45-54 100 10000      10
+          grp   n  rate percent
+      1  0-17 100 20000      10
+      2 18-24 100 10000      10
+      3 25-34 100 10000      10
+      4 35-44 100 10000      10
+      5 45-54 100 10000      10
 
 # `active_calc_age()` matches snapshot
 

@@ -1,3 +1,38 @@
+test_that("`active_plot_race()` matches doppelganger", {
+  tbl_mock <- tibble::tribble(
+                       ~ grp, ~ n, ~ percent, ~ rate,
+    "Black/African American", 500,       0.5,    0.1,
+                     "White", 300,       0.3,    0.1,
+                     "Other", 100,       0.1,    0.1,
+                   "Missing", 100,       0.1,    0.1,
+  ) %>%
+    dplyr::mutate(grp = forcats::as_factor(grp)) %>%
+    mockery::mock()
+
+  mockery::stub(
+    active_plot_race,
+    "active_calc_race",
+    tbl_mock
+  )
+
+  mockery::stub(
+    active_plot_race,
+    "date_inv",
+    lubridate::as_date,
+    depth = 2L
+  )
+
+  plt <- active_plot_race(tibble::tibble(), date = "2021-04-01")
+
+  suppressWarnings(
+    vdiffr::expect_doppelganger(
+      title = "active case rate by race",
+      fig = plt,
+      path = "active-plot-race"
+    )
+  )
+})
+
 test_that("`void(active_table_race())` matches snapshot", {
   tbl_mock <- mockery::mock(tibble::tribble(
                        ~ grp, ~ n, ~ percent, ~ rate,

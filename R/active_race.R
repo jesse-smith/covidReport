@@ -1,3 +1,22 @@
+#' Plot Active Case Rates by Race
+#'
+#' @param data NBS case data, as returned by
+#'   \code{\link[coviData:read-nbs]{pos(process_inv())}}
+#'
+#' @param date The download date of the data; defaults to most recent
+#'
+#' @return A `ggplot`
+#'
+#' @export
+active_plot_race <- function(
+  data = pos(process_inv(read_inv(date))),
+  date = NULL
+) {
+  data %>%
+    active_calc_race(date = date) %>%
+    active_plot_("race", date = date)
+}
+
 #' Tabluate Active Cases by Race
 #'
 #' @param data NBS case data, as returned by

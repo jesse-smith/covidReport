@@ -1,51 +1,52 @@
-#' Plot Active Case Rates by Age
+#' Plot Active Cases by a Categorical Variable
 #'
-#' @param data NBS case data, as returned by
-#'   \code{\link[coviData:read-nbs]{pos(process_inv())}}
+#' @param data Data from an `active_calc_*()` function
 #'
-#' @param date The download date of the data; defaults to most recent
+#' @param grp The grouping variable
 #'
 #' @return A `ggplot`
 #'
-#' @export
-active_plot_age <- function(
-  data = pos(process_inv(read_inv(date))),
+#' @keywords internal
+active_plot_ <- function(
+  data,
+  grp = c("age", "sex", "race", "ethnicity"),
   date = NULL
 ) {
-
   date <- date_inv(date)
+  grp <- rlang::arg_match(grp)[[1L]]
 
-  gg_data <- data %>%
-    active_calc_age(date = date) %>%
-    dplyr::select("age_grp", "rate")
-
-  gg_data %>%
-    active_age_ggplot() %>%
+  data %>%
+    dplyr::select("grp", "rate") %>%
+    dplyr::filter(as.character(.data[["grp"]]) != "Missing") %>%
+    dplyr::mutate(grp = forcats::fct_drop(.data[["grp"]], "Missing")) %>%
+    active_ggplot_() %>%
     set_covid_theme() %>%
-    add_active_age_axis_labels() %>%
-    add_active_age_col() %>%
-    add_active_age_col_labels() %>%
+    add_active_axis_labels_(grp = grp) %>%
+    add_active_col_() %>%
+    add_active_col_labels_() %>%
     remove_x_grid() %>%
-    add_active_age_scale() %>%
-    add_active_age_title_caption(date = date)
+    add_active_scale_() %>%
+    add_active_title_caption_(grp = grp, date = date)
 }
 
-active_age_ggplot <- function(data) {
+
+active_ggplot_ <- function(data) {
   ggplot2::ggplot(
     data,
-    ggplot2::aes(x = .data[["age_grp"]], y = 1e5 * .data[["rate"]])
+    ggplot2::aes(x = .data[["grp"]], y = 1e5 * .data[["rate"]])
   )
 }
 
-add_active_age_col <- function(gg_obj) {
+add_active_axis_labels_ <- function(gg_obj, grp) {
+  Grp <- stringr::str_to_title(grp)
+  add_axis_labels(gg_obj, xlab = Grp, ylab = "Rate per 100,000 Population")
+}
+
+add_active_col_ <- function(gg_obj) {
   gg_obj + ggplot2::geom_col(fill = "midnightblue")
 }
 
-add_active_age_axis_labels <- function(gg_obj) {
-  add_axis_labels(gg_obj, xlab = "Age", ylab = "Rate per 100,000 Population")
-}
-
-add_active_age_col_labels <- function(gg_obj) {
+add_active_col_labels_ <- function(gg_obj) {
 
   y <- gg_obj[["mapping"]][["y"]]
 
@@ -60,7 +61,7 @@ add_active_age_col_labels <- function(gg_obj) {
     )
 }
 
-add_active_age_scale <- function(gg_obj) {
+add_active_scale_ <- function(gg_obj) {
 
   y_max <- gg_obj[["mapping"]][["y"]] %>%
     rlang::eval_tidy(data = gg_obj[["data"]]) %>%
@@ -91,12 +92,12 @@ add_active_age_scale <- function(gg_obj) {
     )
 }
 
-add_active_age_title_caption <- function(gg_obj, date) {
-  sub <-
+add_active_title_caption_ <- function(gg_obj, grp, date) {
+  Grp <- stringr::str_to_title(grp)
   cap <- "Data Source: National Electronic Disease Surveillance System (NEDSS)"
   add_title_caption(
     gg_obj,
-    title = "Active Cases by Age (per 100k)",
+    title = paste("Active Cases by", Grp, "(per 100k)"),
     subtitle = format(lubridate::as_date(date), "%B %d, %Y"),
     caption = cap
   )

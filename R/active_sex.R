@@ -1,3 +1,22 @@
+#' Plot Active Case Rates by Sex
+#'
+#' @param data NBS case data, as returned by
+#'   \code{\link[coviData:read-nbs]{pos(process_inv())}}
+#'
+#' @param date The download date of the data; defaults to most recent
+#'
+#' @return A `ggplot`
+#'
+#' @export
+active_plot_sex <- function(
+  data = pos(process_inv(read_inv(date))),
+  date = NULL
+) {
+  data %>%
+    active_calc_sex(date = date) %>%
+    active_plot_("sex", date = date)
+}
+
 #' Tabluate Active Cases by Sex
 #'
 #' @param data NBS case data, as returned by

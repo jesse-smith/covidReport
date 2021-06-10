@@ -1,3 +1,22 @@
+#' Plot Active Case Rates by Age
+#'
+#' @param data NBS case data, as returned by
+#'   \code{\link[coviData:read-nbs]{pos(process_inv())}}
+#'
+#' @param date The download date of the data; defaults to most recent
+#'
+#' @return A `ggplot`
+#'
+#' @export
+active_plot_age <- function(
+  data = pos(process_inv(read_inv(date))),
+  date = NULL
+) {
+  data %>%
+    active_calc_age(date = date) %>%
+    active_plot_("age", date = date)
+}
+
 #' Tabulate Active Cases by Age
 #'
 #' @param data NBS case data, as returned by
