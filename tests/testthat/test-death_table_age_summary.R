@@ -1,4 +1,4 @@
-test_that("`death_table_age()` info matches reference", {
+test_that("`death_table_age_summary()` info matches reference", {
   data <- tibble::tibble(
     die_from_illness_ind = rep(
       c("Y", rep("N", 3L), rep("U", 3L), rep(NA, 3L)),
@@ -18,7 +18,7 @@ test_that("`death_table_age()` info matches reference", {
   )
 
   capture.output(
-    {tbl_age <- death_table_age(data, date = "2021-03-27") %>%
+    {tbl_age <- death_table_age_summary(data, date = "2021-03-27") %>%
       flextable::flextable_to_rmd() %>%
       xml2::read_html() %>%
       rvest::html_node("table") %>%
@@ -32,7 +32,7 @@ test_that("`death_table_age()` info matches reference", {
   expect_equal(tbl_age, tbl_ref)
 })
 
-test_that("`void(death_table_age())` matches snapshot", {
+test_that("`void(death_table_age_summary())` matches snapshot", {
   data <- tibble::tibble(
     die_from_illness_ind = rep(
       c("Y", rep("N", 3L), rep("U", 3L), rep(NA, 3L)),
@@ -47,7 +47,7 @@ test_that("`void(death_table_age())` matches snapshot", {
     dplyr::slice_sample(prop = 1)
 
   tbl_void <- flextable::void(
-    death_table_age(data, date = "2021-03-27"),
+    death_table_age_summary(data, date = "2021-03-27"),
     part = "all"
   )
 
