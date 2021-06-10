@@ -15,7 +15,7 @@ active_plot_age <- function(
   date <- date_inv(date)
   data %>%
     active_calc_age(date = date) %>%
-    active_plot_("age", date = date)
+    demog_plot_("Active Cases", grp = "age", date = date)
 }
 
 #' Tabulate Active Cases by Age
@@ -34,7 +34,7 @@ active_table_age <- function(
 ) {
   data %>%
     active_calc_age(date = date) %>%
-    active_table_(grp_lbl = "Age") %>%
+    demog_table_(grp_lbl = "Age") %>%
     flextable::autofit()
 }
 
@@ -54,7 +54,7 @@ active_calc_age <- function(
   data %>%
     filter_active(date = date) %>%
     active_trans_age() %>%
-    active_calc_("age")
+    demog_calc_("age")
 }
 
 active_trans_age <- function(data) {

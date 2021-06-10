@@ -15,7 +15,7 @@ active_plot_race <- function(
   date <- date_inv(date)
   data %>%
     active_calc_race(date = date) %>%
-    active_plot_("race", date = date)
+    demog_plot_("Active Cases", grp = "race", date = date)
 }
 
 #' Tabluate Active Cases by Race
@@ -34,7 +34,7 @@ active_table_race <- function(
 ) {
   data %>%
     active_calc_race(date = date) %>%
-    active_table_(grp_lbl = "Race") %>%
+    demog_table_(grp_lbl = "Race") %>%
     flextable::autofit()
 }
 
@@ -54,24 +54,10 @@ active_calc_race <- function(
   data %>%
     filter_active(date = date) %>%
     active_trans_race() %>%
-    active_calc_("race") %>%
-    active_relevel_race()
+    demog_calc_("race") %>%
+    demog_relevel_race()
 }
 
 active_trans_race <- function(data) {
-  dplyr::transmute(data, grp = active_race_grp_(.data[["patient_race_calc"]]))
-}
-
-active_relevel_race <- function(data) {
-  data %>%
-    dplyr::mutate(
-      grp = forcats::fct_relevel(
-        .data[["grp"]],
-        "Black/African American",
-        "White",
-        "Other",
-        "Missing"
-      )
-    ) %>%
-    dplyr::arrange(.data[["grp"]])
+  dplyr::transmute(data, grp = demog_race_grp_(.data[["patient_race_calc"]]))
 }

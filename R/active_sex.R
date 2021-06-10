@@ -15,7 +15,7 @@ active_plot_sex <- function(
   date <- date_inv(date)
   data %>%
     active_calc_sex(date = date) %>%
-    active_plot_("sex", date = date)
+    demog_plot_("Active Cases", grp = "sex", date = date)
 }
 
 #' Tabluate Active Cases by Sex
@@ -34,7 +34,7 @@ active_table_sex <- function(
 ) {
   data %>%
     active_calc_sex(date = date) %>%
-    active_table_(grp_lbl = "Sex") %>%
+    demog_table_(grp_lbl = "Sex") %>%
     flextable::autofit()
 }
 
@@ -54,7 +54,7 @@ active_calc_sex <- function(
   data %>%
     filter_active(date = date) %>%
     active_trans_sex() %>%
-    active_calc_(grp = "sex")
+    demog_calc_(grp = "sex")
 }
 
 active_trans_sex <- function(data) {

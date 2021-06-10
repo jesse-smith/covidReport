@@ -15,7 +15,7 @@ active_plot_ethnicity <- function(
   date <- date_inv(date)
   data %>%
     active_calc_ethnicity(date = date) %>%
-    active_plot_("ethnicity", date = date)
+    demog_plot_("Active Cases", grp = "ethnicity", date = date)
 }
 
 #' Tabluate Active Cases by Ethnicity
@@ -34,7 +34,7 @@ active_table_ethnicity <- function(
 ) {
   data %>%
     active_calc_ethnicity(date = date) %>%
-    active_table_(grp_lbl = "Race") %>%
+    demog_table_(grp_lbl = "Race") %>%
     flextable::autofit()
 }
 
@@ -54,7 +54,7 @@ active_calc_ethnicity <- function(
   data %>%
     filter_active(date = date) %>%
     active_trans_ethnicity() %>%
-    active_calc_("ethnicity")
+    demog_calc_("ethnicity")
 }
 
 active_trans_ethnicity <- function(data) {
