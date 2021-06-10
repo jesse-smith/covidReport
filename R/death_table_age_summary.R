@@ -8,7 +8,7 @@
 #' @return A `flextable`
 #'
 #' @export
-death_table_age <- function(
+death_table_age_summary <- function(
   data = pos(process_inv(read_inv(date = date))),
   date = NULL
 ) {
@@ -21,7 +21,7 @@ death_table_age <- function(
     )
 
   data %>%
-    death_calc_age(date = date) %>%
+    death_calc_age_summary(date = date) %>%
     dplyr::transmute(
       .data[["median"]],
       range = paste0(.data[["min"]], "-", .data[["max"]])
@@ -41,7 +41,7 @@ death_table_age <- function(
 #' @return A `tibble`
 #'
 #' @keywords internal
-death_calc_age <- function(
+death_calc_age_summary <- function(
   data = pos(process_inv(read_inv(date = date))),
   date = NULL
 ) {

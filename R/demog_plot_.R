@@ -11,7 +11,7 @@ demog_plot_ <- function(
   data,
   unit,
   grp = c("age", "sex", "race", "ethnicity"),
-  fill = "midnightblue",
+  color = "midnightblue",
   date = NULL
 ) {
   grp <- rlang::arg_match(grp)[[1L]]
@@ -23,8 +23,8 @@ demog_plot_ <- function(
     demog_ggplot_() %>%
     set_covid_theme() %>%
     add_demog_axis_labels_(grp = grp) %>%
-    add_demog_col_(fill = fill) %>%
-    add_demog_col_labels_(fill = fill) %>%
+    add_demog_col_(fill = color) %>%
+    add_demog_col_labels_(color = color) %>%
     remove_x_grid() %>%
     add_demog_scale_() %>%
     add_demog_title_caption_(unit = unit, grp = grp, date = date)
@@ -49,19 +49,23 @@ add_demog_col_ <- function(gg_obj, fill = "midnightblue") {
   gg_obj + ggplot2::geom_col(fill = fill)
 }
 
-add_demog_col_labels_ <- function(gg_obj, fill = "midnightblue") {
+add_demog_col_labels_ <- function(gg_obj, color = "midnightblue") {
 
-  assert(rlang::is_string(fill))
+  assert(rlang::is_string(color))
 
   y <- gg_obj[["mapping"]][["y"]]
 
   gg_obj +
     ggplot2::geom_label(
-      ggplot2::aes(label = format(round(!!y, digits = 1L), big.mark = ",")),
-      color = "#f0f0f0",
-      fill  = fill,
+      ggplot2::aes(
+        label = format(round(!!y, digits = 1L), big.mark = ",", trim = TRUE)
+      ),
+      color = color,
+      fill  = "#f0f0f0",
       size  = 4.5,
-      vjust = 1,
+      fontface = "bold",
+      vjust = 0,
+      hjust = "middle",
       label.size = 0
     )
 }
