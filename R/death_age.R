@@ -15,7 +15,12 @@ death_plot_age <- function(
   date <- date_inv(date)
   data %>%
     death_calc_age(date = date) %>%
-    demog_plot_("Death Rates", grp = "age", date = date)
+    demog_plot_(
+      "Death Rates",
+      grp = "age",
+      date = date,
+      color = "grey30"
+    )
 }
 
 #' Tabulate Active Cases by Age
@@ -34,8 +39,8 @@ death_table_age <- function(
 ) {
   data %>%
     death_calc_age(date = date) %>%
-    demog_table_(grp_lbl = "Age") %>%
-    flextable::autofit()
+    demog_table_(grp_lbl = "Age", color = "grey30") %>%
+    flextable::autofit(add_h = 0.075)
 }
 
 #' Calculate Active Case Rates and Percentages by Age

@@ -15,7 +15,12 @@ death_plot_ethnicity <- function(
   date <- date_inv(date)
   data %>%
     death_calc_ethnicity(date = date) %>%
-    demog_plot_("Death Rates", grp = "ethnicity", date = date)
+    demog_plot_(
+      "Death Rates",
+      grp = "ethnicity",
+      date = date,
+      color = "grey30"
+    )
 }
 
 #' Tabluate Death Rates by Ethnicity
@@ -34,7 +39,7 @@ death_table_ethnicity <- function(
 ) {
   data %>%
     death_calc_ethnicity(date = date) %>%
-    demog_table_(grp_lbl = "Race") %>%
+    demog_table_(grp_lbl = "Race", color = "grey30") %>%
     flextable::autofit()
 }
 

@@ -14,7 +14,8 @@
 fmt_covid_table <- function(
   table,
   total = FALSE,
-  align_label = c("left", "center", "right")
+  align_label = c("left", "center", "right"),
+  color = "midnightblue"
 ) {
   UseMethod("fmt_covid_table")
 }
@@ -25,7 +26,8 @@ fmt_covid_table <- function(
 fmt_covid_table.flextable <- function(
   table,
   total = FALSE,
-  align_label = c("left", "center", "right")
+  align_label = c("left", "center", "right"),
+  color = "midnightblue"
 ) {
 
   total <- coviData::assert_bool(total)
@@ -37,7 +39,7 @@ fmt_covid_table.flextable <- function(
   covid_table <- table %>%
     # Background
     flextable::bg(bg = "#f0f0f0", part = "all") %>%
-    flextable::bg(bg = "midnightblue", part = "header") %>%
+    flextable::bg(bg = color, part = "header") %>%
     # Font
     flextable::font(fontname = "Arial", part = "all") %>%
     # Font size
@@ -73,7 +75,8 @@ fmt_covid_table.flextable <- function(
 fmt_covid_table.gt_tbl <- function(
   table,
   total = FALSE,
-  align_label = c("left", "center", "right")
+  align_label = c("left", "center", "right"),
+  color = "midnightblue"
 ) {
 
   total <- coviData::assert_bool(total)
@@ -86,7 +89,7 @@ fmt_covid_table.gt_tbl <- function(
     # Background
     gt::tab_options(
       table.background.color = "white",
-      column_labels.background.color = "midnightblue"
+      column_labels.background.color = color
     ) %>%
     # Font
     gt::tab_options(table.font.names = c("Arial", "Helvetica")) %>%
@@ -114,7 +117,7 @@ fmt_covid_table.gt_tbl <- function(
       # Inner horizontal borders
       table_body.hlines.color = "grey60",
       # Inner vertical borders
-      column_labels.vlines.color = "midnightblue",
+      column_labels.vlines.color = color,
       column_labels.vlines.style = "hidden",
       # Footer bottom border (delete)
       source_notes.border.bottom.style = "hidden",
