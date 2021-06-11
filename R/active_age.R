@@ -15,7 +15,7 @@ active_plot_age <- function(
   date <- date_inv(date)
   data %>%
     active_calc_age(date = date) %>%
-    demog_plot_("Active Cases", grp = "age", date = date)
+    demog_plot_("Active Case Rates", grp = "age", date = date)
 }
 
 #' Tabulate Active Cases by Age
@@ -35,7 +35,7 @@ active_table_age <- function(
   data %>%
     active_calc_age(date = date) %>%
     demog_table_(grp_lbl = "Age") %>%
-    flextable::autofit()
+    flextable::autofit(add_h = 0.075)
 }
 
 #' Calculate Active Case Rates and Percentages by Age

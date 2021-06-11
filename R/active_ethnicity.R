@@ -15,7 +15,7 @@ active_plot_ethnicity <- function(
   date <- date_inv(date)
   data %>%
     active_calc_ethnicity(date = date) %>%
-    demog_plot_("Active Cases", grp = "ethnicity", date = date)
+    demog_plot_("Active Case Rates", grp = "ethnicity", date = date)
 }
 
 #' Tabluate Active Cases by Ethnicity
@@ -34,7 +34,7 @@ active_table_ethnicity <- function(
 ) {
   data %>%
     active_calc_ethnicity(date = date) %>%
-    demog_table_(grp_lbl = "Race") %>%
+    demog_table_(grp_lbl = "Ethnicity") %>%
     flextable::autofit()
 }
 
