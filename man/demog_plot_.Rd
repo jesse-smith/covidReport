@@ -9,6 +9,7 @@ demog_plot_(
   unit,
   grp = c("age", "sex", "race", "ethnicity"),
   color = "midnightblue",
+  vjust = c("top", "bottom"),
   date = NULL
 )
 }
