@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Calculate Active Case Rates and Percentages by Age — death_calc_age • covidReport</title>
+<title>Create Powerpoint for Weekly Demographic Status Report — rpt_demog_pptx • covidReport</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,8 @@
 
 
 
-<meta property="og:title" content="Calculate Active Case Rates and Percentages by Age — death_calc_age" />
-<meta property="og:description" content="Calculate Active Case Rates and Percentages by Age" />
+<meta property="og:title" content="Create Powerpoint for Weekly Demographic Status Report — rpt_demog_pptx" />
+<meta property="og:description" content="Create Powerpoint for Weekly Demographic Status Report" />
 
 
 
@@ -108,34 +108,50 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Calculate Active Case Rates and Percentages by Age</h1>
-    <small class="dont-index">Source: <a href='https://github.com/jesse-smith/covidReport/blob/master/R/death_age.R'><code>R/death_age.R</code></a></small>
-    <div class="hidden name"><code>death_calc_age.Rd</code></div>
+    <h1>Create Powerpoint for Weekly Demographic Status Report</h1>
+    <small class="dont-index">Source: <a href='https://github.com/jesse-smith/covidReport/blob/master/R/rpt_demog.R'><code>R/rpt_demog.R</code></a></small>
+    <div class="hidden name"><code>rpt_demog_pptx.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Calculate Active Case Rates and Percentages by Age</p>
+    <p>Create Powerpoint for Weekly Demographic Status Report</p>
     </div>
 
-    <pre class="usage"><span class='fu'>death_calc_age</span><span class='op'>(</span>data <span class='op'>=</span> <span class='fu'>pos</span><span class='op'>(</span><span class='fu'>process_inv</span><span class='op'>(</span><span class='fu'>read_inv</span><span class='op'>(</span><span class='va'>date</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span>, date <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>rpt_demog_pptx</span><span class='op'>(</span>
+  date <span class='op'>=</span> <span class='cn'>NULL</span>,
+ 
+    dir <span class='op'>=</span> <span class='fu'>coviData</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/coviData/man/path_create.html'>path_create</a></span><span class='op'>(</span><span class='st'>"V:/EPI DATA ANALYTICS TEAM/COVID SANDBOX REDCAP DATA/Status Report"</span>,
+    <span class='st'>"automated"</span><span class='op'>)</span>,
+  inv <span class='op'>=</span> <span class='fu'>pos</span><span class='op'>(</span><span class='fu'>process_inv</span><span class='op'>(</span><span class='fu'>read_inv</span><span class='op'>(</span><span class='va'>date</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>data</th>
-      <td><p>NBS case data, as returned by
-<code><a href='https://rdrr.io/pkg/coviData/man/read-nbs.html'>pos(process_inv())</a></code></p></td>
+      <th>date</th>
+      <td><p>The date for which to run the report; defaults to most recent</p></td>
     </tr>
     <tr>
-      <th>date</th>
-      <td><p>The download date of the data; defaults to most recent</p></td>
+      <th>dir</th>
+      <td><p>The directory to save the report; set to <code>NULL</code> to return without
+saving</p></td>
+    </tr>
+    <tr>
+      <th>inv</th>
+      <td><p>Investigation data from
+<code><a href='https://rdrr.io/pkg/coviData/man/process-nbs.html'>process_inv()</a></code></p></td>
+    </tr>
+    <tr>
+      <th>pcr</th>
+      <td><p>PCR test data from
+<code><a href='https://rdrr.io/pkg/coviData/man/process-nbs.html'>process_pcr()</a></code></p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A <code>tibble</code></p>
+    <p>An <code>rpptx</code> object</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
