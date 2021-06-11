@@ -22,6 +22,7 @@ Imports:
     coviData,
     covidModel,
     flextable,
+    forcats,
     ggsci,
     gt,
     httr,

@@ -8,9 +8,6 @@
 #' @param inv Investigation data from
 #'   \code{\link[coviData:process-nbs]{process_inv()}}
 #'
-#' @param pcr PCR test data from
-#'   \code{\link[coviData:process-nbs]{process_pcr()}}
-#'
 #' @return An `rpptx` object
 #'
 #' @export

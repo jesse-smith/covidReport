@@ -20,9 +20,6 @@ saving}
 
 \item{inv}{Investigation data from
 \code{\link[coviData:process-nbs]{process_inv()}}}
-
-\item{pcr}{PCR test data from
-\code{\link[coviData:process-nbs]{process_pcr()}}}
 }
 \value{
 An \code{rpptx} object
