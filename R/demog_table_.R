@@ -26,6 +26,7 @@ demog_table_ <- function(
       percent = "% Total"
     ) %>%
     fmt_covid_table(total = TRUE) %>%
+    flextable::fontsize(size = 16, part = "all") %>%
     flextable::colformat_double(j = "rate", digits = 1L) %>%
     flextable::colformat_double(j = "percent", digits = 1L, suffix = "%")
 }

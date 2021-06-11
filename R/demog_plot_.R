@@ -60,12 +60,11 @@ add_demog_col_labels_ <- function(gg_obj, color = "midnightblue") {
       ggplot2::aes(
         label = format(round(!!y, digits = 1L), big.mark = ",", trim = TRUE)
       ),
-      color = color,
-      fill  = "#f0f0f0",
+      color = "#f0f0f0",
+      fill  = color,
       size  = 4.5,
       fontface = "bold",
-      vjust = 0,
-      hjust = "middle",
+      vjust = 1,
       label.size = 0
     )
 }
