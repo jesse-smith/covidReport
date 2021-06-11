@@ -1,4 +1,4 @@
-# `void(death_table_age())` matches snapshot
+# `void(death_table_age_summary())` matches snapshot
 
     Code
       tbl_void

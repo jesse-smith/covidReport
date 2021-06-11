@@ -37,21 +37,13 @@ case_calc_active <- function(
   data = pos(process_inv(read_inv(date = date))),
   date = NULL
 ) {
-  date <- date_inv(date)
 
   a_cols <- c("illness_onset_dt", "specimen_coll_dt", "inv_start_dt")
 
   data %>%
     dplyr::mutate(.id_tmp_ = dplyr::row_number()) %>%
     dplyr::mutate(
-      active_dt = dplyr::across(
-        {{ a_cols }},
-        ~ coviData::std_dates(.x, orders = "ymdT", train = FALSE, force = "dt")
-      ) %>%
-        dplyr::transmute(dt = coviData::coalesce_across({{ a_cols }})) %>%
-        dplyr::pull("dt"),
-      active_days = as.integer({{ date }} - .data[["active_dt"]]),
-      active = dplyr::between(.data[["active_days"]], 0L, 14L),
+      active = .data[[".id_tmp_"]] %in% filter_active(., date = date)[[".id_tmp_"]],
       died = .data[[".id_tmp_"]] %in% filter_deaths(.)[[".id_tmp_"]]
     ) %>%
     dplyr::transmute(

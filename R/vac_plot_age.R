@@ -272,23 +272,9 @@ vac_age_grp <- function(dbl) {
 vac_join_age_pop <- function(.data, incl_under_12 = FALSE) {
   pop_age <- covidReport::pop_2019 %>%
     dplyr::mutate(
-      age_grp = cut(
-        .data[["age"]],
-        breaks = c(0, 12, 16, seq(25, 75, by = 10), 115),
-        labels = c(
-           "0-11",
-          "12-15",
-          "16-24",
-          "25-34",
-          "35-44",
-          "45-54",
-          "55-64",
-          "65-74",
-          "75+"
-        ),
-        right = FALSE,
-        ordered_result = TRUE
-      ) %>% as.character()
+      age_grp = .data[["age"]] %>%
+        as.double() %>%
+        vac_age_grp()
     ) %>%
     dplyr::group_by(.data[["age_grp"]]) %>%
     dplyr::summarize(n = sum(.data[["population"]]))

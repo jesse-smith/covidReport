@@ -9,19 +9,22 @@
 fmt_covid_table(
   table,
   total = FALSE,
-  align_label = c("left", "center", "right")
+  align_label = c("left", "center", "right"),
+  color = "midnightblue"
 )
 
 \method{fmt_covid_table}{flextable}(
   table,
   total = FALSE,
-  align_label = c("left", "center", "right")
+  align_label = c("left", "center", "right"),
+  color = "midnightblue"
 )
 
 \method{fmt_covid_table}{gt_tbl}(
   table,
   total = FALSE,
-  align_label = c("left", "center", "right")
+  align_label = c("left", "center", "right"),
+  color = "midnightblue"
 )
 }
 \arguments{

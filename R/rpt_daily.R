@@ -72,7 +72,7 @@ rpt_daily_pptx <- function(
   # Deaths slide
   death_tbl_total <- death_table_total(pos_ppl, date = date)
   gc()
-  death_tbl_age <- death_table_age(pos_ppl, date = date)
+  death_tbl_age <- death_table_age_summary(pos_ppl, date = date)
   gc()
 
   # Active slide

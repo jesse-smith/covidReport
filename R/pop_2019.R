@@ -1,4 +1,4 @@
-#' Shelby County Age Demographics - ACS 2019 1-Year Estimates
+#' Shelby County Age Demographics - NCHS Postcensal Estimates
 #'
 #' @format A `tibble` with 1376 rows and 5 variables:
 #'   \describe{
