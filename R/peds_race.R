@@ -15,7 +15,12 @@ peds_plot_race <- function(
   date <- date_inv(date)
   data %>%
     peds_calc_race(date = date) %>%
-    demog_plot_("Pediatric Case Rates", grp = "race", date = date)
+    demog_plot_(
+      "Pediatric Case Rates",
+      grp = "race",
+      date = date,
+      color = "darkorchid4"
+    )
 }
 
 #' Tabluate Pediatric Cases by Race
@@ -34,7 +39,7 @@ peds_table_race <- function(
 ) {
   data %>%
     peds_calc_race(date = date) %>%
-    demog_table_(grp_lbl = "Race") %>%
+    demog_table_(grp_lbl = "Race", color = "darkorchid4") %>%
     flextable::autofit()
 }
 

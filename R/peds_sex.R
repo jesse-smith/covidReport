@@ -15,7 +15,12 @@ peds_plot_sex <- function(
   date <- date_inv(date)
   data %>%
     peds_calc_sex(date = date) %>%
-    demog_plot_("Pediatric Case Rates", grp = "sex", date = date)
+    demog_plot_(
+      "Pediatric Case Rates",
+      grp = "sex",
+      date = date,
+      color = "darkorchid4"
+    )
 }
 
 #' Tabluate Pediatric Cases by Sex
@@ -34,7 +39,7 @@ peds_table_sex <- function(
 ) {
   data %>%
     peds_calc_sex(date = date) %>%
-    demog_table_(grp_lbl = "Sex") %>%
+    demog_table_(grp_lbl = "Sex", color = "darkorchid4") %>%
     flextable::autofit()
 }
 

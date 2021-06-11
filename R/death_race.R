@@ -19,7 +19,7 @@ death_plot_race <- function(
       "Death Rates",
       grp = "race",
       date = date,
-      color = "grey30"
+      color = "firebrick4"
     )
 }
 
@@ -39,7 +39,7 @@ death_table_race <- function(
 ) {
   data %>%
     death_calc_race(date = date) %>%
-    demog_table_(grp_lbl = "Race", color = "grey30") %>%
+    demog_table_(grp_lbl = "Race", color = "firebrick4") %>%
     flextable::autofit()
 }
 

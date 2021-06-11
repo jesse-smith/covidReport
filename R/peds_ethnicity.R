@@ -15,7 +15,12 @@ peds_plot_ethnicity <- function(
   date <- date_inv(date)
   data %>%
     peds_calc_ethnicity(date = date) %>%
-    demog_plot_("Pediatric Case Rates", grp = "ethnicity", date = date)
+    demog_plot_(
+      "Pediatric Case Rates",
+      grp = "ethnicity",
+      date = date,
+      color = "darkorchid4"
+    )
 }
 
 #' Tabluate Pediatric Cases by Ethnicity
@@ -34,7 +39,7 @@ peds_table_ethnicity <- function(
 ) {
   data %>%
     peds_calc_ethnicity(date = date) %>%
-    demog_table_(grp_lbl = "Race") %>%
+    demog_table_(grp_lbl = "Race", color = "darkorchid4") %>%
     flextable::autofit()
 }
 

@@ -19,7 +19,7 @@ death_plot_age <- function(
       "Death Rates",
       grp = "age",
       date = date,
-      color = "grey30",
+      color = "firebrick4",
       vjust = "bottom"
     )
 }
@@ -40,7 +40,7 @@ death_table_age <- function(
 ) {
   data %>%
     death_calc_age(date = date) %>%
-    demog_table_(grp_lbl = "Age", color = "grey30") %>%
+    demog_table_(grp_lbl = "Age", color = "firebrick4") %>%
     flextable::autofit(add_h = 0.075)
 }
 

@@ -19,7 +19,7 @@ death_plot_sex <- function(
       "Death Rates",
       grp = "sex",
       date = date,
-      color = "grey30"
+      color = "firebrick4"
     )
 }
 
@@ -39,7 +39,7 @@ death_table_sex <- function(
 ) {
   data %>%
     death_calc_sex(date = date) %>%
-    demog_table_(grp_lbl = "Sex", color = "grey30") %>%
+    demog_table_(grp_lbl = "Sex", color = "firebrick4") %>%
     flextable::autofit()
 }
 
