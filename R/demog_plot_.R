@@ -12,6 +12,7 @@ demog_plot_ <- function(
   unit,
   grp = c("age", "sex", "race", "ethnicity"),
   color = "midnightblue",
+  vjust = c("top", "bottom"),
   date = NULL
 ) {
   grp <- rlang::arg_match(grp)[[1L]]
@@ -24,7 +25,7 @@ demog_plot_ <- function(
     set_covid_theme() %>%
     add_demog_axis_labels_(grp = grp) %>%
     add_demog_col_(fill = color) %>%
-    add_demog_col_labels_(color = color) %>%
+    add_demog_col_labels_(color = color, vjust = vjust) %>%
     remove_x_grid() %>%
     add_demog_scale_() %>%
     add_demog_title_caption_(unit = unit, grp = grp, date = date)
@@ -49,24 +50,43 @@ add_demog_col_ <- function(gg_obj, fill = "midnightblue") {
   gg_obj + ggplot2::geom_col(fill = fill)
 }
 
-add_demog_col_labels_ <- function(gg_obj, color = "midnightblue") {
+add_demog_col_labels_ <- function(
+  gg_obj,
+  color = "midnightblue",
+  vjust = c("top", "bottom")
+) {
 
   assert(rlang::is_string(color))
+  vjust <- rlang::arg_match(vjust)[[1L]]
 
   y <- gg_obj[["mapping"]][["y"]]
 
-  gg_obj +
+  gg_obj_lbl <- gg_obj +
     ggplot2::geom_label(
       ggplot2::aes(
-        label = format(round(!!y, digits = 1L), big.mark = ",", trim = TRUE)
+        label = purrr::map_chr(
+          !!y,
+          ~ formatC(
+            .x,
+            format = "f",
+            digits = if (.x < 1e3) 1L else 0L,
+            big.mark = ","
+          )
+        )
       ),
-      color = "#f0f0f0",
-      fill  = color,
+      color = if (vjust == "top") "#f0f0f0" else color,
+      fill  = if (vjust == "top") color     else "#f0f0f0",
       size  = 4.5,
-      fontface = "bold",
-      vjust = 1,
+      vjust = vjust,
       label.size = 0
     )
+
+  if (vjust == "bottom") {
+    y_max <- max(rlang::eval_tidy(y, data = gg_obj_lbl[["data"]]), na.rm = TRUE)
+    gg_obj_lbl + ggplot2::coord_cartesian(ylim = c(0, y_max*1.05))
+  } else {
+    gg_obj_lbl
+  }
 }
 
 add_demog_scale_ <- function(gg_obj) {

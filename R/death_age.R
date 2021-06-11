@@ -19,7 +19,8 @@ death_plot_age <- function(
       "Death Rates",
       grp = "age",
       date = date,
-      color = "grey30"
+      color = "grey30",
+      vjust = "bottom"
     )
 }
 
