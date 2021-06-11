@@ -14,7 +14,7 @@ test_that("`rpt_daily_pptx()` works", {
 test_that("`rpt_daily_mail()` works", {
   skip_on_ci()
   skip_reports()
-  rpt_daily_mail()
+  rpt_daily_mail(to = "Jesse.Smith@shelbycountytn.gov")
   rpt_sent <- TRUE
   expect_true(rpt_sent)
 })

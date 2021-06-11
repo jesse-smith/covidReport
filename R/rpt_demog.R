@@ -159,6 +159,7 @@ rpt_demog_pptx <- function(
       location = officer::ph_location_type("pic")
     )
 
+  # Create active sex slide
   active_sex_title <- "Active COVID-19 Cases by Sex"
   pptx <- pptx %>%
     officer::add_slide("Two Content", master) %>%
@@ -184,6 +185,7 @@ rpt_demog_pptx <- function(
       location = officer::ph_location_type("pic")
     )
 
+  # Create active race slide
   active_race_title <- "Active COVID-19 Cases by Race"
   pptx <- pptx %>%
     officer::add_slide("Two Content", master) %>%
@@ -196,6 +198,10 @@ rpt_demog_pptx <- function(
       location = officer::ph_location_type("subTitle")
     ) %>%
     officer::ph_with(
+      value = active_plt_race,
+      location = officer::ph_location_type("pic")
+    ) %>%
+    officer::ph_with(
       value = active_tbl_race,
       location = ph_location_table(
         active_tbl_race,
@@ -203,12 +209,9 @@ rpt_demog_pptx <- function(
         layout = "Two Content",
         valign = 1
       )
-    ) %>%
-    officer::ph_with(
-      value = active_plt_race,
-      location = officer::ph_location_type("pic")
     )
 
+  # Create active ethnicity slide
   active_eth_title <- "Active COVID-19 Cases by Ethnicity"
   pptx <- pptx %>%
     officer::add_slide("Two Content", master) %>%
@@ -231,6 +234,188 @@ rpt_demog_pptx <- function(
     ) %>%
     officer::ph_with(
       value = active_plt_ethnicity,
+      location = officer::ph_location_type("pic")
+    )
+
+  # Create peds sex slide
+  peds_sex_title <- "Pediatric COVID-19 Cases by Sex"
+  pptx <- pptx %>%
+    officer::add_slide("Two Content", master) %>%
+    officer::ph_with(
+      value = peds_sex_title,
+      location = officer::ph_location_type("title")
+    ) %>%
+    officer::ph_with(
+      value = date_ppt,
+      location = officer::ph_location_type("subTitle")
+    ) %>%
+    officer::ph_with(
+      value = peds_tbl_sex,
+      location = ph_location_table(
+        peds_tbl_sex,
+        pptx,
+        layout = "Two Content",
+        valign = 1
+      )
+    ) %>%
+    officer::ph_with(
+      value = peds_plt_sex,
+      location = officer::ph_location_type("pic")
+    )
+
+  # Create peds race slide
+  peds_race_title <- "Pediatric COVID-19 Cases by Race"
+  pptx <- pptx %>%
+    officer::add_slide("Two Content", master) %>%
+    officer::ph_with(
+      value = peds_race_title,
+      location = officer::ph_location_type("title")
+    ) %>%
+    officer::ph_with(
+      value = date_ppt,
+      location = officer::ph_location_type("subTitle")
+    ) %>%
+    officer::ph_with(
+      value = peds_plt_race,
+      location = officer::ph_location_type("pic")
+    ) %>%
+    officer::ph_with(
+      value = peds_tbl_race,
+      location = ph_location_table(
+        peds_tbl_race,
+        pptx,
+        layout = "Two Content",
+        valign = 1
+      )
+    )
+
+  # Create peds ethnicity slide
+  peds_eth_title <- "Pediatric COVID-19 Cases by Ethnicity"
+  pptx <- pptx %>%
+    officer::add_slide("Two Content", master) %>%
+    officer::ph_with(
+      value = peds_eth_title,
+      location = officer::ph_location_type("title")
+    ) %>%
+    officer::ph_with(
+      value = date_ppt,
+      location = officer::ph_location_type("subTitle")
+    ) %>%
+    officer::ph_with(
+      value = peds_tbl_ethnicity,
+      location = ph_location_table(
+        peds_tbl_ethnicity,
+        pptx,
+        layout = "Two Content",
+        valign = 1
+      )
+    ) %>%
+    officer::ph_with(
+      value = peds_plt_ethnicity,
+      location = officer::ph_location_type("pic")
+    )
+
+  # Create death age slide
+  death_age_title <- "COVID-19 Deaths by Age"
+  pptx <- pptx %>%
+    officer::add_slide("Two Content", master) %>%
+    officer::ph_with(
+      value = death_age_title,
+      location = officer::ph_location_type("title")
+    ) %>%
+    officer::ph_with(
+      value = date_ppt,
+      location = officer::ph_location_type("subTitle")
+    ) %>%
+    officer::ph_with(
+      value = death_tbl_age,
+      location = ph_location_table(
+        death_tbl_age,
+        pptx,
+        layout = "Two Content",
+        valign = 1
+      )
+    ) %>%
+    officer::ph_with(
+      value = death_plt_age,
+      location = officer::ph_location_type("pic")
+    )
+
+  # Create death sex slide
+  death_sex_title <- "COVID-19 Deaths by Sex"
+  pptx <- pptx %>%
+    officer::add_slide("Two Content", master) %>%
+    officer::ph_with(
+      value = death_sex_title,
+      location = officer::ph_location_type("title")
+    ) %>%
+    officer::ph_with(
+      value = date_ppt,
+      location = officer::ph_location_type("subTitle")
+    ) %>%
+    officer::ph_with(
+      value = death_tbl_sex,
+      location = ph_location_table(
+        death_tbl_sex,
+        pptx,
+        layout = "Two Content",
+        valign = 1
+      )
+    ) %>%
+    officer::ph_with(
+      value = death_plt_sex,
+      location = officer::ph_location_type("pic")
+    )
+
+  # Create death race slide
+  death_race_title <- "COVID-19 Deaths by Race"
+  pptx <- pptx %>%
+    officer::add_slide("Two Content", master) %>%
+    officer::ph_with(
+      value = death_race_title,
+      location = officer::ph_location_type("title")
+    ) %>%
+    officer::ph_with(
+      value = date_ppt,
+      location = officer::ph_location_type("subTitle")
+    ) %>%
+    officer::ph_with(
+      value = death_plt_race,
+      location = officer::ph_location_type("pic")
+    ) %>%
+    officer::ph_with(
+      value = death_tbl_race,
+      location = ph_location_table(
+        death_tbl_race,
+        pptx,
+        layout = "Two Content",
+        valign = 1
+      )
+    )
+
+  # Create death ethnicity slide
+  death_eth_title <- "COVID-19 Deaths by Ethnicity"
+  pptx <- pptx %>%
+    officer::add_slide("Two Content", master) %>%
+    officer::ph_with(
+      value = death_eth_title,
+      location = officer::ph_location_type("title")
+    ) %>%
+    officer::ph_with(
+      value = date_ppt,
+      location = officer::ph_location_type("subTitle")
+    ) %>%
+    officer::ph_with(
+      value = death_tbl_ethnicity,
+      location = ph_location_table(
+        death_tbl_ethnicity,
+        pptx,
+        layout = "Two Content",
+        valign = 1
+      )
+    ) %>%
+    officer::ph_with(
+      value = death_plt_ethnicity,
       location = officer::ph_location_type("pic")
     )
 
