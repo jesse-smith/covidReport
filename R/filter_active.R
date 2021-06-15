@@ -28,14 +28,14 @@ filter_active <- function(
         ~ coviData::std_dates(.x, orders = "ymdT", train = FALSE, force = "dt")
       ) %>%
         dplyr::transmute(
-          dplyr::across(
-            {{ a_cols }},
-            ~ dplyr::if_else(
-              {{ start_dt }} <= .x & .x <= {{ date }},
-              .x,
-              lubridate::NA_Date_
-            )
-          ),
+          # dplyr::across(
+          #   {{ a_cols }},
+          #   ~ dplyr::if_else(
+          #     {{ start_dt }} <= .x & .x <= {{ date }},
+          #     .x,
+          #     lubridate::NA_Date_
+          #   )
+          # ),
           dt = coviData::coalesce_across({{ a_cols }})
         ) %>%
         dplyr::pull("dt"),
