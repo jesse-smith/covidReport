@@ -21,7 +21,6 @@
 #' @keywords internal
 gs_timeseries <- function(
   inv = process_inv(read_inv(date = date)),
-  pcr = process_pcr(read_pcr(date = date), inv = inv),
   delay = 5L,
   date = NULL
 ) {
@@ -29,48 +28,11 @@ gs_timeseries <- function(
 
   new_rpt_dt <- NROW(read_inv_id(date)) - NROW(read_inv_id(date-1L))
 
-  inv_dt <- inv %>%
-    prep_test_pos(min_date = "2020-03-05", date = date, delay = 0L) %>%
-    dplyr::mutate(
-      dplyr::across(
-        where(rlang::is_double) & !where(lubridate::is.Date),
-        ~ dplyr::if_else(is.nan(.x), 0, .x) %>%
-          vec_assign(i = tail(vec_seq_along(.), n = delay), value = NA_real_)
-      )
+  pos(inv) %>%
+    prep_daily_data(
+      min_date = lubridate::as_date("2020-03-05"),
+      date = date,
+      delay = delay
     ) %>%
-    dplyr::select(
-      dt = "test_date",
-      inv_pos = "positive",
-      inv_neg = "negative",
-      inv_pct_pos = "pct_pos",
-      inv_pct_pos_avg = "avg"
-    )
-
-  test_dt <- pcr %>%
-    prep_test_pos(min_date = "2020-03-05", date = date, delay = 0L) %>%
-    dplyr::mutate(
-      dplyr::across(
-        where(rlang::is_double) & !where(lubridate::is.Date),
-        ~ dplyr::if_else(is.nan(.x), 0, .x) %>%
-          vec_assign(i = tail(vec_seq_along(.), n = delay), value = NA_real_)
-      )
-    ) %>%
-    dplyr::select(dt = "test_date", pcr_pos = "positive", pcr_neg = "negative")
-
-  death_dt <- pos(inv) %>%
-    filter_deaths() %>%
-    dplyr::mutate(
-      inv_death_dt = std_dates(.data[["inv_death_dt"]], orders = "ymdT")
-    ) %>%
-    dplyr::filter(
-      lubridate::as_date("2020-03-05") <= .data[["inv_death_dt"]],
-      .data[["inv_death_dt"]] <= {{ date }}
-    ) %>%
-    dplyr::count(dt = .data[["inv_death_dt"]]) %>%
-    complete_dt_n("dt", from = "2020-03-05", to = date) %>%
-    dplyr::rename(deaths = "n")
-
-  inv_dt %>%
-    dplyr::left_join(test_dt, by = "dt") %>%
-    dplyr::left_join(death_dt, by = "dt")
+    dplyr::select(dt = "test_date", case_test_dt_avg = "avg")
 }
