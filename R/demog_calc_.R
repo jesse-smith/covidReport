@@ -65,19 +65,23 @@ demog_relevel_race <- function(data) {
 #' @return A `tibble` with column `n_pop`
 #'
 #' @keywords internal
-demog_join_ <- function(data, grp = c("age", "sex", "race", "ethnicity"), peds = FALSE) {
+demog_join_ <- function(
+  data,
+  grp = c("age", "sex", "race", "ethnicity"),
+  peds = FALSE
+) {
   g <- rlang::arg_match(grp)[[1L]]
-  pop_cnt <- purrr::when(
-    count_pop(g, peds = peds),
-    g == "age"  ~ demog_collapse_age_(.),
-    g == "race" ~ demog_collapse_race_(.),
-    ~ .
-  )
-  pop <- dplyr::transmute(
-    pop_cnt,
-    grp = if (is.factor(.data[[g]])) as.character(.data[[g]]) else .data[[g]],
-    .data[["n"]]
-  )
+  pop <- count_pop(g, peds = peds) %>%
+    purrr::when(
+      g == "age"  ~ demog_collapse_age_(.),
+      g == "race" ~ demog_collapse_race_(.),
+      ~ .
+    ) %>%
+    dplyr::transmute(
+      grp = if (is.factor(.data[[g]])) as.character(.data[[g]]) else .data[[g]],
+      .data[["n"]]
+    ) %>%
+    dplyr::filter(grp != "Other")
   dplyr::left_join(data, pop, by = "grp", suffix = c("", "_pop"))
 }
 
@@ -178,11 +182,11 @@ demog_race_grp_ <- function(chr) {
   # aian <- "American Indian/Alaskan Native"
 
   dplyr::case_when(
-    stringr::str_detect(chr, "(INDIAN)|(NATIVE)") ~ "Other",
-    stringr::str_detect(chr, "(ASIAN)|(PACIFIC)") ~ "Other",
     stringr::str_detect(chr, "(BLACK)|(AFRICAN)") ~ baa,
     stringr::str_detect(chr, "(WHITE)|(CAUCASIAN)") ~ w,
-    chr == "OTHER" ~ "Other",
+    stringr::str_detect(chr, "(INDIAN)|(NATIVE)") ~ "Other",
+    stringr::str_detect(chr, "(ASIAN)|(PACIFIC)") ~ "Other",
+    stringr::str_detect(chr, "OTHER") ~ "Other",
     TRUE ~ NA_character_
   )
 }

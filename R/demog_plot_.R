@@ -19,8 +19,10 @@ demog_plot_ <- function(
 
   data %>%
     dplyr::select("grp", "rate") %>%
-    dplyr::filter(as.character(.data[["grp"]]) != "Missing") %>%
-    dplyr::mutate(grp = forcats::fct_drop(.data[["grp"]], "Missing")) %>%
+    dplyr::filter(!as.character(.data[["grp"]]) %in% c("Other", "Missing")) %>%
+    dplyr::mutate(
+      grp = forcats::fct_drop(.data[["grp"]], c("Other", "Missing"))
+    ) %>%
     demog_ggplot_() %>%
     set_covid_theme() %>%
     add_demog_axis_labels_(grp = grp) %>%
