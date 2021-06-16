@@ -16,8 +16,7 @@ demog_table_ <- function(
     janitor::adorn_totals() %>%
     dplyr::mutate(
       percent = 100 * .data[["percent"]],
-      rate = 1e5 * .data[["rate"]],
-      rate = vec_assign(.data[["rate"]], i = vec_size(.), value = NA_real_)
+      rate = 1e5 * .data[["rate"]]
     ) %>%
     flextable::flextable() %>%
     flextable::set_header_labels(
