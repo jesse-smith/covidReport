@@ -25,6 +25,6 @@
         <fct>                  <int>   <dbl>    <dbl>
       1 Black/African American  5964  0.596   0.0116 
       2 White                   3054  0.305   0.00785
-      3 Other                    509  0.0509  0.0157 
+      3 Other                    509  0.0509 NA      
       4 Missing                  472  0.0472 NA      
 
