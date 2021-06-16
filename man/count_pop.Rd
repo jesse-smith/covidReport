@@ -4,7 +4,7 @@
 \alias{count_pop}
 \title{Summarize Population Demopgraphics}
 \usage{
-count_pop(cols = c("age", "sex", "race", "ethnicity"))
+count_pop(cols = c("age", "sex", "race", "ethnicity"), peds = FALSE)
 }
 \arguments{
 \item{cols}{\code{character}. The column(s) to summarize.}

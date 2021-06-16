@@ -9,7 +9,7 @@
 #'   `percent` (`dbl`), and `rate` (`dbl`)
 #'
 #' @keywords internal
-demog_calc_ <- function(data, grp = c("age", "sex", "race", "ethnicity")) {
+demog_calc_ <- function(data, grp = c("age", "sex", "race", "ethnicity"), peds = FALSE) {
   grp <- rlang::arg_match(grp)[[1L]]
   data %>%
     dplyr::count(.data[["grp"]]) %>%
@@ -18,7 +18,7 @@ demog_calc_ <- function(data, grp = c("age", "sex", "race", "ethnicity")) {
       grp == "race" ~ demog_collapse_race_(.),
       ~ .
     ) %>%
-    demog_join_(grp) %>%
+    demog_join_(grp, peds = peds) %>%
     dplyr::transmute(
       grp = .data[["grp"]] %>%
         factor() %>%
@@ -65,10 +65,10 @@ demog_relevel_race <- function(data) {
 #' @return A `tibble` with column `n_pop`
 #'
 #' @keywords internal
-demog_join_ <- function(data, grp = c("age", "sex", "race", "ethnicity")) {
+demog_join_ <- function(data, grp = c("age", "sex", "race", "ethnicity"), peds = FALSE) {
   g <- rlang::arg_match(grp)[[1L]]
   pop_cnt <- purrr::when(
-    count_pop(g),
+    count_pop(g, peds = peds),
     g == "age"  ~ demog_collapse_age_(.),
     g == "race" ~ demog_collapse_race_(.),
     ~ .

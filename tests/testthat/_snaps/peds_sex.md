@@ -22,7 +22,7 @@
       # A tibble: 3 x 4
         grp         n percent    rate
         <fct>   <int>   <dbl>   <dbl>
-      1 Female  10064  0.503   0.0204
-      2 Male     9692  0.485   0.0218
+      1 Female  10064  0.503   0.0877
+      2 Male     9692  0.485   0.0821
       3 Missing   234  0.0117 NA     
 

@@ -4,7 +4,7 @@
 \alias{demog_join_}
 \title{Join to Population Demographics}
 \usage{
-demog_join_(data, grp = c("age", "sex", "race", "ethnicity"))
+demog_join_(data, grp = c("age", "sex", "race", "ethnicity"), peds = FALSE)
 }
 \arguments{
 \item{data}{Data summarized by demographic}

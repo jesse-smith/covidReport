@@ -59,7 +59,7 @@ peds_calc_race <- function(
   data %>%
     filter_peds() %>%
     peds_trans_race() %>%
-    demog_calc_("race") %>%
+    demog_calc_("race", peds = TRUE) %>%
     demog_relevel_race()
 }
 

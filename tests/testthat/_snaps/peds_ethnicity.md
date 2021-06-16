@@ -22,7 +22,7 @@
       # A tibble: 3 x 4
         grp                     n percent     rate
         <fct>               <int>   <dbl>    <dbl>
-      1 Hispanic/Latino     14006  0.701   0.225  
-      2 Not Hispanic/Latino  1964  0.0982  0.00224
+      1 Hispanic/Latino     14006  0.701   0.515  
+      2 Not Hispanic/Latino  1964  0.0982  0.00955
       3 Missing              4020  0.201  NA      
 

@@ -4,7 +4,7 @@
 \alias{demog_calc_}
 \title{Calculate Demographic Summary}
 \usage{
-demog_calc_(data, grp = c("age", "sex", "race", "ethnicity"))
+demog_calc_(data, grp = c("age", "sex", "race", "ethnicity"), peds = FALSE)
 }
 \arguments{
 \item{data}{Data from the associated \verb{*_calc_*()} function}

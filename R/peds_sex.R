@@ -59,7 +59,7 @@ peds_calc_sex <- function(
   data %>%
     filter_peds() %>%
     peds_trans_sex() %>%
-    demog_calc_(grp = "sex")
+    demog_calc_(grp = "sex", peds = TRUE)
 }
 
 peds_trans_sex <- function(data) {

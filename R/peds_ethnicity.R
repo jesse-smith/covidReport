@@ -59,7 +59,7 @@ peds_calc_ethnicity <- function(
   data %>%
     filter_peds() %>%
     peds_trans_ethnicity() %>%
-    demog_calc_("ethnicity")
+    demog_calc_("ethnicity", peds = TRUE)
 }
 
 peds_trans_ethnicity <- function(data) {
