@@ -119,7 +119,7 @@ prep_test_ts <- function(data, date, status = c("+", "-")) {
 #'   (missing `test_date`s)
 #'
 #' @noRd
-prep_test_pos <- function(data, date, delay) {
+prep_test_pos <- function(data, min_date = "2020-03-14", date, delay) {
   positive <- prep_test_ts(data, date = date, status = "+")
   negative <- prep_test_ts(data, date = date, status = "-")
   remove(data)
@@ -142,7 +142,7 @@ prep_test_pos <- function(data, date, delay) {
       ) %>% purrr::prepend(rep(NA_real_, 6L))
     ) %>%
     dplyr::filter(
-      lubridate::as_date("2020-03-14") <= .data[["test_date"]],
+      lubridate::as_date({{ min_date }}) <= .data[["test_date"]],
       .data[["test_date"]] <= {{ date }} - {{ delay }}
     ) %>%
     tibble::new_tibble(
