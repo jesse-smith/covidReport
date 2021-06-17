@@ -487,18 +487,24 @@
           crs: NULL
           datum: crs
           default: TRUE
+          default_crs: NULL
+          determine_crs: function
           distance: function
           expand: TRUE
           fixup_graticule_labels: function
+          get_default_crs: function
           is_free: function
           is_linear: function
           label_axes: list
           label_graticule: 
           labels: function
           limits: list
+          lims_method: cross
           modify_scales: function
           ndiscr: 100
+          params: list
           range: function
+          record_bbox: function
           render_axis_h: function
           render_axis_v: function
           render_bg: function

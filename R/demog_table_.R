@@ -10,13 +10,20 @@
 demog_table_ <- function(
   data,
   grp_lbl,
-  color = "midnightblue"
+  color = "midnightblue",
+  peds = FALSE
 ) {
+  total_pop <- sum(count_pop(peds = peds)[["n"]], na.rm = TRUE)
   data %>%
     janitor::adorn_totals() %>%
     dplyr::mutate(
       percent = 100 * .data[["percent"]],
-      rate = 1e5 * .data[["rate"]]
+      rate = 1e5 * .data[["rate"]],
+      rate = vec_assign(
+        .data[["rate"]],
+        i = vec_size(.),
+        value = 1e5 * .data[["n"]][[vec_size(.)]] / {{ total_pop }}
+      )
     ) %>%
     flextable::flextable() %>%
     flextable::set_header_labels(

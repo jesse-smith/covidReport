@@ -4,7 +4,7 @@
 \alias{demog_table_}
 \title{Create Demographic Table}
 \usage{
-demog_table_(data, grp_lbl, color = "midnightblue")
+demog_table_(data, grp_lbl, color = "midnightblue", peds = FALSE)
 }
 \arguments{
 \item{data}{Data from the associated \verb{*_calc_*()} function}

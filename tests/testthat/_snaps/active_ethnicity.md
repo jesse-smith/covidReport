@@ -8,11 +8,11 @@
       header has 1 row(s) 
       body has 4 row(s) 
       original dataset sample: 
-                        grp    n percent  rate
-      1     Hispanic/Latino  700      70 10000
-      2 Not Hispanic/Latino  100      10 10000
-      3             Missing  200      20    NA
-      4               Total 1000     100    NA
+                        grp    n percent       rate
+      1     Hispanic/Latino  700      70 10000.0000
+      2 Not Hispanic/Latino  100      10 10000.0000
+      3             Missing  200      20         NA
+      4               Total 1000     100   106.7047
 
 # `active_calc_ethnicity()` matches snapshot
 

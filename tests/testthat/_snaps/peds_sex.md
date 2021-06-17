@@ -8,11 +8,11 @@
       header has 1 row(s) 
       body has 4 row(s) 
       original dataset sample: 
-            grp    n percent  rate
-      1  Female  500      50 10000
-      2    Male  400      40 10000
-      3 Missing  100      10 10000
-      4   Total 1000     100    NA
+            grp    n percent       rate
+      1  Female  500      50 10000.0000
+      2    Male  400      40 10000.0000
+      3 Missing  100      10 10000.0000
+      4   Total 1000     100   106.7047
 
 # `peds_calc_sex()` matches snapshot
 

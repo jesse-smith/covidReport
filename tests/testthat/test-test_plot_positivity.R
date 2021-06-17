@@ -12,10 +12,12 @@ test_that("`test_plot_positivity()` matches doppelganger", {
     dplyr::arrange(dplyr::desc(.data[["positive"]])) %>%
     set_attr("date", as.Date("2021-04-19"))
 
-  vdiffr::expect_doppelganger(
-    title = "test positivity",
-    fig = test_plot_positivity(data, date = "2021-04-19"),
-    path = "test-plot-positivity"
+  suppressWarnings(
+    vdiffr::expect_doppelganger(
+      title = "test positivity",
+      fig = test_plot_positivity(data, date = "2021-04-19"),
+      path = "test-plot-positivity"
+    )
   )
 })
 

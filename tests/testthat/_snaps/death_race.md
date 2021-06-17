@@ -8,12 +8,12 @@
       header has 1 row(s) 
       body has 5 row(s) 
       original dataset sample: 
-                           grp    n percent  rate
-      1 Black/African American  500      50 10000
-      2                  White  300      30 10000
-      3                  Other  100      10 10000
-      4                Missing  100      10 10000
-      5                  Total 1000     100    NA
+                           grp    n percent       rate
+      1 Black/African American  500      50 10000.0000
+      2                  White  300      30 10000.0000
+      3                  Other  100      10 10000.0000
+      4                Missing  100      10 10000.0000
+      5                  Total 1000     100   106.7047
 
 # `death_calc_race()` matches snapshot
 

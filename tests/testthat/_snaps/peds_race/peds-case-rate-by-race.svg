@@ -1,0 +1,69 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' class='svglite' data-engine-version='2.0' width='720.00pt' height='576.00pt' viewBox='0 0 720.00 576.00'>
+<defs>
+  <style type='text/css'><![CDATA[
+    .svglite line, .svglite polyline, .svglite polygon, .svglite path, .svglite rect, .svglite circle {
+      fill: none;
+      stroke: #000000;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-miterlimit: 10.00;
+    }
+  ]]></style>
+</defs>
+<rect width='100%' height='100%' style='stroke: none; fill: #FFFFFF;'/>
+<defs>
+  <clipPath id='cpMC4wMHw3MjAuMDB8MC4wMHw1NzYuMDA='>
+    <rect x='0.00' y='0.00' width='720.00' height='576.00' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMC4wMHw3MjAuMDB8MC4wMHw1NzYuMDA=)'>
+<rect x='0.00' y='0.00' width='720.00' height='576.00' style='stroke-width: 1.36; stroke: none; fill: #F0F0F0;' />
+</g>
+<defs>
+  <clipPath id='cpNzAuOTZ8NzA1LjYwfDU4LjgwfDUxMS41NA=='>
+    <rect x='70.96' y='58.80' width='634.64' height='452.73' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpNzAuOTZ8NzA1LjYwfDU4LjgwfDUxMS41NA==)'>
+<rect x='70.96' y='58.80' width='634.64' height='452.73' style='stroke-width: 1.36; stroke: none; fill: #F0F0F0;' />
+<polyline points='70.96,490.96 705.60,490.96 ' style='stroke-width: 1.36; stroke: #D2D2D2; stroke-linecap: butt;' />
+<polyline points='70.96,449.80 705.60,449.80 ' style='stroke-width: 1.36; stroke: #D2D2D2; stroke-linecap: butt;' />
+<polyline points='70.96,408.64 705.60,408.64 ' style='stroke-width: 1.36; stroke: #D2D2D2; stroke-linecap: butt;' />
+<polyline points='70.96,367.49 705.60,367.49 ' style='stroke-width: 1.36; stroke: #D2D2D2; stroke-linecap: butt;' />
+<polyline points='70.96,326.33 705.60,326.33 ' style='stroke-width: 1.36; stroke: #D2D2D2; stroke-linecap: butt;' />
+<polyline points='70.96,285.17 705.60,285.17 ' style='stroke-width: 1.36; stroke: #D2D2D2; stroke-linecap: butt;' />
+<polyline points='70.96,244.01 705.60,244.01 ' style='stroke-width: 1.36; stroke: #D2D2D2; stroke-linecap: butt;' />
+<polyline points='70.96,202.86 705.60,202.86 ' style='stroke-width: 1.36; stroke: #D2D2D2; stroke-linecap: butt;' />
+<polyline points='70.96,161.70 705.60,161.70 ' style='stroke-width: 1.36; stroke: #D2D2D2; stroke-linecap: butt;' />
+<polyline points='70.96,120.54 705.60,120.54 ' style='stroke-width: 1.36; stroke: #D2D2D2; stroke-linecap: butt;' />
+<polyline points='70.96,79.38 705.60,79.38 ' style='stroke-width: 1.36; stroke: #D2D2D2; stroke-linecap: butt;' />
+<rect x='114.23' y='79.38' width='259.62' height='411.58' style='stroke-width: 1.07; stroke: none; stroke-linecap: square; stroke-linejoin: miter; fill: #68228B;' />
+<rect x='402.71' y='79.38' width='259.62' height='411.58' style='stroke-width: 1.07; stroke: none; stroke-linecap: square; stroke-linejoin: miter; fill: #68228B;' />
+<polygon points='223.02,95.40 265.07,95.40 264.98,95.39 265.33,95.38 265.67,95.31 265.99,95.19 266.29,95.01 266.56,94.79 266.79,94.53 266.98,94.24 267.12,93.92 267.20,93.58 267.23,93.24 267.23,93.24 267.23,81.54 267.23,81.54 267.20,81.20 267.12,80.86 266.98,80.54 266.79,80.25 266.56,79.99 266.29,79.77 265.99,79.59 265.67,79.47 265.33,79.40 265.07,79.38 223.02,79.38 223.28,79.40 222.94,79.39 222.59,79.43 222.26,79.52 221.94,79.67 221.66,79.87 221.41,80.11 221.20,80.39 221.04,80.70 220.93,81.03 220.87,81.37 220.86,81.54 220.86,93.24 220.87,93.06 220.87,93.41 220.93,93.75 221.04,94.08 221.20,94.39 221.41,94.67 221.66,94.91 221.94,95.11 222.26,95.25 222.59,95.35 222.94,95.39 ' style='stroke-width: 0.00; stroke: none; fill: #68228B;' />
+<text x='244.05' y='92.04' text-anchor='middle' style='font-size: 12.80px; fill: #F0F0F0; font-family: sans;' textLength='39.16px' lengthAdjust='spacingAndGlyphs'>10,000</text>
+<polygon points='511.50,95.40 553.54,95.40 553.45,95.39 553.80,95.38 554.14,95.31 554.47,95.19 554.77,95.01 555.04,94.79 555.27,94.53 555.45,94.24 555.59,93.92 555.67,93.58 555.70,93.24 555.70,93.24 555.70,81.54 555.70,81.54 555.67,81.20 555.59,80.86 555.45,80.54 555.27,80.25 555.04,79.99 554.77,79.77 554.47,79.59 554.14,79.47 553.80,79.40 553.54,79.38 511.50,79.38 511.76,79.40 511.41,79.39 511.06,79.43 510.73,79.52 510.42,79.67 510.13,79.87 509.88,80.11 509.67,80.39 509.51,80.70 509.40,81.03 509.34,81.37 509.34,81.54 509.34,93.24 509.34,93.06 509.34,93.41 509.40,93.75 509.51,94.08 509.67,94.39 509.88,94.67 510.13,94.91 510.42,95.11 510.73,95.25 511.06,95.35 511.41,95.39 ' style='stroke-width: 0.00; stroke: none; fill: #68228B;' />
+<text x='532.52' y='92.04' text-anchor='middle' style='font-size: 12.80px; fill: #F0F0F0; font-family: sans;' textLength='39.16px' lengthAdjust='spacingAndGlyphs'>10,000</text>
+<rect x='70.96' y='58.80' width='634.64' height='452.73' style='stroke-width: 1.36; stroke: none;' />
+</g>
+<g clip-path='url(#cpMC4wMHw3MjAuMDB8MC4wMHw1NzYuMDA=)'>
+<text x='64.69' y='494.81' text-anchor='end' style='font-size: 11.20px; fill: #3C3C3C; font-family: sans;' textLength='21.79px' lengthAdjust='spacingAndGlyphs'>     0</text>
+<text x='64.69' y='453.66' text-anchor='end' style='font-size: 11.20px; fill: #3C3C3C; font-family: sans;' textLength='31.14px' lengthAdjust='spacingAndGlyphs'> 1,000</text>
+<text x='64.69' y='412.50' text-anchor='end' style='font-size: 11.20px; fill: #3C3C3C; font-family: sans;' textLength='31.14px' lengthAdjust='spacingAndGlyphs'> 2,000</text>
+<text x='64.69' y='371.34' text-anchor='end' style='font-size: 11.20px; fill: #3C3C3C; font-family: sans;' textLength='31.14px' lengthAdjust='spacingAndGlyphs'> 3,000</text>
+<text x='64.69' y='330.18' text-anchor='end' style='font-size: 11.20px; fill: #3C3C3C; font-family: sans;' textLength='31.14px' lengthAdjust='spacingAndGlyphs'> 4,000</text>
+<text x='64.69' y='289.03' text-anchor='end' style='font-size: 11.20px; fill: #3C3C3C; font-family: sans;' textLength='31.14px' lengthAdjust='spacingAndGlyphs'> 5,000</text>
+<text x='64.69' y='247.87' text-anchor='end' style='font-size: 11.20px; fill: #3C3C3C; font-family: sans;' textLength='31.14px' lengthAdjust='spacingAndGlyphs'> 6,000</text>
+<text x='64.69' y='206.71' text-anchor='end' style='font-size: 11.20px; fill: #3C3C3C; font-family: sans;' textLength='31.14px' lengthAdjust='spacingAndGlyphs'> 7,000</text>
+<text x='64.69' y='165.55' text-anchor='end' style='font-size: 11.20px; fill: #3C3C3C; font-family: sans;' textLength='31.14px' lengthAdjust='spacingAndGlyphs'> 8,000</text>
+<text x='64.69' y='124.40' text-anchor='end' style='font-size: 11.20px; fill: #3C3C3C; font-family: sans;' textLength='31.14px' lengthAdjust='spacingAndGlyphs'> 9,000</text>
+<text x='64.69' y='83.24' text-anchor='end' style='font-size: 11.20px; fill: #3C3C3C; font-family: sans;' textLength='34.26px' lengthAdjust='spacingAndGlyphs'>10,000</text>
+<text x='244.05' y='525.52' text-anchor='middle' style='font-size: 11.20px; fill: #3C3C3C; font-family: sans;' textLength='115.80px' lengthAdjust='spacingAndGlyphs'>Black/African American</text>
+<text x='532.52' y='525.52' text-anchor='middle' style='font-size: 11.20px; fill: #3C3C3C; font-family: sans;' textLength='28.63px' lengthAdjust='spacingAndGlyphs'>White</text>
+<text x='388.28' y='540.97' text-anchor='middle' style='font-size: 14.00px; font-weight: bold; fill: #3C3C3C; font-family: sans;' textLength='32.69px' lengthAdjust='spacingAndGlyphs'>Race</text>
+<text transform='translate(24.03,285.17) rotate(-90)' text-anchor='middle' style='font-size: 14.00px; font-weight: bold; fill: #3C3C3C; font-family: sans;' textLength='178.26px' lengthAdjust='spacingAndGlyphs'>Rate per 100,000 Population</text>
+<text x='388.28' y='48.51' text-anchor='middle' style='font-size: 16.00px; fill: #3C3C3C; font-family: sans;' textLength='98.74px' lengthAdjust='spacingAndGlyphs'>April 01, 2021</text>
+<text x='388.28' y='26.79' text-anchor='middle' style='font-size: 18.00px; font-weight: bold; fill: #3C3C3C; font-family: sans;' textLength='327.21px' lengthAdjust='spacingAndGlyphs'>Pediatric Case Rates by Race (per 100k)</text>
+<text x='388.28' y='559.11' text-anchor='middle' style='font-size: 12.00px; font-style: italic; fill: #3C3C3C; font-family: sans;' textLength='384.89px' lengthAdjust='spacingAndGlyphs'>Data Source: National Electronic Disease Surveillance System (NEDSS)</text>
+</g>
+</svg>
