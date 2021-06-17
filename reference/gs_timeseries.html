@@ -119,7 +119,6 @@
 
     <pre class="usage"><span class='fu'>gs_timeseries</span><span class='op'>(</span>
   inv <span class='op'>=</span> <span class='fu'>process_inv</span><span class='op'>(</span><span class='fu'>read_inv</span><span class='op'>(</span>date <span class='op'>=</span> <span class='va'>date</span><span class='op'>)</span><span class='op'>)</span>,
-  pcr <span class='op'>=</span> <span class='fu'>process_pcr</span><span class='op'>(</span><span class='fu'>read_pcr</span><span class='op'>(</span>date <span class='op'>=</span> <span class='va'>date</span><span class='op'>)</span>, inv <span class='op'>=</span> <span class='va'>inv</span><span class='op'>)</span>,
   delay <span class='op'>=</span> <span class='fl'>5L</span>,
   date <span class='op'>=</span> <span class='cn'>NULL</span>
 <span class='op'>)</span></pre>
@@ -133,11 +132,6 @@
 <code><a href='https://rdrr.io/pkg/coviData/man/process-nbs.html'>process_inv()</a></code></p></td>
     </tr>
     <tr>
-      <th>pcr</th>
-      <td><p>PCR test data from
-<code><a href='https://rdrr.io/pkg/coviData/man/process-nbs.html'>process_pcr()</a></code></p></td>
-    </tr>
-    <tr>
       <th>delay</th>
       <td><p>The number of days that reporting is delayed; will truncate
 percent positive numbers at this date</p></td>
@@ -145,6 +139,11 @@ percent positive numbers at this date</p></td>
     <tr>
       <th>date</th>
       <td><p>Download date of the data</p></td>
+    </tr>
+    <tr>
+      <th>pcr</th>
+      <td><p>PCR test data from
+<code><a href='https://rdrr.io/pkg/coviData/man/process-nbs.html'>process_pcr()</a></code></p></td>
     </tr>
     </table>
 
