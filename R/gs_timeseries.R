@@ -21,6 +21,7 @@
 #' @keywords internal
 gs_timeseries <- function(
   inv = process_inv(read_inv(date = date)),
+  pcr = process_pcr(read_pcr(date = date), inv = inv),
   delay = 5L,
   date = NULL
 ) {
@@ -28,11 +29,31 @@ gs_timeseries <- function(
 
   new_rpt_dt <- NROW(read_inv_id(date)) - NROW(read_inv_id(date-1L))
 
-  pos(inv) %>%
+  inv_dt <- pos(inv) %>%
     prep_daily_data(
       min_date = lubridate::as_date("2020-03-05"),
       date = date,
       delay = delay
     ) %>%
     dplyr::select(dt = "test_date", case_test_dt_avg = "avg")
+
+  pcr_dt <- pcr %>%
+    prep_test_pos(min_date = "2020-03-05", date = date, delay = delay) %>%
+    dplyr::group_by(
+      epiweek = paste0(
+        lubridate::epiyear(.data[["test_date"]]),
+        "-",
+        lubridate::epiweek(.data[["test_date"]])
+      )
+    ) %>%
+    dplyr::mutate(
+      test_pct_pos_wk = divide_by(
+        sum(.data[["positive"]], na.rm = TRUE),
+        sum(.data[["total"]], na.rm = TRUE)
+      )
+    ) %>%
+    dplyr::ungroup() %>%
+    dplyr::select(dt = "test_date", "test_pct_pos_wk")
+
+  dplyr::left_join(inv_dt, pcr_dt, by = "dt")
 }

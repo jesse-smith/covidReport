@@ -6,6 +6,7 @@
 \usage{
 gs_timeseries(
   inv = process_inv(read_inv(date = date)),
+  pcr = process_pcr(read_pcr(date = date), inv = inv),
   delay = 5L,
   date = NULL
 )
@@ -14,13 +15,13 @@ gs_timeseries(
 \item{inv}{Investigation data from
 \code{\link[coviData:process_inv]{process_inv()}}}
 
+\item{pcr}{PCR test data from
+\code{\link[coviData:process_inv]{process_pcr()}}}
+
 \item{delay}{The number of days that reporting is delayed; will truncate
 percent positive numbers at this date}
 
 \item{date}{Download date of the data}
-
-\item{pcr}{PCR test data from
-\code{\link[coviData:process_inv]{process_pcr()}}}
 }
 \value{
 A \code{tibble} with columns
