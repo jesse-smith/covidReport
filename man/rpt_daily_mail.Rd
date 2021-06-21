@@ -23,6 +23,9 @@ rpt_daily_mail(
 
 \item{dir_pptx}{Directory containing daily status report powerpoint files}
 
+\item{demog}{Should the demographics report be attached? The default attaches
+on Tuesdays only.}
+
 \item{inv}{Investigation data from
 \code{\link[coviData:process-nbs]{process_inv()}}}
 

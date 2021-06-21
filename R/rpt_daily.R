@@ -280,6 +280,9 @@ rpt_daily_pptx <- function(
 #'
 #' @param dir_pptx Directory containing daily status report powerpoint files
 #'
+#' @param demog Should the demographics report be attached? The default attaches
+#'   on Tuesdays only.
+#'
 #' @param inv Investigation data from
 #'   \code{\link[coviData:process-nbs]{process_inv()}}
 #'
