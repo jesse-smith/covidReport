@@ -298,6 +298,7 @@ rpt_daily_mail <- function(
     "V:/EPI DATA ANALYTICS TEAM/COVID SANDBOX REDCAP DATA/Status Report",
     "automated"
   ),
+  demog = rlang::is_true(weekdays(date_inv(date)) == "Tuesday"),
   inv = process_inv(read_inv(date)),
   pcr = process_pcr(read_pcr(date), inv = inv)
 ) {
@@ -423,9 +424,9 @@ rpt_daily_mail <- function(
   vac_data <- coviData::vac_prep(coviData::read_vac(date = vac_date))
   gc()
 
-  vac_recent <- gt::as_raw_html(vac_table_recent(vac_data, date = date))
+  vac_recent <- gt::as_raw_html(vac_table_recent(vac_data, date = vac_date))
   gc()
-  vac_ppl <- gt::as_raw_html(vac_table_totals(vac_data, date = date))
+  vac_ppl <- gt::as_raw_html(vac_table_totals(vac_data, date = vac_date))
   gc()
 
   remove(vac_data)
@@ -499,12 +500,21 @@ rpt_daily_mail <- function(
     "<i>Note: This email was generated automatically</i>"
   )
 
-  # Get powerpoint if available
+  # Get powerpoints if available
   ppt_path <- fs::dir_ls(
     dir_pptx,
     type = "file",
     regexp = paste0("daily_status_report_", date, ".pptx", collapse = "")
   )
+
+  if (rlang::is_true(demog)) {
+    demog_path <- fs::dir_ls(
+      dir_pptx,
+      type = "file",
+      regexp = paste0("demographic_status_report_",date,".pptx", collapse = "")
+    )
+    ppt_path <- c(ppt_path, demog_path)
+  }
 
   coviData::notify(
     to = to,

@@ -11,6 +11,7 @@ rpt_daily_mail(
  
     dir_pptx = coviData::path_create("V:/EPI DATA ANALYTICS TEAM/COVID SANDBOX REDCAP DATA/Status Report",
     "automated"),
+  demog = rlang::is_true(weekdays(date_inv(date)) == "Tuesday"),
   inv = process_inv(read_inv(date)),
   pcr = process_pcr(read_pcr(date), inv = inv)
 )
