@@ -100,10 +100,20 @@ inv_calc_total <- function(
 #'   `2021-02-02` to the date given in the `date` parameter
 #'
 #' @noRd
-redcap_contacts <- function(date, nit_token = Sys.getenv("redcap_NIT_token")) {
+redcap_contacts <- function(
+  date,
+  min_date = as.Date("2021-02-02"),
+  contacts_only = TRUE,
+  nit_token = Sys.getenv("redcap_NIT_token")
+) {
 
-  min_dt <- lubridate::as_date("2021-02-02")
+  min_dt <- lubridate::as_date(min_date)
   max_dt <- lubridate::as_date(date)
+
+  filter <- paste0(
+    if (contacts_only) '[n_contacts] > 0 AND ' else '',
+    '"', min_dt, ' 00:00:00" <= [date] AND [date] <= "', max_dt, ' 23:59:59"'
+  )
 
   api_url <- "https://redcap.shelbycountytn.gov/api/"
 
@@ -113,9 +123,9 @@ redcap_contacts <- function(date, nit_token = Sys.getenv("redcap_NIT_token")) {
     format            = "json",
     rawOrLabels       = "raw",
     rawOrLabelHeaders = "raw",
-    filter            = "numb_contacts_16 > 0",
+    filterLogic       = filter,
     `fields[0]`       = "date",
-    `fields[1]`       = "numb_contacts_16"
+    `fields[1]`       = "n_contacts"
   )
 
   httr::RETRY(
@@ -136,7 +146,7 @@ redcap_contacts <- function(date, nit_token = Sys.getenv("redcap_NIT_token")) {
         train = FALSE,
         force = "dt"
       ),
-      n = as.integer(.data[["numb_contacts_16"]])
+      n = tidyr::replace_na(as.integer(.data[["n_contacts"]]), replace = 0L)
     ) %>%
     dplyr::filter(
       {{ min_dt }} <= .data[["date"]],
