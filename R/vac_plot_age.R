@@ -210,7 +210,7 @@ vac_age_label_fn <- function(x, pct, suffix = "") {
 add_vac_age_title_caption <- function(gg_obj, by_pop, date) {
 
   title <- dplyr::case_when(
-     by_pop ~ "Population Vaccinated by Age",
+     by_pop ~ "Population Vaccinated (At Least 1 Dose) by Age",
     !by_pop ~ "People Vaccinated by Age"
   )
   subtitle <- format(as.Date(date), "%B %d, %Y")
