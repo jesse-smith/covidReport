@@ -2,42 +2,108 @@ library(magrittr)
 library(ggplot2)
 
 # Convenience smoothing function
-smth_stl <- function(x, freq = 7L, trend = 30L, periodic = FALSE, remainder = FALSE) {
-  x %>%
+roll_sd <- function(x, window = 30L) {
+  timetk::slidify_vec(
+    x,
+    ~ sd(.x, na.rm = TRUE),
+    .period = window,
+    .align = "center",
+    .partial = TRUE
+  )
+}
+
+
+smth_stl <- function(x, freq = 7L, trend = 30L, periodic = TRUE, add = c("none", "remainder", "low", "high"), conf = 0.8) {
+  add <- rlang::arg_match(add)[[1L]]
+  smth <- x %>%
     stats::ts(frequency = freq) %>%
     stats::stl(
       s.window = if (periodic) "periodic" else freq,
       t.window = trend,
       robust = TRUE,
       na.action = na.exclude
-    ) %>%
-    sweep::sw_tidy_decomp() %>%
-    dplyr::select(if (remainder) c("trend", "remainder") else "trend") %>%
-    rowSums()
+    )
+
+  if (add == "none") {
+    sweep::sw_tidy_decomp(smth)$trend
+  } else if (add == "remainder") {
+    sweep::sw_tidy_decomp(smth)$seasadj
+  } else {
+    stdev <- smth %>%
+      sweep::sw_tidy_decomp() %>%
+      dplyr::pull("remainder") %>%
+      magrittr::multiply_by(smth$weights) %>%
+      roll_sd(window = trend)
+    z <- if (add == "low") qt(0.5-conf/2, df = trend/2) else qt(0.5+conf/2, df = trend/2)
+    sweep::sw_tidy_decomp(smth)$trend + z*stdev
+  }
+}
+
+roll_q <- function(x, prob, period = 30L, align = "center", partial = TRUE, na.rm = TRUE) {
+  if (dplyr::near(prob, 0.5)) {
+    r_fn <- purrr::partial(
+      median,
+      na.rm = na.rm
+    )
+  } else {
+    r_fn <- purrr::partial(
+      quantile,
+      prob = prob,
+      type = 8L,
+      na.rm = na.rm
+    )
+  }
+
+  timetk::slidify_vec(
+    x,
+    r_fn,
+    .period = period,
+    .align = align,
+    .partial = partial
+  )
 }
 
 # Load data
 inv <- coviData::pos(coviData::process_inv())
 v <- coviData::vac_prep(distinct = TRUE)
 
+inv_t <- inv %>%
+  dplyr::mutate(
+    # Convert illness onset and investigation start dates to `Date`
+    dplyr::across(
+      c("illness_onset_dt", "inv_start_dt"),
+      ~ lubridate::as_date(lubridate::ymd_hms(.x))
+    ),
+    # Replace impossible dates with NA
+    dplyr::across(
+      c("illness_onset_dt", "specimen_coll_dt", "inv_start_dt"),
+      ~ data.table::fifelse(
+        data.table::between(.x, as.Date("2020-03-05"), coviData::date_inv()),
+        .x,
+        lubridate::NA_Date_
+      )
+    )
+  ) %>%
+  dplyr::transmute(
+    # Assume that all cases not marked as breakthrough are not breakthrough
+    vac = breakthrough_case %in% "Yes",
+    # Prefer illness onset > specimen collection > investigation start date
+    dt = data.table::fcoalesce(
+      illness_onset_dt,
+      specimen_coll_dt,
+      inv_start_dt
+    )
+  )
+
 # Get total cases prior to Jan 11
-n_prior <- inv %>%
-  dplyr::transmute(dt = specimen_coll_dt) %>%
+n_prior <- inv_t %>%
   tidytable::filter.(
     tidytable::between.(dt, as.Date("2020-03-05"), as.Date("2021-01-10"))
   ) %>%
   NROW()
 
 # All cases (by breakthrough status - aka fully vaccinated status)
-inv_dt <- inv %>%
-  # Don't convert to `tidytable` (aka `data.table`) until excess variables are removed
-  # Otherwise all columns will be read for copy
-  dplyr::transmute(
-    # Assume that all cases not marked as breakthrough are not breakthrough
-    vac = breakthrough_case %in% "Yes",
-    # Use specimen collection date as end date
-    dt = specimen_coll_dt
-  ) %>%
+inv_dt <- inv_t %>%
   # Filter out impossible/irrelevant times and dates
   tidylog::filter(
     !is.na(dt),
@@ -99,6 +165,10 @@ v_dt <- v %>%
   # Ensure date is still key
   data.table::setkey(dt)
 
+# Quantile coverage
+conf <- 0.95
+trend <- 30L
+
 gg_data <- v_dt %>%
   # Join all vaccinated (cumulative) and all cases (incident) by date
   tidytable::left_join.(inv_dt, by = "dt") %>%
@@ -133,22 +203,19 @@ gg_data <- v_dt %>%
   # Subset to final variables (date & rates)
   tidytable::transmute.(
     dt,
+    # Population at Risk
+    u_n,
+    v_n,
+    # Cases
+    u_case,
+    v_case,
     # Case rate in unvaccinated susceptibles
     u_rate = 1e5*u_case/u_n,
     # Case rate in vaccinated susceptibles
-    v_rate = 1e5*v_case/v_n
-  ) %>%
-  tidytable::mutate.(
-    # Smooth case rates
-    u_rate_smth = smth_stl(sqrt(u_rate))^2,
-    v_rate_smth = smth_stl(sqrt(v_rate))^2,
-    v_rate = smth_stl(sqrt(v_rate), remainder = TRUE)^2,
-    u_rate = smth_stl(sqrt(u_rate), remainder = TRUE)^2,
-    # Ratio (unsmoothed and smoothed)
+    v_rate = 1e5*v_case/v_n,
+    # Ratio
     u_ratio = v_rate / u_rate,
     v_ratio = u_ratio,
-    u_ratio_smth = v_rate_smth / u_rate_smth,
-    v_ratio_smth = u_ratio_smth
   ) %>%
   # Pivot rates by vaccination status
   tidytable::pivot_longer.(
@@ -158,6 +225,51 @@ gg_data <- v_dt %>%
   ) %>%
   # Reset key to status/dt
   data.table::setkey(status, dt) %>%
+  tidytable::mutate.(
+    # Case rate smooth and PI (adjusted for seasonality)
+    rate_low = rate %>%
+      magrittr::add(0.01) %>%
+      log() %>%
+      smth_stl(trend = trend, add = "low", conf = conf) %>%
+      exp() %>%
+      magrittr::subtract(0.01) %>%
+      pmax(0),
+    rate_med = rate %>%
+      magrittr::add(0.01) %>%
+      log() %>%
+      smth_stl(trend = trend, add = "none", conf = conf) %>%
+      exp() %>%
+      magrittr::subtract(0.01) %>%
+      pmax(0),
+    rate_high = rate %>%
+      magrittr::add(0.01) %>%
+      log() %>%
+      smth_stl(trend = trend, add = "high", conf = conf) %>%
+      exp() %>%
+      magrittr::subtract(0.01) %>%
+      pmax(0),
+    .by = "status",
+    .before = "ratio"
+  ) %>%
+  tidytable::mutate.(
+    # Ratio smooth and PI (adjusted for seasonality)
+    ratio_low = ratio %>%
+      timetk::log_interval_vec(0, 1, offset = 0.01, silent = TRUE) %>%
+      smth_stl(trend = trend, add = "low", conf = conf) %>%
+      timetk::log_interval_inv_vec(0, 1, offset = 0.01) %>%
+      pmax(0),
+    ratio_med = ratio %>%
+      timetk::log_interval_vec(0, 1, offset = 0.01, silent = TRUE) %>%
+      smth_stl(trend = trend, add = "none", conf = conf) %>%
+      timetk::log_interval_inv_vec(0, 1, offset = 0.01) %>%
+      pmax(0),
+    ratio_high = ratio %>%
+      timetk::log_interval_vec(0, 1, offset = 0.01, silent = TRUE) %>%
+      smth_stl(trend = trend, add = "high", conf = conf) %>%
+      timetk::log_interval_inv_vec(0, 1, offset = 0.01) %>%
+      pmax(0),
+    .by = "status"
+  ) %>%
   # Remove unstable dates
   tidytable::filter.(dt > as.Date("2021-02-28")) %>%
   # Reset status/dt as key (unsure how data.table handles change to key column)
@@ -165,9 +277,20 @@ gg_data <- v_dt %>%
   data.table::setkey(status, dt)
 
 plt_rt <- gg_data %>%
-  {ggplot2::ggplot(., ggplot2::aes(x = dt, y = rate, color = status, fill = status)) +
-    ggplot2::geom_point(size = 1, alpha = 0.2, show.legend = FALSE) +
-    ggplot2::geom_line(ggplot2::aes(y = rate_smth), size = 1, show.legend = FALSE) +
+  {ggplot2::ggplot(., ggplot2::aes(x = dt, color = status, fill = status)) +
+    ggplot2::geom_point(
+      ggplot2::aes(y = rate),
+      size = 1,
+      alpha = 0.1,
+      show.legend = FALSE
+    ) +
+    ggplot2::geom_ribbon(
+      ggplot2::aes(ymin = rate_low, ymax = rate_high),
+      color = NA,
+      alpha = 0.2,
+      show.legend = FALSE
+    ) +
+    ggplot2::geom_line(ggplot2::aes(y = rate_med), size = 1, show.legend = FALSE) +
     ggplot2::scale_color_manual(
       values = c(v = "cornflowerblue", u = "firebrick")
     ) +
@@ -177,8 +300,8 @@ plt_rt <- gg_data %>%
       x = as.Date("2021-04-22"),
       y = gg_data %>%
         dplyr::filter(dt == as.Date("2021-04-22")) %>%
-        dplyr::pull("rate_smth") %>%
-        add(max(gg_data$rate)/120),
+        dplyr::pull("rate_med") %>%
+        add(max(gg_data$rate)/60),
       label = c("Not Fully Vaccinated", "Fully Vaccinated"),
       color = c("firebrick", "cornflowerblue"),
       fill = "#f0f0f0",
@@ -189,25 +312,66 @@ plt_rt <- gg_data %>%
   coviData::set_covid_theme() %>%
   coviData::add_title_caption(
     "Case Rates in Population at Risk",
-    subtitle = paste0("By Vaccination Status (", format(min(coviData::date_inv(), coviData::date_vac()), "%m/%d/%Y"), ")"),
+    subtitle = format(coviData::date_inv(), "%B %d, %Y"),
     caption = paste0(
-      "Population at risk: Number of p'eople in group on a given day,",
+      "Population at risk: Number of people in group on a given day,",
       " excluding known cases in the group up to that day"
     )
   ) %>%
   coviData::add_axis_labels(ylab = "Cases per 100k") %>%
-  coviData::add_scale_month()
+  coviData::add_scale_month() %T>%
+  {if (interactive()) show(.)}
 
 plt_ef <- gg_data %>%
-  {ggplot2::ggplot(., ggplot2::aes(x = dt, y = 1 - ratio, group = status)) +
-    ggplot2::geom_point(color = "darkorchid", size = 1, alpha = 0.2) +
-    ggplot2::geom_line(ggplot2::aes(y = 1 - ratio_smth), size = 1, color = "darkorchid") +
-    ggplot2::scale_y_continuous(breaks = seq(0, 1, by = 0.1), labels = scales::label_percent(accuracy = 1))
+  tidytable::filter.(status == "v") %>%
+  {ggplot2::ggplot(., ggplot2::aes(x = dt)) +
+    ggplot2::geom_point(
+      ggplot2::aes(y = 1-ratio),
+      color = "darkorchid",
+      alpha = 0.1,
+      size = 1
+    ) +
+    ggplot2::geom_ribbon(
+      ggplot2::aes(
+        ymin = 1-ratio_low,
+        ymax = 1-ratio_high
+      ),
+      fill = "darkorchid",
+      alpha = 0.2
+    ) +
+    ggplot2::geom_line(
+      ggplot2::aes(
+        y = 1-ratio_med,
+      ),
+      color = "darkorchid",
+      size = 1
+    ) +
+    ggplot2::scale_y_continuous(
+      breaks = seq(0, 1, by = 0.05),
+      labels = scales::label_percent(accuracy = 1)
+    )
   } %>%
   coviData::set_covid_theme() %>%
   coviData::add_axis_labels(ylab = "% Case Rate Reduction") %>%
-  coviData::set_axis_limits(ylim = c(0.75, 1)) %>%
+  # coviData::set_axis_limits(ylim = c(0.5, 1)) %>%
   coviData::add_title_caption(
-    title = "Vaccine Effectiveness Over Time"
-  )
+    title = "Vaccine Effectiveness Over Time",
+    subtitle = format(coviData::date_inv(), "%B %d, %Y")
+  ) %T>%
+  {if (interactive()) show(.)}
 
+coviData::save_plot(
+  plt_rt,
+  paste0(
+    "V:/EPI DATA ANALYTICS TEAM/COVID SANDBOX REDCAP DATA/jtf_figs/",
+    "vaccine_effectiveness/case_rate_at_risk_", Sys.Date(), ".png"
+  )
+)
+
+coviData::save_plot(
+  plt_ef,
+  paste0(
+    "V:/EPI DATA ANALYTICS TEAM/COVID SANDBOX REDCAP DATA/jtf_figs/",
+    "vaccine_effectiveness/vac_eff_", Sys.Date(), ".png"
+  )
+)

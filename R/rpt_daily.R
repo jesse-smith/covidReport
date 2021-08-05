@@ -33,7 +33,7 @@ rpt_daily_pptx <- function(
     package = "covidReport",
     mustWork = TRUE
   ))
-  gc()
+  gc(verbose = FALSE)
 
   # Data
   pos_ppl <- dplyr::select(
@@ -55,44 +55,48 @@ rpt_daily_pptx <- function(
     data = list_of(dplyr::select(.data[["data"]], {{ pcr_cols }}))
   )
   remove(pcr, inv)
-  gc()
+  gc(verbose = FALSE)
 
   # Cumulative case slide
   case_plt_cumulative <- case_plot_cumulative(pos_ppl, date = date)
-  gc()
+  gc(verbose = FALSE)
 
   # Daily case slide
   case_plt_daily <- case_plot_daily(pos_ppl, date = date)
-  gc()
+  gc(verbose = FALSE)
 
   # Confirmed/Probable slide
   case_tbl_cp <- case_table_confirmed_probable(pos_ppl, date = date)
-  gc()
+  gc(verbose = FALSE)
 
   # Deaths slide
   death_tbl_total <- death_table_total(pos_ppl, date = date)
-  gc()
+  gc(verbose = FALSE)
   death_tbl_age <- death_table_age_summary(pos_ppl, date = date)
-  gc()
+  gc(verbose = FALSE)
 
   # Active slide
   case_tbl_active <- case_table_active(pos_ppl, date = date)
-  gc()
+  gc(verbose = FALSE)
 
-  # Test slide
+  # Test table slide
   test_tbl_total <- test_table_total(pcr_subset, date = date)
-  gc()
+  gc(verbose = FALSE)
+
+  # Test plot slide
+  test_plt_total <- test_plot_total(pcr_subset, date = date)
+  gc(verbose = FALSE)
 
   # Positivity slide
   test_plt_pos <- test_plot_positivity(pcr_subset, date = date)
-  gc()
+  gc(verbose = FALSE)
 
   # Investigations slide
   inv_tbl_total <- inv_table_total(pos_ppl, date = date)
-  gc()
+  gc(verbose = FALSE)
 
   remove(pos_ppl, pcr_subset)
-  gc()
+  gc(verbose = FALSE)
 
   # Report variables
   master <- "HD Blue and White"
@@ -206,12 +210,12 @@ rpt_daily_pptx <- function(
       )
     )
 
-  # Create test slide
-  test_title <- "COVID-19 PCR Tests"
+  # Create test table slide
+  test_tbl_title <- "COVID-19 PCR Tests"
   pptx <- pptx %>%
     officer::add_slide("Table", master) %>%
     officer::ph_with(
-      value = test_title,
+      value = test_tbl_title,
       location = officer::ph_location_type("title")
     ) %>%
     officer::ph_with(
@@ -227,6 +231,14 @@ rpt_daily_pptx <- function(
         pos_h = FALSE,
         valign = 1
       )
+    )
+
+  # Create test plot slide
+  pptx <- pptx %>%
+    officer::add_slide("Picture only", master) %>%
+    officer::ph_with(
+      value = test_plt_total,
+      location = officer::ph_location_type("pic")
     )
 
   # Create positivity slide

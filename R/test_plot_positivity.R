@@ -22,7 +22,7 @@ test_plot_positivity <- function(
   gg_data <- prep_test_pos(data, date = date, delay = delay)
 
   # Prep data
-  prep_test_pos(data, date = date, delay = delay) %>%
+  gg_data %>%
     ggplot_test_positivity() %>%
     coviData::set_covid_theme() %>%
     add_test_pos_curve() %>%
