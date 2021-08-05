@@ -150,14 +150,14 @@ vac_map_pct <- function(
   theme_mods <- ggplot2::theme(
     panel.grid.major = ggplot2::element_blank(),
     axis.text = ggplot2::element_blank(),
-    legend.position = c(0.1, 0.55),
+    legend.position = c(0.1, 0.525),
     legend.direction = "vertical",
     legend.box.background = ggplot2::element_blank()
   )
 
   set_covid_theme(zip_plt) %>%
     add_title_caption(
-      title = "% Population Vaccinated (At Least 1 Dose) by ZIP Code",
+      title = "Population Vaccinated by ZIP Code\n(at least 1 dose)",
       subtitle = paste("12/16/2020 -", format(date_vac(date), "%m/%d/%Y")),
       caption = caption
     ) %>%
