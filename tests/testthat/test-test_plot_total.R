@@ -1,11 +1,10 @@
-test_that("`test_plot_positivity()` matches doppelganger", {
+test_that("`test_plot_total()` matches doppelganger", {
   mockery::stub(
-    test_plot_positivity,
+    test_plot_total,
     "date_pcr",
     lubridate::as_date
   )
 
-  # Stub processing functions
   data <- readRDS(test_path("../data/test_positivity_data.rds")) %>%
     dplyr::mutate(positive = .data[["inv_case_status"]] %in% c("C", "P")) %>%
     dplyr::nest_by(.data[["positive"]]) %>%
