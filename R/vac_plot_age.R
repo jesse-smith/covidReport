@@ -33,14 +33,14 @@ vac_plot_age <- function(
     max(na.rm = TRUE)
 
   gg_data <- .data %>%
-    vac_count_age_grp() %>%
+    vac_count_grp() %>%
     vac_join_age_pop(incl_under_12 = incl_under_12) %>%
     vac_age_fct()
 
   gg_data %>%
-    vac_age_ggplot(pct = TRUE, by_pop = by_pop) %>%
+    vac_age_ggplot(by_pop = by_pop) %>%
     set_covid_theme() %>%
-    set_vac_age_axis_limits() %>%
+    set_axis_limits(ylim = c(0, 1)) %>%
     add_vac_age_axis_labels(by_pop = by_pop) %>%
     add_vac_age_col(by_pop = by_pop) %>%
     add_vac_age_col_labels() %>%
@@ -49,42 +49,27 @@ vac_plot_age <- function(
     add_vac_age_title_caption(by_pop = by_pop, date = date)
 }
 
-vac_age_ggplot <- function(.data, pct, by_pop) {
+vac_age_ggplot <- function(data, by_pop) {
 
   ggplot2::ggplot(
-    .data,
+    data,
     ggplot2::aes(
       x = .data[["age_grp"]],
-      y = !!vac_age_choose_y(pct = pct, by_pop = by_pop)
+      y = !!vac_age_choose_y(by_pop = by_pop),
+      color = .data[["full"]],
+      fill = .data[["full"]]
     )
   )
 }
 
-vac_age_test_pct <- function(gg_obj) {
-  y <- rlang::eval_tidy(
-    gg_obj[["mapping"]][["y"]],
-    data = gg_obj[["data"]]
-  )
-
-  max(y, na.rm = TRUE) <= 1L
-}
-
-vac_age_choose_y <- function(pct, by_pop) {
-  pct <- coviData::assert_bool(pct)
+vac_age_choose_y <- function(by_pop) {
   by_pop <- coviData::assert_bool(by_pop)
 
-  if (by_pop && pct) {
+  if (by_pop) {
     rlang::expr(.data[["n_vac"]] / .data[["n_pop"]])
-  } else if (!by_pop && pct) {
-    rlang::expr(.data[["n_vac"]] / sum(.data[["n_vac"]], na.rm = TRUE))
   } else {
-    rlang::expr(.data[["n_vac"]])
+    rlang::expr(.data[["n_vac"]] / sum(.data[["n_vac"]], na.rm = TRUE))
   }
-}
-
-set_vac_age_axis_limits <- function(gg_obj) {
-  pct <- vac_age_test_pct(gg_obj)
-  set_axis_limits(gg_obj, ylim = if (pct) c(0, 1) else NULL)
 }
 
 remove_x_grid <- function(gg_obj) {
@@ -96,130 +81,129 @@ remove_x_grid <- function(gg_obj) {
 }
 
 add_vac_age_col <- function(gg_obj, by_pop) {
-  pct <- vac_age_test_pct(gg_obj)
+
   by_pop <- coviData::assert_bool(by_pop)
 
-  pal_indigo <- ggsci::pal_material("indigo", n = 10L, reverse = TRUE)
-  color <- pal_indigo(2L)[[2L]]
   width <- if (by_pop) 0.95 else 0.99
 
-  if (by_pop && !pct) {
-    gg_obj +
-      ggplot2::geom_col(
-        ggplot2::aes(y = .data[["n_pop"]]),
-        color = color,
-        fill  = NA,
-        width = width
-      ) +
-      ggplot2::geom_col(fill = color, width = width)
-  } else {
-    gg_obj + ggplot2::geom_col(fill = color, width = width)
-  }
+  gg_obj + ggplot2::geom_col(position = "identity", width = width)
 }
 
 add_vac_age_scale <- function(gg_obj, by_pop) {
-  pct <- vac_age_test_pct(gg_obj)
   by_pop <- coviData::assert_bool(by_pop)
 
-  label_fn <- purrr::partial(vac_age_label_fn, pct = !!pct)
+  label_fn <- purrr::partial(vac_age_label_fn, n = NULL)
 
-  if (pct) {
-    breaks <- seq(0, 1, by = 0.1)
-  } else if (by_pop) {
-    breaks <- seq.int(0L, 1e6L, by = 20000L)
-  } else {
-    breaks <- ggplot2::waiver()
-  }
+  pal_indigo <- ggsci::pal_material("indigo", n = 10L, reverse = TRUE)
+  pal_purple <- ggsci::pal_material("deep-purple", n = 10L, reverse = TRUE)
+  indigo <- pal_indigo(6L)[[6L]]
+  purple <- pal_purple(2L)[[2L]]
 
-  gg_obj + ggplot2::scale_y_continuous(
-    breaks = breaks,
-    labels = label_fn,
-    minor_breaks = NULL
-  )
+  gg_obj +
+    ggplot2::scale_y_continuous(
+      breaks = seq(0, 1, by = 0.1),
+      labels = scales::label_percent(1),
+      minor_breaks = NULL
+    ) +
+    ggplot2::scale_color_manual(
+      name = "Vaccination Status",
+      values = c(`FALSE` = indigo, `TRUE` = purple, " " = "#f0f0f0"),
+      labels = c(`FALSE` = "At least 1 dose", `TRUE` = "Fully Vaccinated"),
+      aesthetics = c("color", "fill")
+    )
 }
 
 add_vac_age_axis_labels <- function(gg_obj, by_pop) {
-  pct <- vac_age_test_pct(gg_obj)
   by_pop <- coviData::assert_bool(by_pop)
 
-  ylab <- dplyr::case_when(
-    pct &&  by_pop ~ "% Population",
-    pct && !by_pop ~ "% Vaccinations",
-     by_pop ~ "People",
-    !by_pop ~ "People"
-  )
+  ylab <- dplyr::if_else(by_pop, "% Population", "% Vaccinations")
   add_axis_labels(gg_obj, xlab = "Age", ylab = ylab)
 }
 
 add_vac_age_col_labels <- function(gg_obj) {
-  pct <- vac_age_test_pct(gg_obj)
 
   y <- gg_obj[["mapping"]][["y"]]
 
-  pal_indigo <- ggsci::pal_material("indigo", n = 10L, reverse = TRUE)
-  color <- pal_indigo(2L)[[2L]]
-
-  gg_obj_lbl1 <- gg_obj +
-    ggplot2::geom_label(
-      ggplot2::aes(
-        label = vac_age_label_fn(!!y, pct = max(!!y, na.rm = TRUE) <= 1)
+  gg_obj + ggplot2::geom_label(
+    ggplot2::aes(
+      label = vac_age_label_fn(n = .data[["n_vac"]], pct = !!y),
+      color = dplyr::if_else(
+        .data[["full"]],
+        " ",
+        as.character(.data[["full"]])
       ),
-      color = color,
-      fill = "#f0f0f0",
-      size = 4.5,
-      vjust = 0
-    )
-
-  if (pct) {
-
-    gg_obj_lbl1 + ggplot2::geom_label(
-      ggplot2::aes(
-        label = dplyr::if_else(
-          !!y >= 0.05,
-          vac_age_label_fn(.data[["n_vac"]], pct = FALSE),
-          NA_character_
-        )
+      fill  = dplyr::if_else(
+        .data[["full"]],
+        as.character(.data[["full"]]),
+        " "
       ),
-      color = "#f0f0f0",
-      fill  = color,
-      size  = 4.5,
-      vjust = 1,
-      label.size = 0
-    )
-  }
+      vjust = purrr::when(.data[["full"]], . ~ . + 0.1, ~ .)
+    ),
+    size = 4.5,
+    label.size = 0,
+    show.legend = FALSE
+  )
 }
 
-vac_age_label_fn <- function(x, pct, suffix = "") {
-  pct <- coviData::assert_bool(pct)
-  vctrs::vec_assert(suffix, ptype = character(), size = 1L)
-  add_space <- all(
-    stringr::str_length(suffix) > 0L,
-    stringr::str_starts(suffix, "\\s")
-  )
-  purrr::map_chr(
-    x * if (pct) 100 else 1e-3,
-    ~ paste0(
-      round(.x, digits = if (rlang::is_integerish(.x)) 0L else 1L),
-      if (pct) "%" else "k",
-      if (add_space) " ",
-      suffix
+vac_age_label_fn <- function(
+  n = NULL,
+  pct = NULL,
+  pct_first = TRUE
+) {
+
+  assert_bool(pct_first)
+
+  n_is_empty <- vec_is_empty(n)
+  pct_is_empty <- vec_is_empty(pct)
+
+  if (n_is_empty && pct_is_empty) {
+    rlang::abort("Either `n` or `pct` must not be empty")
+  }
+
+  lbl_k <- purrr::as_mapper(
+    ~ scales::number(
+      .x,
+      accuracy = 1,
+      scale = 1e-3,
+      suffix = "k",
+      big.mark = ","
     )
   )
+
+  lbl_pct <- purrr::as_mapper(
+    ~ scales::percent(
+      .x,
+      accuracy = if(rlang::is_integerish(.x)) 1 else 0.1,
+      big.mark = ",",
+      trim = TRUE
+    )
+  )
+
+  empty_lbl <- vec_rep("", times = vec_size_common(n, pct))
+
+  n_lbl   <- if (!n_is_empty)   purrr::map_chr(n, lbl_k)     else empty_lbl
+  pct_lbl <- if (!pct_is_empty) purrr::map_chr(pct, lbl_pct) else empty_lbl
+
+  if (n_is_empty) {
+    pct_lbl
+  } else if (pct_is_empty) {
+    n_lbl
+  } else if (pct_first) {
+    paste0(pct_lbl, " (", n_lbl, ")")
+  } else {
+    paste0(n_lbl, " (", pct_lbl, ")")
+  }
 }
 
 add_vac_age_title_caption <- function(gg_obj, by_pop, date) {
 
   title <- dplyr::case_when(
-     by_pop ~ "Population Vaccinated by Age\n(at least 1 dose)",
+     by_pop ~ "Population Vaccinated by Age",
     !by_pop ~ "People Vaccinated by Age"
   )
   subtitle <- format(as.Date(date), "%B %d, %Y")
 
-  caption <- paste0(
-    "Totals, percentages, and ages are calculated using latest dose ",
-    "for an individual\n",
-    "Data Source: Tennessee Immunization Information System (TennIIS)"
-  )
+  caption <- "Data Source: Tennessee Immunization Information System (TennIIS)"
   add_title_caption(
     gg_obj,
     title = title,
@@ -228,14 +212,15 @@ add_vac_age_title_caption <- function(gg_obj, by_pop, date) {
   )
 }
 
-vac_count_age_grp <- function(.data) {
+vac_count_grp <- function(.data) {
   .data %>%
     vac_filter_residents() %>%
-    vac_distinct() %>%
     dplyr::transmute(
+
+      full = .data[["recip_fully_vacc"]] %in% TRUE,
       age_grp = .data[["age_at_admin"]] %>% std_age() %>% vac_age_grp()
     ) %>%
-    dplyr::count(.data[["age_grp"]])
+    dplyr::count(.data[["full"]], .data[["age_grp"]])
 }
 
 std_age <- function(x) {
