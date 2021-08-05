@@ -303,7 +303,7 @@
         ..$ inherit.blank: logi TRUE
         ..- attr(*, "class")= chr [1:2] "element_text" "element"
        $ legend.title.align        : NULL
-       $ legend.position           : num [1:2] 0.1 0.55
+       $ legend.position           : num [1:2] 0.1 0.525
        $ legend.direction          : chr "vertical"
        $ legend.justification      : chr "center"
        $ legend.box                : chr "vertical"
@@ -546,7 +546,7 @@
       plt[["labels"]]
     Output
       $title
-      [1] "% Population Vaccinated by ZIP Code"
+      [1] "Population Vaccinated by ZIP Code\n(at least 1 dose)"
       
       $subtitle
       [1] "12/16/2020 - 04/01/2021"
