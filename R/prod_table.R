@@ -92,7 +92,7 @@ prod_calc <- function(
     dplyr::mutate(grp = "Contacts", .before = 1L)
 
   dplyr::bind_rows(asg_tbl, cont_tbl) %>%
-    dplyr::filter(grp %in% c("Cases", "Contacts")) %>%
+    dplyr::filter(.data[["grp"]] %in% c("Cases", "Contacts")) %>%
     dplyr::select(-"grp") %>%
     set_attr("dt_range", c(dt_min, dt_max))
 }
