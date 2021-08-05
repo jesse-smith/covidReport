@@ -40,12 +40,12 @@ vac_plot_age <- function(
   gg_data %>%
     vac_age_ggplot(by_pop = by_pop) %>%
     set_covid_theme() %>%
-    set_axis_limits(ylim = c(0, 1)) %>%
+    vac_age_axis_limits(by_pop = by_pop) %>%
     add_vac_age_axis_labels(by_pop = by_pop) %>%
     add_vac_age_col(by_pop = by_pop) %>%
     add_vac_age_col_labels() %>%
-    remove_x_grid() %>%
     add_vac_age_scale(by_pop = by_pop) %>%
+    remove_x_grid() %>%
     add_vac_age_title_caption(by_pop = by_pop, date = date)
 }
 
@@ -60,6 +60,11 @@ vac_age_ggplot <- function(data, by_pop) {
       fill = .data[["full"]]
     )
   )
+}
+
+vac_age_axis_limits <- function(gg_obj, by_pop) {
+  assert_bool(by_pop)
+  if (by_pop) set_axis_limits(gg_obj, ylim = c(0, 1)) else gg_obj
 }
 
 vac_age_choose_y <- function(by_pop) {
@@ -92,6 +97,25 @@ add_vac_age_col <- function(gg_obj, by_pop) {
 add_vac_age_scale <- function(gg_obj, by_pop) {
   by_pop <- coviData::assert_bool(by_pop)
 
+  if (by_pop) {
+    breaks <- seq(0, 1, by = 0.1)
+  } else {
+    max_pct <- max(rlang::eval_tidy(
+      gg_obj[["mapping"]][["y"]],
+      data = gg_obj[["data"]]
+    ))
+    magnitude <- 10^floor(log10(max_pct))
+    location <- max_pct / magnitude
+    seq_by <- purrr::when(
+      location,
+      . <= 10/4 ~ magnitude * 0.1,
+      . <= 20/4 ~ magnitude * 0.25,
+      . <= 33/4 ~ magnitude * 0.5,
+      ~ magnitude
+    )
+    breaks <- seq(0, 10*max_pct, by = seq_by)
+  }
+
   label_fn <- purrr::partial(vac_age_label_fn, n = NULL)
 
   pal_indigo <- ggsci::pal_material("indigo", n = 10L, reverse = TRUE)
@@ -101,7 +125,7 @@ add_vac_age_scale <- function(gg_obj, by_pop) {
 
   gg_obj +
     ggplot2::scale_y_continuous(
-      breaks = seq(0, 1, by = 0.1),
+      breaks = breaks,
       labels = scales::label_percent(1),
       minor_breaks = NULL
     ) +
