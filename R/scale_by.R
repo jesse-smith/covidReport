@@ -17,10 +17,10 @@ scale_by <- function(range) {
   location  <- range / magnitude
   by <- purrr::when(
     location,
-    . <= 2.5 ~ 0.10,
-    . <= 5.0 ~ 0.25,
-    . <= 7.5 ~ 0.50,
-             ~ 1.00
+    . <=  5/3 ~ 0.1,
+    . <=  7/3 ~ 0.2,
+    . <= 12/3 ~ 0.5,
+              ~ 1.0
   )
 
   as.double(by * magnitude)
