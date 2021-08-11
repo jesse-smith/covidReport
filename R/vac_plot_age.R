@@ -20,7 +20,7 @@
 #'
 #' @export
 vac_plot_age <- function(
-  .data = coviData::vac_prep(coviData::read_vac()),
+  .data = coviData::vac_prep(),
   by_pop = TRUE,
   incl_under_12 = FALSE
 ) {
@@ -238,13 +238,20 @@ add_vac_age_title_caption <- function(gg_obj, by_pop, date) {
 
 vac_count_grp <- function(.data) {
   .data %>%
-    vac_filter_residents() %>%
+    coviData::vac_distinct() %>%
     dplyr::transmute(
-
       full = .data[["recip_fully_vacc"]] %in% TRUE,
       age_grp = .data[["age_at_admin"]] %>% std_age() %>% vac_age_grp()
     ) %>%
-    dplyr::count(.data[["full"]], .data[["age_grp"]])
+    dplyr::count(.data[["full"]], .data[["age_grp"]]) %>%
+    tidyr::pivot_wider(names_from = "full", values_from = "n") %>%
+    dplyr::mutate(`FALSE` = .data[["FALSE"]] + .data[["TRUE"]]) %>%
+    tidyr::pivot_longer(
+      c("FALSE", "TRUE"),
+      names_to = "full",
+      values_to = "n",
+      names_transform = list(full = as.logical)
+    )
 }
 
 std_age <- function(x) {
