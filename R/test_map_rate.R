@@ -1,4 +1,3 @@
-
 #' Plot Test Rates by ZIP Code for a Given Period
 #'
 #' @param data Prepped case data
@@ -19,7 +18,7 @@ test_map_rate <- function(
   date = NULL
 ) {
 
-  date_lag <- coviData::date_pcr(date) - lag
+  date_lag <- date_pcr(date) - lag
 
   if (!rlang::is_installed("RColorBrewer") || !rlang::is_installed("sf")) {
     rlang::abort(paste(
