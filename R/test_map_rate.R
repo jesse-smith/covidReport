@@ -24,20 +24,17 @@ test_map_rate <- function(
   if (!rlang::is_installed("RColorBrewer") || !rlang::is_installed("sf")) {
     rlang::abort(paste(
       "The {RColorBrewer} and {sf} packages must be installed",
-      "to use `active_map_rate()`"
+      "to use `test_map_rate()`"
     ))
   }
 
   counts <- dplyr::bind_rows(
-    dplyr::select(pos(pcr), "patient_zip", "specimen_coll_dt"),
-    dplyr::select(neg(pcr), "patient_zip", "specimen_coll_dt")
+    dplyr::select(pos(data), "patient_zip", "specimen_coll_dt"),
+    dplyr::select(neg(data), "patient_zip", "specimen_coll_dt")
   ) %>%
     dplyr::filter(
-      dplyr::between(
-        .data[["specimen_coll_dt"]],
-        {{ date_lag }} - {{ days }},
-        {{ date_lag }}
-      )
+      {{ date_lag }} - {{ days }} <= .data[["specimen_coll_dt"]],
+      .data[["specimen_coll_dt"]] <= {{ date_lag }}
     ) %>%
     dplyr::transmute(
       # `vac_parse_zip()` is defined in coviData
@@ -112,11 +109,7 @@ test_map_rate <- function(
 
   bbox <- sf::st_bbox(gg_data[["geometry"]])
 
-  breaks <- seq(
-    10^floor(log10(rate_min)),
-    10^ceiling(log10(rate_max)),
-    by = scale_by(c(rate_min, rate_max))
-  )
+  breaks <- scale_breaks(rate_min, rate_max)[[1L]]
 
   label <- paste0(
     "Shelby Co. Total: ", str_rt_t, "\n",
@@ -169,7 +162,7 @@ test_map_rate <- function(
     add_title_caption(
       title = "PCR Testing Rates by ZIP Code",
       subtitle = paste0(
-        format(c(date_inv(date)-days, date_inv(date)), "%m/%d/%Y"),
+        format(c(date_lag - days, date_lag), "%m/%d/%Y"),
         collapse = " - "
       ),
       caption = caption
