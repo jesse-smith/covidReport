@@ -357,7 +357,8 @@ plt_ef <- gg_data %>%
   coviData::add_title_caption(
     title = "Vaccine Effectiveness Over Time",
     subtitle = format(coviData::date_inv(), "%B %d, %Y")
-  ) %T>%
+  ) %>%
+  coviData::set_axis_limits(xlim = c(as.Date("2021-04-7"), max(gg_data$dt))) %T>%
   {if (interactive()) show(.)}
 
 coviData::save_plot(
