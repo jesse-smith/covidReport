@@ -23,8 +23,10 @@ active_map_rate <- function(
     ))
   }
 
+  date <- date_inv(date)
+
   counts <- data %>%
-    filter_active(days = days) %>%
+    filter_active(days = days, date = date) %>%
     dplyr::transmute(
       # `vac_parse_zip()` is defined in coviData
       zip = vac_parse_zip(.data[["patient_zip"]]),
@@ -98,11 +100,7 @@ active_map_rate <- function(
 
   bbox <- sf::st_bbox(gg_data[["geometry"]])
 
-  breaks <- seq(
-    10^floor(log10(rate_min)),
-    10^ceiling(log10(rate_max)),
-    by = scale_by(c(rate_min, rate_max))
-  )
+  breaks <- scale_breaks(rate_min, rate_max)
 
   label <- paste0(
     "Shelby Co. Total: ", str_rt_t, "\n",
@@ -154,10 +152,7 @@ active_map_rate <- function(
   set_covid_theme(zip_plt) %>%
     add_title_caption(
       title = "Active Cases by ZIP Code",
-      subtitle = paste0(
-        format(c(date_inv(date)-days, date_inv(date)), "%m/%d/%Y"),
-        collapse = " - "
-      ),
+      subtitle = format(date, "%m/%d/%Y"),
       caption = caption
     ) %>%
     {. + theme_mods}
