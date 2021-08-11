@@ -26,11 +26,9 @@ scale_breaks <- function(lower, upper, lim_zero = TRUE) {
     lim_upper_tmp + by,
     lim_upper_tmp
   )
-
-  purrr::pmap(
-    list(lim_lower, lim_upper, by),
-    ~ seq(..1, ..2, by = ..3)
-  )
+  list(lim_lower, lim_upper, by) %>%
+    purrr::pmap(~ seq(..1, ..2, by = ..3)) %>%
+    as_list_of(.ptype = double())
 }
 
 #' Calculate Scale Guides for Plots
@@ -41,14 +39,27 @@ scale_breaks <- function(lower, upper, lim_zero = TRUE) {
 #'
 #' @keywords internal
 scale_by <- function(range) {
-  invalid_range <- {
-    vec_size(range) != 1L ||
-      !is.numeric(range) ||
-      vec_is_empty(range) ||
-      dplyr::near(range, 0L)
-  }
-  if (invalid_range) {
-    rlang::abort("`range` must be a non-empty, positive, numeric scalar")
+  range_scalar <- rlang::is_true(vec_size(range) == 1L)
+  range_num  <- rlang::is_true(is.numeric(range))
+  range_not_empty <- rlang::is_true(!vec_is_empty(range))
+  range_positive  <- rlang::is_true(range >= 0)
+  valid_range <- c(range_scalar, range_num, range_not_empty, range_positive)
+
+  if (!all(valid_range)) {
+    nms <- dplyr::if_else(valid_range, "", "x")
+    checks <- c(
+      "scalar (length 1)",
+      "numeric (integer or double)",
+      "non-empty (not `NULL` or length 0)",
+      "positive (not 0, negative, or missing)"
+    )
+    valid_range <-
+    rlang::abort(
+      paste0(
+        "`range` must be:\n",
+        rlang::format_error_bullets(vec_set_names(checks, nms))
+      )
+    )
   }
 
   magnitude <- 10^floor(log10(range))
