@@ -14,45 +14,35 @@ vac_table_totals <- function(
   date = NULL
 ) {
 
-  today <- vac_date(date)
+  pop <- 937166
+
+  today <- date_vac(date)
 
   title <- paste0(
     "People Vaccinated (", format(today, "%m/%d/%y"), ")"
   )
-  vac_count(.data = data) %>%
-    dplyr::summarize(
-      total = sum(.data[["n"]], na.rm = TRUE),
-      partial = sum(
-        vctrs::vec_slice(
-          .data[["n"]],
-          i = !.data[["recip_fully_vacc"]] | is.na(.data[["recip_fully_vacc"]])
-        ),
-        na.rm = TRUE
+  vac_count(data) %>%
+    dplyr::mutate(
+      status = dplyr::if_else(
+        .data[["recip_fully_vacc"]] %in% TRUE,
+        "Completed",
+        "Initiated"
       ),
-      full1  = sum(
-        vctrs::vec_slice(
-          .data[["n"]],
-          i = .data[["recip_fully_vacc"]] & .data[["dose_count"]] == 1L
-        ),
-        na.rm = TRUE
-      ),
-      full2 = sum(
-        vctrs::vec_slice(
-          .data[["n"]],
-          i = .data[["recip_fully_vacc"]] & .data[["dose_count"]] == 2L
-        ),
-        na.rm = TRUE
-      )
+      .before = 1L
     ) %>%
-    dplyr::mutate(full = .data[["full1"]] + .data[["full2"]]) %>%
-    dplyr::select(-c("full1", "full2")) %>%
+    dplyr::group_by(.data[["status"]]) %>%
+    dplyr::summarize(n = sum(.data[["n"]], na.rm = TRUE)) %>%
+    dplyr::arrange(dplyr::desc(.data[["status"]])) %>%
+    dplyr::mutate(pct_pop = .data[["n"]] / {{ pop }}) %>%
+    janitor::adorn_totals() %>%
     gt::gt() %>%
     gt::cols_label(
-      total = gt::html("<b>Total</b>"),
-      partial = gt::html("<b>Partial</b>"),
-      full = gt::html("<b>Full</b>")
+      status = gt::html("<b>Status</b>"),
+      n = gt::html("<b>N</b>"),
+      pct_pop = gt::html("<b>% Population</b>")
     ) %>%
     gt::tab_header(gt::html("<b>", title, "</b>")) %>%
-    gt::fmt_number(gt::everything(), decimals = 0L) %>%
-    fmt_covid_table()
+    gt::fmt_number("n", decimals = 0L) %>%
+    gt::fmt_percent("pct_pop", decimals = 1L) %>%
+    fmt_covid_table(total = TRUE)
 }
