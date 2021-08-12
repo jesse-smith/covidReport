@@ -5,7 +5,8 @@
 \title{Plot Vaccinations by Age Group}
 \usage{
 vac_plot_age(
-  .data = coviData::vac_prep(coviData::read_vac()),
+  .data = vac_prep(read_vac(date)),
+  date = NULL,
   by_pop = TRUE,
   incl_under_12 = FALSE
 )
@@ -13,6 +14,8 @@ vac_plot_age(
 \arguments{
 \item{.data}{Vaccination data, as created by
 \code{\link[coviData:vac_prep]{vac_prep()}}}
+
+\item{date}{Date of vaccination data}
 
 \item{by_pop}{Should the resulting graphic be calculated using age group
 population statistics (\code{TRUE}, the default) or not (\code{FALSE})?}

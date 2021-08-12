@@ -7,13 +7,8 @@
 vac_plot_goal(
   data = coviData::vac_prep(coviData::read_vac(date = date)),
   date = NULL,
-  n_vaccinated = NULL,
-  n_first = NULL,
-  n_second = NULL,
-  n_goal = 7e+05,
-  n_max = 937166,
-  date_updated = NULL,
-  resident_only = TRUE
+  n_goal = 0.7 * n_max,
+  n_max = 937166
 )
 }
 \arguments{
@@ -21,20 +16,9 @@ vac_plot_goal(
 
 \item{date}{Date of file to pull; defaults to most recent}
 
-\item{n_vaccinated}{Number of people vaccinated}
-
-\item{n_first}{Deprecated (use \code{n_vaccinated}). Number of first doses given}
-
-\item{n_second}{Deprecate (no longer used). Number of second doses given}
-
 \item{n_goal}{Goal for number of people vaccinated}
 
 \item{n_max}{Maximum number of people (population size)}
-
-\item{date_updated}{The date to use for the figure subtitle; defaults to last
-updated date in the file}
-
-\item{resident_only}{Should the figure only count Shelby County residents?}
 }
 \value{
 A \code{ggplot} object

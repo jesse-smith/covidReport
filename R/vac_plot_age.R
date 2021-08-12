@@ -10,6 +10,8 @@
 #' @param .data Vaccination data, as created by
 #'   \code{\link[coviData:vac_prep]{vac_prep()}}
 #'
+#' @param date Date of vaccination data
+#'
 #' @param by_pop Should the resulting graphic be calculated using age group
 #'   population statistics (`TRUE`, the default) or not (`FALSE`)?
 #'
@@ -20,17 +22,15 @@
 #'
 #' @export
 vac_plot_age <- function(
-  .data = coviData::vac_prep(),
+  .data = vac_prep(read_vac(date)),
+  date = NULL,
   by_pop = TRUE,
   incl_under_12 = FALSE
 ) {
   by_pop <- coviData::assert_bool(by_pop)
   incl_under_12 <- coviData::assert_bool(incl_under_12)
 
-  date <- .data %>%
-    dplyr::pull("vacc_date") %>%
-    coviData::std_dates(orders = "mdY", force = "dt") %>%
-    max(na.rm = TRUE)
+  date <- date_vac(date)
 
   gg_data <- .data %>%
     vac_count_grp() %>%
