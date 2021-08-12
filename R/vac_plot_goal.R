@@ -24,39 +24,24 @@
 #' @export
 vac_plot_goal <- function(
   data = coviData::vac_prep(coviData::read_vac(date = date)),
-  date = NULL,
-  n_vaccinated = NULL,
-  n_first = NULL,
-  n_second = NULL,
-  n_goal = 700000,
-  n_max  = 937166,
-  date_updated = NULL,
-  resident_only = TRUE
+  n_goal = 0.7 * n_max,
+  n_max = 937166,
+  date = NULL
 ) {
-
-  # Handled deprecated arguments
-  if (!is.null(n_first) || !is.null(n_second)) {
-    rlang::warn(paste(
-      "`n_first` and `n_second` arguments are deprecated and will be removed",
-      "in the future. Please use `n_vaccinated` instead of `n_first`;",
-      "this switch is currently performed for you.",
-      "`n_second` is not used in current figure."
-    ))
-  }
-
   # Get counts
-  if (is.null(n_vaccinated) && !is.null(n_first)) {
-    n_vaccinated <- n_first
-  } else if (is.null(n_vaccinated)) {
-    n_vaccinated <- data %>%
-      vac_count() %>%
-      dplyr::pull("n") %>%
-      sum(na.rm = TRUE)
-  }
+  counts <- data %>%
+    vac_count(by = "dose") %>%
+    tidyr::replace_na(list(recip_fully_vacc = FALSE)) %>%
+    dplyr::group_by(.data[["recip_fully_vacc"]]) %>%
+    dplyr::summarize(n = sum(.data[["n"]]))
 
-  if (is.null(date_updated)) {
-    date_updated <- vac_date(date)
-  }
+  n_initiated <- counts %>%
+    dplyr::filter(!.data[["recip_fully_vacc"]]) %>%
+    dplyr::pull("n")
+  n_completed <- counts %>%
+    dplyr::filter(.data[["recip_fully_vacc"]]) %>%
+    dplyr::pull("n")
+  date_updated <- vac_date(date)
 
   covidReport::shelby_poly %>%
     set_vaccination_count_max(n_max = n_max) %>%
@@ -65,12 +50,16 @@ vac_plot_goal <- function(
     set_axis_limits(xlim = c(0, 1), ylim = c(0, n_max)) %>%
     add_vaccination_scale() %>%
     add_vaccination_polygon() %>%
-    add_vaccination_count_fill(n_vaccinated = n_vaccinated) %>%
+    add_vaccination_count_fill(
+      n_initiated = n_initiated,
+      n_completed = n_completed
+    ) %>%
     add_vaccination_goal_marker(n_goal = n_goal, n_max = n_max) %>%
     add_axis_labels(ylab = "People") %>%
     add_vaccination_labels(
-      n_goal = n_goal,
-      n_vaccinated = n_vaccinated
+      n_initiated = n_initiated,
+      n_completed = n_completed,
+      n_max = n_max
     ) %>%
     add_vaccination_title_caption(
       date_updated = date_updated,
@@ -99,18 +88,23 @@ add_vaccination_polygon <- function(gg_obj) {
   gg_obj + ggplot2::geom_polygon(fill = "grey83")
 }
 
-add_vaccination_count_fill <- function(gg_obj, n_vaccinated) {
+add_vaccination_count_fill <- function(gg_obj, n_initiated, n_completed) {
 
   # Create fill polygon
-  y_partial <- rlang::expr(pmin(.data[["y"]], n_vaccinated))
+  y_initiated <- rlang::expr(pmin(.data[["y"]], n_initiated))
+  y_completed <- rlang::expr(pmin(.data[["y"]], n_completed))
 
   # Create and assign fill colors
   pal_indigo <- ggsci::pal_material("indigo", n = 10L, reverse = TRUE)
 
-  fill_color <- pal_indigo(8L)[[8L]]
+  pal_indigo <- ggsci::pal_material("indigo", n = 10L, reverse = TRUE)
+  pal_purple <- ggsci::pal_material("deep-purple", n = 10L, reverse = TRUE)
+  indigo <- pal_indigo(6L)[[6L]]
+  purple <- pal_purple(2L)[[2L]]
 
   gg_obj +
-    ggplot2::geom_polygon(ggplot2::aes(y = !!y_partial), fill = fill_color)
+    ggplot2::geom_polygon(ggplot2::aes(y = !!y_initiated), fill = indigo) +
+    ggplot2::geom_polygon(ggplot2::aes(y = !!y_completed), fill = purple)
 }
 
 add_vaccination_goal_marker <- function(gg_obj, n_goal, n_max) {
@@ -135,7 +129,7 @@ add_vaccination_goal_marker <- function(gg_obj, n_goal, n_max) {
       "text",
       x = segment_range[["min"]],
       y = n_goal,
-      label = "Goal",
+      label = paste0("Goal (", round(100*n_goal/n_max), "%)"),
       color = "goldenrod3",
       fontface = "bold",
       size = 5,
@@ -146,41 +140,57 @@ add_vaccination_goal_marker <- function(gg_obj, n_goal, n_max) {
 
 add_vaccination_labels <- function(
   gg_obj,
-  n_goal,
-  n_vaccinated
+  n_initiated,
+  n_completed,
+  n_max
 ) {
 
-  # Create and assign colors
+  # Colors
   pal_indigo <- ggsci::pal_material("indigo", n = 10L, reverse = TRUE)
+  pal_purple <- ggsci::pal_material("deep-purple", n = 10L, reverse = TRUE)
+  indigo <- pal_indigo(6L)[[6L]]
+  purple <- pal_purple(2L)[[2L]]
 
-  color <- pal_indigo(8L)[[8L]]
-
-  x_pct <- mean(c(
-    get_vaccination_label_x_coord(gg_obj, n_vaccinated, side = "left"),
-    get_vaccination_label_x_coord(gg_obj, n_vaccinated, side = "right")
+  x_init_pct <- mean(c(
+    get_vaccination_label_x_coord(gg_obj, n_initiated, side = "left"),
+    get_vaccination_label_x_coord(gg_obj, n_initiated, side = "right")
   ))
 
+  x_comp_pct <- mean(c(
+    get_vaccination_label_x_coord(gg_obj, n_completed, side = "left"),
+    get_vaccination_label_x_coord(gg_obj, n_completed, side = "right")
+  ))
+
+  x_both_pct <- c(x_init_pct, x_comp_pct)
+
+  x_pct <- x_both_pct[which.min(abs(x_both_pct - 0.5))]
+
   # Get goal percentage
-  pct_goal <- round(100 * n_vaccinated / n_goal, digits = 1L)
+  pct_init <- round(100 * n_initiated / n_max, digits = 1L)
+  pct_comp <- round(100 * n_completed / n_max, digits = 1L)
 
   # Create label text
-
-  label <- paste0(
-    "People Vaccinated: ",
-    format(n_vaccinated, big.mark = ",", scientific = FALSE), "\n",
-    "(", pct_goal, "% of goal)"
+  label_init <- paste0(
+    "Residents Vaccinated (Initiated): ",
+    format(n_initiated, big.mark = ",", scientific = FALSE), "\n",
+    "(", pct_init, "% of population)"
+  )
+  label_comp <- paste0(
+    "Residents Vaccinated (Completed): ",
+    format(n_completed, big.mark = ",", scientific = FALSE), "\n",
+    "(", pct_comp, "% of population)"
   )
 
   gg_obj +
     ggplot2::annotate(
       "label",
       x = x_pct,
-      y = n_vaccinated,
-      label = label,
-      color = color,
+      y = c(n_initiated, n_completed),
+      label = c(label_init, label_comp),
+      color = c(indigo, purple),
       fill = "#f0f0f0",
       label.size = 1,
-      vjust = 0,
+      vjust = c(0, 1),
       fontface = "bold",
       size = 5
     )
@@ -188,7 +198,7 @@ add_vaccination_labels <- function(
 
 add_vaccination_title_caption <- function(gg_obj, date_updated, n_goal, n_max) {
 
-  n_chr   <- format(n_goal, scientific = FALSE, big.mark = ",")
+  n_chr   <- format(round(n_goal), scientific = FALSE, big.mark = ",")
 
   pct_chr <- scales::percent(n_goal / n_max)
 
