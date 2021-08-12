@@ -5,7 +5,7 @@
 \title{Plot Vaccinations by Age Group}
 \usage{
 vac_plot_age(
-  .data = coviData::vac_prep(coviData::read_vac()),
+  .data = coviData::vac_prep(),
   by_pop = TRUE,
   incl_under_12 = FALSE
 )

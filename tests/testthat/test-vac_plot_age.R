@@ -8,6 +8,12 @@ test_that("`vac_plot_age()` matches doppelganger", {
     recip_fully_vacc = c(rep(TRUE, 3e4), rep(FALSE, 9e4))
   ) %>% dplyr::slice_sample(prop = 1)
 
+  mockery::stub(
+    vac_plot_age,
+    "date_vac",
+    lubridate::as_date("2021-04-19")
+  )
+
   suppressWarnings(
     vdiffr::expect_doppelganger(
       "vaccination rate by age (no under 12)",
