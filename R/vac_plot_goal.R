@@ -29,18 +29,14 @@ vac_plot_goal <- function(
   date = NULL
 ) {
   # Get counts
-  counts <- data %>%
-    vac_count(by = "dose") %>%
-    tidyr::replace_na(list(recip_fully_vacc = FALSE)) %>%
-    dplyr::group_by(.data[["recip_fully_vacc"]]) %>%
-    dplyr::summarize(n = sum(.data[["n"]]))
+  counts <- vac_count(data)
 
-  n_initiated <- counts %>%
-    dplyr::filter(!.data[["recip_fully_vacc"]]) %>%
-    dplyr::pull("n")
+  n_initiated <- sum(counts[["n"]], na.rm = TRUE)
   n_completed <- counts %>%
     dplyr::filter(.data[["recip_fully_vacc"]]) %>%
-    dplyr::pull("n")
+    dplyr::pull("n") %>%
+    sum(na.rm = TRUE)
+
   date_updated <- vac_date(date)
 
   covidReport::shelby_poly %>%
