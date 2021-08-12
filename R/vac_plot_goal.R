@@ -4,29 +4,18 @@
 #'
 #' @param date Date of file to pull; defaults to most recent
 #'
-#' @param n_vaccinated Number of people vaccinated
-#'
-#' @param n_first Deprecated (use `n_vaccinated`). Number of first doses given
-#'
-#' @param n_second Deprecate (no longer used). Number of second doses given
-#'
 #' @param n_goal Goal for number of people vaccinated
 #'
 #' @param n_max Maximum number of people (population size)
-#'
-#' @param date_updated The date to use for the figure subtitle; defaults to last
-#'   updated date in the file
-#'
-#' @param resident_only Should the figure only count Shelby County residents?
 #'
 #' @return A `ggplot` object
 #'
 #' @export
 vac_plot_goal <- function(
   data = coviData::vac_prep(coviData::read_vac(date = date)),
+  date = NULL,
   n_goal = 0.7 * n_max,
-  n_max = 937166,
-  date = NULL
+  n_max = 937166
 ) {
   # Get counts
   counts <- vac_count(data)
@@ -37,7 +26,7 @@ vac_plot_goal <- function(
     dplyr::pull("n") %>%
     sum(na.rm = TRUE)
 
-  date_updated <- vac_date(date)
+  date_updated <- date_vac(date)
 
   covidReport::shelby_poly %>%
     set_vaccination_count_max(n_max = n_max) %>%

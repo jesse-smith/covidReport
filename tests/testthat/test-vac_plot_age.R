@@ -11,13 +11,13 @@ test_that("`vac_plot_age()` matches doppelganger", {
   mockery::stub(
     vac_plot_age,
     "date_vac",
-    lubridate::as_date("2021-04-19")
+    lubridate::as_date
   )
 
   suppressWarnings(
     vdiffr::expect_doppelganger(
       "vaccination rate by age (no under 12)",
-      vac_plot_age(data),
+      vac_plot_age(data, date = "2021-04-19"),
       path = "vac-age-pop-12plus"
     )
   )
@@ -25,7 +25,7 @@ test_that("`vac_plot_age()` matches doppelganger", {
   suppressWarnings(
     vdiffr::expect_doppelganger(
       "vaccination distribution by age (no under 12)",
-      vac_plot_age(data, by_pop = FALSE),
+      vac_plot_age(data, by_pop = FALSE, date = "2021-04-19"),
       path = "vac-age-distr-12plus"
     )
   )
@@ -33,7 +33,7 @@ test_that("`vac_plot_age()` matches doppelganger", {
   suppressWarnings(
     vdiffr::expect_doppelganger(
       "vaccination rate by age (w/ under 12)",
-      vac_plot_age(data, incl_under_12 = TRUE),
+      vac_plot_age(data, incl_under_12 = TRUE, date = "2021-04-19"),
       path = "vac-age-rate-under12"
     )
   )
@@ -41,7 +41,7 @@ test_that("`vac_plot_age()` matches doppelganger", {
   suppressWarnings(
     vdiffr::expect_doppelganger(
       "vaccination distribution by age (w/ under 12)",
-      vac_plot_age(data, by_pop = FALSE, incl_under_12 = TRUE),
+      vac_plot_age(data, by_pop = FALSE, incl_under_12 = TRUE, date = "2021-04-19"),
       path = "vac-age-distr-under12"
     )
   )
