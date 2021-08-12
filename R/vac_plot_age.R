@@ -263,11 +263,11 @@ vac_age_grp <- function(dbl) {
 
   vctrs::vec_assert(dbl, ptype = double())
 
-  breaks <- c(0, 12, 16, seq(25, 75, by = 10), 115)
+  breaks <- c(0, 12, 18, seq(25, 75, by = 10), 115)
   lbls <- c(
      "0-11",
-    "12-15",
-    "16-24",
+    "12-17",
+    "18-24",
     "25-34",
     "35-44",
     "45-54",
