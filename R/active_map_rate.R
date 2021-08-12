@@ -100,7 +100,7 @@ active_map_rate <- function(
 
   bbox <- sf::st_bbox(gg_data[["geometry"]])
 
-  breaks <- scale_breaks(rate_min, rate_max)
+  breaks <- scale_breaks(rate_min, rate_max)[[1L]]
 
   label <- paste0(
     "Shelby Co. Total: ", str_rt_t, "\n",
