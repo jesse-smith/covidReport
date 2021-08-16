@@ -453,7 +453,7 @@ rpt_daily_mail <- function(
     dplyr::mutate(
       dplyr::across(.fns = ~ as.integer(stringr::str_remove_all(.x, "[^0-9]")))
     ) %>%
-    dplyr::pull("Total")
+    dplyr::pull("Status")
   n_pct_vac <- round(100*n_ppl_vac/7e5L, 1L)
   n_avg_vac <- vac_recent %>%
     as_tbl() %>%
