@@ -453,8 +453,10 @@ rpt_daily_mail <- function(
     dplyr::mutate(
       dplyr::across(.fns = ~ as.integer(stringr::str_remove_all(.x, "[^0-9]")))
     ) %>%
-    dplyr::pull("Status")
-  n_pct_vac <- round(100*n_ppl_vac/7e5L, 1L)
+    dplyr::pull("N")
+  n_ppl_vac <- n_ppl_vac[[3]]
+  n_pct_vac <- round(100*n_ppl_vac/937166)
+  n_pct_vac <- n_pct_vac[[3]]
   n_avg_vac <- vac_recent %>%
     as_tbl() %>%
     dplyr::mutate(
@@ -496,7 +498,7 @@ rpt_daily_mail <- function(
     "New Cases: ", str_ppl_new, "<br>",
     "Total Deaths: ", str_deaths,
     "<br><br>",
-    "% Vaccinated of Goal: ", str_pct_vac, "<br>",
+    "% Vaccinated of Population: ", str_pct_vac, "<br>",
     "Total People Vaccinated: ", str_ppl_vac, "<br>",
     "Vaccinations per day (7-day average): ", str_avg_vac, "<br>",
     "Reported cases per day (7-day average): ", str_avg_case,
