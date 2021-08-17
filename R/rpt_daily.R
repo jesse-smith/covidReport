@@ -454,9 +454,10 @@ rpt_daily_mail <- function(
       dplyr::across(.fns = ~ as.integer(stringr::str_remove_all(.x, "[^0-9]")))
     ) %>%
     dplyr::pull("N")
+  n_pct_vac <- round(100*n_ppl_vac/937166, digits = 1)
   n_ppl_vac <- n_ppl_vac[[3]]
-  n_pct_vac <- round(100*n_ppl_vac/937166)
   n_pct_vac <- n_pct_vac[[3]]
+  n_pct_vac_goal <- round(100*n_ppl_vac/700000, digits = 1)
   n_avg_vac <- vac_recent %>%
     as_tbl() %>%
     dplyr::mutate(
@@ -485,6 +486,7 @@ rpt_daily_mail <- function(
   str_deaths <- format(n_deaths, big.mark = ",")
 
   str_pct_vac <- paste0(n_pct_vac, "%")
+  str_pct_vac_goal <- paste0(n_pct_vac_goal, "%")
   str_ppl_vac <- format(n_ppl_vac, big.mark = ",")
   str_avg_vac <- format(n_avg_vac, big.mark = ",")
   str_avg_case <- format(n_avg_case, big.mark = ",")
@@ -498,6 +500,7 @@ rpt_daily_mail <- function(
     "New Cases: ", str_ppl_new, "<br>",
     "Total Deaths: ", str_deaths,
     "<br><br>",
+    "% Vaccinated of Goal: ", str_pct_vac_goal, "<br>",
     "% Vaccinated of Population: ", str_pct_vac, "<br>",
     "Total People Vaccinated: ", str_ppl_vac, "<br>",
     "Vaccinations per day (7-day average): ", str_avg_vac, "<br>",
