@@ -23,6 +23,38 @@ peds_plot_race <- function(
     )
 }
 
+
+
+
+
+#' Plot Active Pediatric Case Rates by Race
+#'
+#' @param data NBS case data, as returned by
+#'   \code{\link[coviData:read-nbs]{filter_active(pos(process_inv()))}}
+#'
+#' @param date The download date of the data; defaults to most recent
+#'
+#' @return A `ggplot`
+#'
+#' @export
+act_peds_plot_race <- function(
+  data = filter_active(pos(process_inv(read_inv(date)))),
+  date = NULL
+) {
+  date <- date_inv(date)
+  data %>%
+    peds_calc_race(date = date) %>%
+    demog_plot_(
+      "Pediatric Case Rates",
+      grp = "race",
+      date = date,
+      color = "darkorchid1"
+    )
+}
+
+
+
+
 #' Tabluate Pediatric Cases by Race
 #'
 #' @param data NBS case data, as returned by
@@ -39,9 +71,32 @@ peds_table_race <- function(
 ) {
   data %>%
     peds_calc_race(date = date) %>%
-    demog_table_(grp_lbl = "Race", color = "darkorchid4") %>%
+    demog_table_(grp_lbl = "Race", color = "darkorchid4", peds = TRUE) %>%
     flextable::autofit()
 }
+
+
+
+#' Tabluate Active Pediatric Cases by Race
+#'
+#' @param data NBS case data, as returned by
+#'   \code{\link[coviData:read-nbs]{filter_active(pos(process_inv()))}}
+#'
+#' @param date The download date of the data; defaults to most recent
+#'
+#' @return A `flextable`
+#'
+#' @export
+act_peds_table_race <- function(
+  data = filter_active(pos(process_inv(read_inv(date)))),
+  date = NULL
+) {
+  data %>%
+    peds_calc_race(date = date) %>%
+    demog_table_(grp_lbl = "Race", color = "darkorchid1", peds = TRUE) %>%
+    flextable::autofit()
+}
+
 
 #' Calculate Pediatric Case Rates and Percentages by Race
 #'

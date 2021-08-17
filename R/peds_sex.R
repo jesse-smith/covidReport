@@ -23,6 +23,32 @@ peds_plot_sex <- function(
     )
 }
 
+
+#' Plot Active Pediatric Cases by Sex
+#'
+#' @param data NBS case data, as returned by
+#'   \code{\link[coviData:read-nbs]{filter_active(pos(process_inv()))}}
+#'
+#' @param date The download date of the data; defaults to most recent
+#'
+#' @return A `ggplot`
+#'
+#' @export
+act_peds_plot_sex <- function(
+  data = filter_active(pos(process_inv(read_inv(date)))),
+  date = NULL
+) {
+  date <- date_inv(date)
+  data %>%
+    peds_calc_sex(date = date) %>%
+    demog_plot_(
+      "Pediatric Case Rates",
+      grp = "sex",
+      date = date,
+      color = "darkorchid1"
+    )
+}
+
 #' Tabluate Pediatric Cases by Sex
 #'
 #' @param data NBS case data, as returned by
@@ -39,9 +65,33 @@ peds_table_sex <- function(
 ) {
   data %>%
     peds_calc_sex(date = date) %>%
-    demog_table_(grp_lbl = "Sex", color = "darkorchid4") %>%
+    demog_table_(grp_lbl = "Sex", color = "darkorchid4", peds = TRUE) %>%
     flextable::autofit()
 }
+
+
+
+
+#' Tabluate Active Pediatric Cases by Sex
+#'
+#' @param data NBS case data, as returned by
+#'   \code{\link[coviData:read-nbs]{filter_active(pos(process_inv()))}}
+#'
+#' @param date The download date of the data; defaults to most recent
+#'
+#' @return A `flextable`
+#'
+#' @export
+act_peds_table_sex <- function(
+  data = filter_active(pos(process_inv(read_inv(date)))),
+  date = NULL
+) {
+  data %>%
+    peds_calc_sex(date = date) %>%
+    demog_table_(grp_lbl = "Sex", color = "darkorchid1", peds = TRUE) %>%
+    flextable::autofit()
+}
+
 
 #' Calculate Pediatric Case Rates and Percentages by Sex
 #'
