@@ -76,6 +76,26 @@ rpt_demog_pptx <- function(
   active_plt_ethnicity <- active_plot_ethnicity(pos_ppl, date = date)
   gc()
 
+
+
+  # Active Pediatric Cases by Sex
+  active_peds_tbl_sex <- act_peds_table_sex(filter_active(pos_ppl), date = date)
+  active_peds_plt_sex <- act_peds_plot_sex(filter_active(pos_ppl), date = date)
+  gc()
+
+  # Active Pediatric Cases by Race
+  active_peds_tbl_race <- act_peds_table_race(filter_active(pos_ppl), date = date)
+  active_peds_plt_race <- act_peds_plot_race(filter_active(pos_ppl), date = date)
+  gc()
+
+  # Active Pediatric Cases by Ethnicity
+  active_peds_tbl_ethnicity <- act_peds_table_ethnicity(filter_active(pos_ppl), date = date)
+  active_peds_plt_ethnicity <- act_peds_plot_ethnicity(filter_active(pos_ppl), date = date)
+  gc()
+
+
+
+
   # Pediatric Cases by Sex
   peds_tbl_sex <- peds_table_sex(pos_ppl, date = date)
   peds_plt_sex <- peds_plot_sex(pos_ppl, date = date)
@@ -234,8 +254,92 @@ rpt_demog_pptx <- function(
       location = officer::ph_location_type("pic")
     )
 
+
+
+
+  # Create active peds sex slide
+  active_peds_sex_title <- "Active Pediatric COVID-19 Cases by Sex"
+  pptx <- pptx %>%
+    officer::add_slide("Two Content", master) %>%
+    officer::ph_with(
+      value = active_peds_sex_title,
+      location = officer::ph_location_type("title")
+    ) %>%
+    officer::ph_with(
+      value = date_ppt,
+      location = officer::ph_location_type("subTitle")
+    ) %>%
+    officer::ph_with(
+      value = active_peds_tbl_sex,
+      location = ph_location_table(
+        active_peds_tbl_sex,
+        pptx,
+        layout = "Two Content",
+        valign = 1
+      )
+    ) %>%
+    officer::ph_with(
+      value = active_peds_plt_sex,
+      location = officer::ph_location_type("pic")
+    )
+
+  # Create active peds race slide
+  active_peds_race_title <- "Active Pediatric COVID-19 Cases by Race"
+  pptx <- pptx %>%
+    officer::add_slide("Two Content", master) %>%
+    officer::ph_with(
+      value = active_peds_race_title,
+      location = officer::ph_location_type("title")
+    ) %>%
+    officer::ph_with(
+      value = date_ppt,
+      location = officer::ph_location_type("subTitle")
+    ) %>%
+    officer::ph_with(
+      value = active_peds_plt_race,
+      location = officer::ph_location_type("pic")
+    ) %>%
+    officer::ph_with(
+      value = active_peds_tbl_race,
+      location = ph_location_table(
+        active_peds_tbl_race,
+        pptx,
+        layout = "Two Content",
+        valign = 1
+      )
+    )
+
+  # Create active peds ethnicity slide
+  active_peds_eth_title <- "Active Pediatric COVID-19 Cases by Ethnicity"
+  pptx <- pptx %>%
+    officer::add_slide("Two Content", master) %>%
+    officer::ph_with(
+      value = active_peds_eth_title,
+      location = officer::ph_location_type("title")
+    ) %>%
+    officer::ph_with(
+      value = date_ppt,
+      location = officer::ph_location_type("subTitle")
+    ) %>%
+    officer::ph_with(
+      value = active_peds_tbl_ethnicity,
+      location = ph_location_table(
+        active_peds_tbl_ethnicity,
+        pptx,
+        layout = "Two Content",
+        valign = 1
+      )
+    ) %>%
+    officer::ph_with(
+      value = active_peds_plt_ethnicity,
+      location = officer::ph_location_type("pic")
+    )
+
+
+
+
   # Create peds sex slide
-  peds_sex_title <- "Pediatric COVID-19 Cases by Sex"
+  peds_sex_title <- "Cumulative Pediatric COVID-19 Cases by Sex"
   pptx <- pptx %>%
     officer::add_slide("Two Content", master) %>%
     officer::ph_with(
@@ -261,7 +365,7 @@ rpt_demog_pptx <- function(
     )
 
   # Create peds race slide
-  peds_race_title <- "Pediatric COVID-19 Cases by Race"
+  peds_race_title <- "Cumulative Pediatric COVID-19 Cases by Race"
   pptx <- pptx %>%
     officer::add_slide("Two Content", master) %>%
     officer::ph_with(
@@ -287,7 +391,7 @@ rpt_demog_pptx <- function(
     )
 
   # Create peds ethnicity slide
-  peds_eth_title <- "Pediatric COVID-19 Cases by Ethnicity"
+  peds_eth_title <- "Cumulative Pediatric COVID-19 Cases by Ethnicity"
   pptx <- pptx %>%
     officer::add_slide("Two Content", master) %>%
     officer::ph_with(
