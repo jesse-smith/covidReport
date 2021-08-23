@@ -62,7 +62,11 @@ rpt_daily_pptx <- function(
   gc(verbose = FALSE)
 
   # Daily case slide
-  case_plt_daily <- case_plot_daily(pos_ppl, date = date)
+  case_plt_daily_all <- case_plot_daily_ped_all(pos_ppl, date = date)
+  gc(verbose = FALSE)
+
+  # Daily ped slide
+  case_plt_daily_ped <- case_plot_daily_ped_only (pos_ppl, date = date)
   gc(verbose = FALSE)
 
   # Confirmed/Probable slide
@@ -127,7 +131,15 @@ rpt_daily_pptx <- function(
   pptx <- pptx %>%
     officer::add_slide("Picture only", master) %>%
     officer::ph_with(
-      value = case_plt_daily,
+      value = case_plt_daily_all,
+      location = officer::ph_location_type("pic")
+    )
+
+  # Create daily ped slide
+  pptx <- pptx %>%
+    officer::add_slide("Picture only", master) %>%
+    officer::ph_with(
+      value = case_plt_daily_ped,
       location = officer::ph_location_type("pic")
     )
 
