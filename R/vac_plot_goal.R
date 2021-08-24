@@ -156,7 +156,7 @@ add_vaccination_labels <- function(
 
   # Create label text
   label_init <- paste0(
-    "Residents Vaccinated (Initiated): ",
+    "Residents Vaccinated (At Least One Dose): ",
     format(n_initiated, big.mark = ",", scientific = FALSE), "\n",
     "(", pct_init, "% of population)"
   )
