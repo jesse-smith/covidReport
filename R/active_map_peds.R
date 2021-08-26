@@ -11,7 +11,7 @@
 #'
 #' @export
 active_ped_map_rate <- function(
-  data = covidReport::filter_active(covidReport::filter_peds(covidReport::pos(covidReport::process_inv(covidReport::read_inv(date = date))))),
+  data = filter_active(filter_peds(pos(process_inv(read_inv(date = date))))),
   days = 14L,
   date = NULL
 ) {
