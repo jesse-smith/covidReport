@@ -99,7 +99,7 @@ add_daily_curve_ped <- function(gg_obj) {
     ) +
     ggplot2::geom_line(
       ggplot2::aes(y = .data[["avg"]]),
-      color = "darkorange",
+      color = "red",
       size = 1.25,
       show.legend = FALSE
     )
@@ -137,7 +137,7 @@ add_daily_label_ped <- function(gg_obj, total, new) {
       x = min_date,
       y = 300L,
       label = label,
-      color = "midnightblue",
+      color = "red",
       fill = "#f0f0f0",
       hjust = 0,
       vjust = 1,

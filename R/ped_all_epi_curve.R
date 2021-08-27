@@ -84,6 +84,7 @@ case_plot_daily_ped_all <- function(
     add_daily_scale() %>%
     add_daily_curve_ped_all() %>%
     add_covid_events(lab_y = 1200L, color = "grey60", size = 3) %>%
+    add_daily_label(total = n_total, new = n_new)%>%
     add_daily_label_ped_all(total = n_total, new = n_new, total_ped = n_total_ped, new_ped = n_new_ped) %>%
     add_daily_axis_labels() %>%
     add_daily_title_caption_ped_all(date = date, missing = n_missing)
@@ -174,7 +175,7 @@ add_daily_curve_ped_all <- function(gg_obj) {
       show.legend = FALSE
     ) +
     ggplot2::geom_line(
-      ggplot2::aes(y = .data[["n_ped"]]),
+      ggplot2::aes(y = .data[["avg_ped"]]),
       color = "red",
       size = 1.25,
       show.legend = FALSE
@@ -203,17 +204,17 @@ add_daily_label_ped_all <- function(gg_obj, total, new, total_ped, new_ped) {
   min_date <- min(gg_obj[["data"]][[x]], na.rm = TRUE)
 
   label <- paste0(
-    "Total Cases = ", format(total, big.mark = ","),", Peds = ", format(total_ped, big.mark = ","), "\n",
-    " New Reported Cases = ", format(new, big.mark = ","), ", Peds = ",  format(new_ped, big.mark = ",")
+    "Total Peds Cases = ", format(total_ped, big.mark = ","), "\n",
+    "New Reported Peds Cases = ",  format(new_ped, big.mark = ",")
   )
 
   gg_obj +
     ggplot2::annotate(
       "label",
       x = min_date,
-      y = 800L,
+      y = 650L,
       label = label,
-      color = "midnightblue",
+      color = "red",
       fill = "#f0f0f0",
       hjust = 0,
       vjust = 1,
