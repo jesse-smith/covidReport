@@ -54,6 +54,7 @@ rpt_daily_pptx <- function(
     pcr,
     data = list_of(dplyr::select(.data[["data"]], {{ pcr_cols }}))
   )
+
   remove(pcr, inv)
   gc(verbose = FALSE)
 
@@ -364,7 +365,15 @@ rpt_daily_mail <- function(
     pcr,
     data = list_of(dplyr::select(.data[["data"]], {{ pcr_cols }}))
   )
-  remove(pcr, inv)
+
+  n_ped_total <- NROW(filter_peds(pos(inv)))
+  n_ped_active <- NROW(filter_active(filter_peds(pos(inv))))
+  n_ped_30 <- NROW(filter_active(filter_peds(pos(inv)), days = 30L))
+  inv_yest = process_inv(read_inv(date-1))
+
+  n_ped_new <- n_ped_total - NROW(filter_peds(pos(inv_yest)))
+
+  remove(pcr, inv, inv_yest)
   gc()
 
   # People totals
@@ -502,6 +511,10 @@ rpt_daily_mail <- function(
   str_ppl_vac <- format(n_ppl_vac, big.mark = ",")
   str_avg_vac <- format(n_avg_vac, big.mark = ",")
   str_avg_case <- format(n_avg_case, big.mark = ",")
+  str_ped_30 <- format(n_ped_30, big.mark = ",")
+  str_ped_active <- format(n_ped_active, big.mark = ",")
+  str_ped_new <- format(n_ped_new, big.mark = ",")
+  str_ped_total <- format(n_ped_total, big.mark = ",")
 
   body <- paste0(
     intro,
@@ -511,6 +524,11 @@ rpt_daily_mail <- function(
     "Total Cases: ", str_ppl_pos, "<br>",
     "New Cases: ", str_ppl_new, "<br>",
     "Total Deaths: ", str_deaths,
+    "<br><br>",
+    "Cumulative Pediatric Cases: ", str_ped_total,
+    "Pediatric Cases in the Last 30 Days: ", str_ped_30,
+    "Active Pediatric Cases: ", str_ped_active,
+    "New Pediatric Cases: ", str_ped_new,
     "<br><br>",
     "% Vaccinated of Goal: ", str_pct_vac_goal, "<br>",
     "% Vaccinated of Population: ", str_pct_vac, "<br>",
