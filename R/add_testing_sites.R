@@ -1,5 +1,8 @@
-
-
+#' Add testing sites to peds map
+#'
+#' @return A saved png object for peds
+#'
+#' @export
 add_ts_ped_map <- function()
 {
 
@@ -20,7 +23,11 @@ magick::image_write(try_map, path = paste0("//c19links/COVID-19/EPI DATA ANALYTI
 }
 
 
-
+#' Add testing sites to test map
+#'
+#' @return A saved png object for tests
+#'
+#' @export
 add_ts_test_map <- function()
 {
 
@@ -42,7 +49,11 @@ magick::image_write(try_map, path = paste0("//c19links/COVID-19/EPI DATA ANALYTI
 
 
 
-
+#' Add testing sites to active map
+#'
+#' @return A saved png object for active
+#'
+#' @export
 add_ts_active_map <- function()
 {
 
