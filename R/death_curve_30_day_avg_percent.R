@@ -194,7 +194,7 @@ add_daily_curve_death_30 <- function(gg_obj) {
   gg_obj +
     ggplot2::geom_line(
       ggplot2::aes(y = .data[["30_avg_death_percent"]]),
-      color = "purple",
+      color = "firebrick4",
       size = 1.25,
       show.legend = FALSE
     )
@@ -243,7 +243,7 @@ add_daily_label_death_30 <- function(gg_obj, deaths) {
       x = min_date,
       y = 1.75L,
       label = label,
-      color = "purple",
+      color = "firebrick4",
       fill = "#f0f0f0",
       hjust = 0,
       vjust = 1,
