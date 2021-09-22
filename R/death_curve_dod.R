@@ -176,13 +176,13 @@ add_daily_scale_death <- function(gg_obj) {
 add_daily_curve <- function(gg_obj) {
   gg_obj +
     ggplot2::geom_col(
-      fill = "midnightblue",
+      fill = "firebrick4",
       width = 1,
       show.legend = FALSE
     ) +
     ggplot2::geom_line(
       ggplot2::aes(y = .data[["avg"]]),
-      color = "darkorange",
+      color = "gray53",
       size = 1.25,
       show.legend = FALSE
     )
@@ -220,7 +220,7 @@ add_daily_label_death <- function(gg_obj, total, new) {
       x = min_date,
       y = 15L,
       label = label,
-      color = "midnightblue",
+      color = "firebrick4",
       fill = "#f0f0f0",
       hjust = 0,
       vjust = 1,
