@@ -1,4 +1,4 @@
-rpt_daily_pptx <- function(
+rpt_vac_pptx <- function(
   date = NULL,
   dir = coviData::path_create(
     "V:/EPI DATA ANALYTICS TEAM/COVID SANDBOX REDCAP DATA/Status Report",
