@@ -15,17 +15,17 @@ vac_date <- date
 
 #table by vaccinations
 
-vaccinations <- vac_table_recent_new()
+vaccinations <- vac_table_recent_new(date = vac_date)
 
-vaccinated_people <- vac_table_totals_new()
+vaccinated_people <- vac_table_totals_new(date = vac_date)
 
-vac_map <- vac_plot_goal()
+#vac_map <- vac_plot_goal(date = vac_date)
 
-vac_plot <- vac_plot_daily()
+vac_plot <- vac_plot_daily(date = vac_date)
 
-vac_age <- vac_plot_age()
+vac_age <- vac_plot_age(date = vac_date)
 
-vac_map_pct <- vac_map_pct()
+#vac_map_pct <- vac_map_pct(date = vac_date)
 
 
 #Start processing data for tables
