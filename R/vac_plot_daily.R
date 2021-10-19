@@ -19,7 +19,7 @@ vac_plot_daily <- function(
   min_date <- lubridate::as_date("2020-12-15")
 
   # Date for current (and previous) counts
-  date <- date_inv(date)
+  date <- date_vac(date)
 
 
   vac_date <- date
