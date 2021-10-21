@@ -21,7 +21,7 @@ test_plot_total <- function(
 
   gg_data %>%
     ggplot_test_total() %>%
-    coviData::set_covid_theme() %>%
+    set_ts_theme() %>%
     add_test_total_curve() %>%
     add_axis_labels(ylab = "PCR Tests") %>%
     add_scale_month() %>%

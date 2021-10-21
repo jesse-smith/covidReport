@@ -24,7 +24,7 @@ test_plot_positivity <- function(
   # Prep data
   gg_data %>%
     ggplot_test_positivity() %>%
-    coviData::set_covid_theme() %>%
+    set_ts_theme() %>%
     add_test_pos_curve() %>%
     add_axis_labels(ylab = "% Positive") %>%
     add_scale_month() %>%
