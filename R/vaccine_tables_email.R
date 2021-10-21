@@ -11,8 +11,8 @@
 #'
 #' @export
 vac_table_totals_email <- function(
-  data_all = coviData:::vac_prep_all(coviData::read_vac(date = date)),
-  data_12 = coviData:::vac_prep(coviData::read_vac(date = date)),
+  data_all = coviData:::vac_prep_all(coviData::read_vac(date)),
+  data_12 = coviData:::vac_prep(coviData::read_vac(date)),
   date = NULL
 ) {
 
@@ -101,7 +101,7 @@ vac_table_totals_email <- function(
 #'
 #' @export
 vac_table_recent_email <- function(
-  data = coviData:::vac_prep_all(coviData::read_vac(date = date)),
+  data = coviData:::vac_prep_all(coviData::read_vac(date)),
   date = NULL
 ) {
 
