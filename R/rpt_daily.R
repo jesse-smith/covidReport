@@ -318,7 +318,7 @@ rpt_daily_pptx <- function(
 rpt_daily_mail <- function(
   date = NULL,
   to = c(
-    "Jesse.Smith@shelbycountytn.gov",
+    "Liang.Li@shelbycountytn.gov",
     "Chaitra.Subramanya@shelbycountytn.gov",
     "Allison.Plaxco@shelbycountytn.gov"
   ),
@@ -460,9 +460,12 @@ rpt_daily_mail <- function(
   vac_data <- coviData::vac_prep(coviData::read_vac(date = vac_date))
   gc()
 
-  vac_recent <- gt::as_raw_html(vac_table_recent(vac_data, date = vac_date))
+  vac_recent <- gt::as_raw_html(vac_table_recent_email(data = coviData:::vac_prep_all(coviData::read_vac(date = vac_date)),
+                                                       date = vac_date))
   gc()
-  vac_ppl <- gt::as_raw_html(vac_table_totals(vac_data, date = vac_date))
+  vac_ppl <- gt::as_raw_html(vac_table_totals_email(data_all = coviData:::vac_prep_all(coviData::read_vac(date = vac_date)),
+                                                    data_12 = coviData:::vac_prep(coviData::read_vac(date = vac_date)),
+                                                    date = vac_date))
   gc()
 
   remove(vac_data)
@@ -476,8 +479,8 @@ rpt_daily_mail <- function(
     ) %>%
     dplyr::pull("N")
   n_pct_vac <- round(100*n_ppl_vac/937166, digits = 1)
-  n_ppl_vac <- n_ppl_vac[[3]]
-  n_pct_vac <- n_pct_vac[[3]]
+  n_ppl_vac <- n_ppl_vac[[4]]
+  n_pct_vac <- n_pct_vac[[4]]
   n_pct_vac_goal <- round(100*n_ppl_vac/700000, digits = 1)
   n_avg_vac <- vac_recent %>%
     as_tbl() %>%
