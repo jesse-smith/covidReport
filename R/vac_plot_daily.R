@@ -228,14 +228,14 @@ prep_daily_vac_data <- function(data, min_date, date, delay) {
       na.rm = TRUE,
       .align = "right",
       .names = "avg"
-    ) %>%
-    dplyr::mutate(
-      avg = vec_assign(
-        .data[["avg"]],
-        i = (NROW(.) - delay + 0L):NROW(.),
-        value = NA_real_
-      )
-    )
+    ) #%>%
+    # dplyr::mutate(
+    #   avg = vec_assign(
+    #     .data[["avg"]],
+    #     i = (NROW(.) - delay + 0L):NROW(.),
+    #     value = NA_real_
+    #   )
+    # )
 }
 
 #' Set Theme for Time Series Plots
