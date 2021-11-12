@@ -84,7 +84,22 @@ fully_age <- fully_age %>% dplyr::select(-full, -n_vac, -n_pop)
 atleast1_age$atleast1 <- atleast1_age$n_vac
 atleast1_age <- atleast1_age %>% dplyr::select(-full, -n_vac, -n_pop)
 
-age_table <- dplyr::full_join(atleast1_age, fully_age)%>%
+
+age_draft <- dplyr::full_join(atleast1_age, fully_age)
+age_draft2 <- subset(age_draft, age_grp != "0-4")
+
+count_atleast1 <- nrow(vac_people)
+
+count_fullyvac <- sum(vac_people$recip_fully_vacc == 1)
+
+#make a data frame just for the other/missing
+age_grp <- c("Other/Unknown")
+atleast1 <- count_atleast1 - sum(age_draft2$atleast1)
+fully_vac <- count_fullyvac - sum(age_draft2$fully_vac)
+
+o_u <- data.frame(age_grp, atleast1, fully_vac)
+
+age_table <- dplyr::full_join(age_draft2, o_u)%>%
   janitor::adorn_totals()%>%
   flextable::flextable() %>%
   flextable::set_header_labels(
@@ -93,9 +108,8 @@ age_table <- dplyr::full_join(atleast1_age, fully_age)%>%
     fully_vac = "Fully Vaccinated"
   ) %>%
   fmt_covid_table(total = TRUE) %>%
-  flextable::autofit()
-
-
+  flextable::autofit()%>%
+  flextable::fontsize(size = 16, part = "all")
 
 
 
