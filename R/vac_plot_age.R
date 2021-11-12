@@ -25,7 +25,7 @@ vac_plot_age <- function(
   .data = vac_prep(read_vac(date)),
   date = NULL,
   by_pop = TRUE,
-  incl_under_12 = FALSE
+  incl_under_12 = TRUE
 ) {
   by_pop <- coviData::assert_bool(by_pop)
   incl_under_12 <- coviData::assert_bool(incl_under_12)
@@ -35,7 +35,9 @@ vac_plot_age <- function(
   gg_data <- .data %>%
     vac_count_grp() %>%
     vac_join_age_pop(incl_under_12 = incl_under_12) %>%
-    vac_age_fct()
+    vac_age_fct()%>%
+    subset(!is.na(age_grp))%>%
+    subset(age_grp != "0-4")
 
   gg_data %>%
     vac_age_ggplot(by_pop = by_pop) %>%
@@ -263,9 +265,10 @@ vac_age_grp <- function(dbl) {
 
   vctrs::vec_assert(dbl, ptype = double())
 
-  breaks <- c(0, 12, 18, seq(25, 75, by = 10), 115)
+  breaks <- c(0, 5, 12, 18, seq(25, 75, by = 10), 115)
   lbls <- c(
-     "0-11",
+     "0-4",
+     "05-11",
     "12-17",
     "18-24",
     "25-34",
