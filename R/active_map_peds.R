@@ -11,7 +11,8 @@
 #'
 #' @export
 active_ped_map_rate <- function(
-  data = filter_active(filter_peds(pos(process_inv(read_inv(date = date))))),
+  data = filter_active(filter_peds(pos(process_inv(read_inv(date = date)))),
+                       date = date),
   days = 14L,
   date = NULL
 ) {
