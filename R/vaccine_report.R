@@ -41,7 +41,10 @@ vac_data2 <- subset(vac_data, shelby_resident != "No")
 vac_data2 <- subset(vac_data2, dose_count<= 2)
 
 vac_data2$recip_fully_vacc <- ifelse(vac_data2$dose_count == 2
-                                     & (vac_data2$cvx_code == 207 |vac_data2$cvx_code == 208), 1,0)
+                                     & (vac_data2$cvx_code == 207
+                                        |vac_data2$cvx_code == 208
+                                        |vac_data2$cvx_code == 217
+                                        |vac_data2$cvx_code == 218), 1,0)
 
 
 vac_data2$recip_fully_vacc <- ifelse(vac_data2$dose_count == 1
