@@ -213,7 +213,7 @@ add_daily_label <- function(gg_obj, total, new) {
     ggplot2::annotate(
       "label",
       x = min_date,
-      y = 1100L,
+      y = 1200L,
       label = label,
       color = "midnightblue",
       fill = "#f0f0f0",
