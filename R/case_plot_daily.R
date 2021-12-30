@@ -150,7 +150,7 @@ set_ts_theme <- function(gg_obj) {
 #' @noRd
 add_daily_scale <- function(gg_obj) {
 
-  breaks <- seq(0L, 2e3L, by = 1e2L)
+  breaks <- seq(0L, 3500, by = 2e2L)
 
   label_fn <- rlang::as_function(~ format(.x, big.mark = ","))
 
@@ -213,7 +213,7 @@ add_daily_label <- function(gg_obj, total, new) {
     ggplot2::annotate(
       "label",
       x = min_date,
-      y = 1200L,
+      y = 1600L,
       label = label,
       color = "midnightblue",
       fill = "#f0f0f0",
