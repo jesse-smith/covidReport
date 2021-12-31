@@ -83,7 +83,7 @@ case_plot_daily_ped_all <- function(
     set_ts_theme() %>%
     add_daily_scale() %>%
     add_daily_curve_ped_all() %>%
-    add_covid_events(lab_y = 2200L, color = "grey60", size = 4) %>%
+    add_covid_events(lab_y = 3500L, color = "grey60", size = 3) %>%
     add_daily_label(total = n_total, new = n_new)%>%
     add_daily_label_ped_all(total = n_total, new = n_new, total_ped = n_total_ped, new_ped = n_new_ped) %>%
     add_daily_axis_labels() %>%
@@ -212,7 +212,7 @@ add_daily_label_ped_all <- function(gg_obj, total, new, total_ped, new_ped) {
     ggplot2::annotate(
       "label",
       x = min_date,
-      y = 900L,
+      y = 1000L,
       label = label,
       color = "red",
       fill = "#f0f0f0",
