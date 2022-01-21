@@ -109,7 +109,7 @@ active_table_age2 <- function(
 ) {
   data %>%
     active_calc_age2(date = date) %>%
-    demog_table_(grp_lbl = "Age") %>%
+    covidReport:::demog_table_(grp_lbl = "Age") %>%
     flextable::autofit(add_h = 0.075)
 }
 
