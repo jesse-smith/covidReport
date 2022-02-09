@@ -28,7 +28,7 @@ test_plot_positivity <- function(
     add_test_pos_curve() %>%
     add_axis_labels(ylab = "% Positive") %>%
     add_scale_month() %>%
-    add_covid_events(lab_y = 0.25, color = "grey60") %>%
+    add_covid_events(lab_y = 0.45, color = "grey60") %>%
     add_test_pos_label() %>%
     add_test_pos_scale() %>%
     add_test_pos_title_caption(
