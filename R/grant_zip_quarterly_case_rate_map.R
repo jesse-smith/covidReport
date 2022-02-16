@@ -10,8 +10,8 @@
 #' @return A `ggplot` object
 #'
 #' @export
-grant_death_quarterly_rate <- function(
-  data = filter_deaths(pos(process_inv(read_inv(date = date)))),
+grant_case_quarterly_rate <- function(
+  data = pos(process_inv(read_inv(date = date))),
   date = NULL
 ) {
 
@@ -29,9 +29,9 @@ grant_death_quarterly_rate <- function(
     lubridate::add_with_rollback(months(-3))
   quarter_end_c <- lubridate::floor_date(date, unit = "quarter")-1
 
-  data$inv_death_dt <- lubridate::as_date(data$inv_death_dt)
+  data$specimen_coll_dt <- lubridate::as_date(data$specimen_coll_dt)
 
-  data$quarter_start <- lubridate::floor_date(data$inv_death_dt, unit = "quarter")
+  data$quarter_start <- lubridate::floor_date(data$specimen_coll_dt, unit = "quarter")
 
 
   counts <- data %>%
@@ -105,7 +105,7 @@ grant_death_quarterly_rate <- function(
   )
 
   pal_n <- 9L
-  pal <- RColorBrewer::brewer.pal(pal_n, "Reds")
+  pal <- RColorBrewer::brewer.pal(pal_n, "Oranges")
 
   bbox <- sf::st_bbox(gg_data[["geometry"]])
 
@@ -147,7 +147,7 @@ grant_death_quarterly_rate <- function(
       size = 1
     )+
     ggplot2::scale_fill_gradientn(
-      name = "Quarter Deaths per 100k",
+      name = "Quarter Cases per 100k",
       breaks = breaks,
       oob = scales::oob_squish,
       colors = pal,
@@ -179,7 +179,7 @@ grant_death_quarterly_rate <- function(
 
   set_covid_theme(zip_plt) %>%
     add_title_caption(
-      title = "Quarterly Death Rate by ZIP Code",
+      title = "Quarterly Case Rate by ZIP Code",
       subtitle = paste0(format(quarter_start_c, "%m/%d/%Y"), " - ",
                         format(quarter_end_c, "%m/%d/%Y")),
       caption = caption
@@ -195,10 +195,10 @@ grant_death_quarterly_rate <- function(
 
 
 
-# grant_death_quarterly <- grant_death_quarterly_rate()
-# path_grant_death_quarterly_rate <- coviData::path_create(
+# grant_case_quarterly <- grant_case_quarterly_rate()
+# path_grant_case_quarterly_rate <- coviData::path_create(
 #   "V:/EPI DATA ANALYTICS TEAM/COVID SANDBOX REDCAP DATA/",
-#   "jtf_figs/quarterly_death_rate/", paste0("quarterly_death_rate_", coviData::date_inv()),
+#   "jtf_figs/quarterly_death_rate/", paste0("quarterly_case_rate_", coviData::date_inv()),
 #   ext = "png"
 # )
-# coviData::save_plot(grant_death_quarterly, path = path_grant_death_quarterly_rate, ratio = c(12,9), size = 1.125)
+# coviData::save_plot(grant_case_quarterly, path = path_grant_case_quarterly_rate, ratio = c(12,9), size = 1.125)

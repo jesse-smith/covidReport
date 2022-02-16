@@ -1,19 +1,20 @@
-
-#' Plot Quarterly Death Rates by ZIP Code
+#' Plot Test Rates by ZIP Code for a Given Period
 #'
 #' @param data Prepped case data
 #'
 #' @param date The download date of the data; defaults to most recent
 #'
-#' @param days Number of active days to consider
+#' @param days Number of days to consider
+#'
+#' @param lag Reporting lag
 #'
 #' @return A `ggplot` object
 #'
 #' @export
-grant_death_quarterly_rate <- function(
-  data = filter_deaths(pos(process_inv(read_inv(date = date)))),
+quarterly_vac_map_rate <- function(
   date = NULL
 ) {
+
 
   if (!rlang::is_installed("RColorBrewer") || !rlang::is_installed("sf")) {
     rlang::abort(paste(
@@ -24,21 +25,35 @@ grant_death_quarterly_rate <- function(
 
   date <- date_inv(date)
 
+
+  #this is the processed data, not including the 3rd doses
+  vac_data <- coviData::vac_prep(coviData::read_vac(date))
+  #third doses
+  vac_third_dose <- coviData:::vac_prep_dose3(data = read_vac(date))
+  #merge the vaccination data
+  data <- dplyr::bind_rows(vac_data, vac_third_dose)
+
+
+
+
+
   #get the start date of the previous quater
   quarter_start_c <- lubridate::floor_date(date, unit = "quarter") %>%
     lubridate::add_with_rollback(months(-3))
   quarter_end_c <- lubridate::floor_date(date, unit = "quarter")-1
 
-  data$inv_death_dt <- lubridate::as_date(data$inv_death_dt)
-
-  data$quarter_start <- lubridate::floor_date(data$inv_death_dt, unit = "quarter")
 
 
-  counts <- data %>%
+  data$vacc_date <- lubridate::mdy(data$vacc_date)
+
+  data$quarter_start <- lubridate::floor_date(data$vacc_date, unit = "quarter")
+
+
+  counts <- data%>%
     subset(quarter_start == quarter_start_c) %>%
     dplyr::transmute(
       # `vac_parse_zip()` is defined in coviData
-      zip = vac_parse_zip(.data[["patient_zip"]]),
+      zip = vac_parse_zip(.data[["address_zip"]]),
       zip_mrg = dplyr::case_when(
         zip == "" ~ NA_character_,
         zip %in% c('38018','38028') ~ '38018+38028',
@@ -105,7 +120,7 @@ grant_death_quarterly_rate <- function(
   )
 
   pal_n <- 9L
-  pal <- RColorBrewer::brewer.pal(pal_n, "Reds")
+  pal <- RColorBrewer::brewer.pal(pal_n, "Purples")
 
   bbox <- sf::st_bbox(gg_data[["geometry"]])
 
@@ -143,11 +158,11 @@ grant_death_quarterly_rate <- function(
     ggplot2::geom_sf(
       data = specialzip,
       fill = NA,
-      color = "springgreen2",
+      color = "darkorange",
       size = 1
     )+
     ggplot2::scale_fill_gradientn(
-      name = "Quarter Deaths per 100k",
+      name = "Quarter Doses per 100k",
       breaks = breaks,
       oob = scales::oob_squish,
       colors = pal,
@@ -179,13 +194,12 @@ grant_death_quarterly_rate <- function(
 
   set_covid_theme(zip_plt) %>%
     add_title_caption(
-      title = "Quarterly Death Rate by ZIP Code",
-      subtitle = paste0(format(quarter_start_c, "%m/%d/%Y"), " - ",
+      title = "Quarterly Vaccination Rate by ZIP Code",
+      subtitle = paste0("Including 1st, 2nd, and 3rd Doses", '\n',format(quarter_start_c, "%m/%d/%Y"), " - ",
                         format(quarter_end_c, "%m/%d/%Y")),
       caption = caption
     ) %>%
     {. + theme_mods}
-
 
 }
 
@@ -194,11 +208,13 @@ grant_death_quarterly_rate <- function(
 
 
 
-
-# grant_death_quarterly <- grant_death_quarterly_rate()
-# path_grant_death_quarterly_rate <- coviData::path_create(
+#
+# quarterly_vac_map <- quarterly_vac_map_rate()
+# path_grant_vac_quarterly_rate <- coviData::path_create(
 #   "V:/EPI DATA ANALYTICS TEAM/COVID SANDBOX REDCAP DATA/",
-#   "jtf_figs/quarterly_death_rate/", paste0("quarterly_death_rate_", coviData::date_inv()),
+#   "jtf_figs/quarterly_death_rate/", paste0("quarterly_vac_rate_", coviData::date_inv()),
 #   ext = "png"
 # )
-# coviData::save_plot(grant_death_quarterly, path = path_grant_death_quarterly_rate, ratio = c(12,9), size = 1.125)
+# coviData::save_plot(quarterly_vac_map, path = path_grant_vac_quarterly_rate, ratio = c(12,9), size = 1.125)
+#
+#
