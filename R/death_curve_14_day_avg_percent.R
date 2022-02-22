@@ -12,7 +12,7 @@
 #' @return A `ggplot` object
 #'
 #' @export
-death_plot_daily_30 <- function(
+death_plot_daily_14 <- function(
   data = pos(process_inv(read_inv(date = date))),
   date = NULL,
   delay = 34
