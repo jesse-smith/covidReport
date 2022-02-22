@@ -150,7 +150,7 @@ set_ts_theme <- function(gg_obj) {
 #' @noRd
 add_daily_scale <- function(gg_obj) {
 
-  breaks <- seq(0L, 3500, by = 2e2L)
+  breaks <- seq(0L, 4000, by = 250)
 
   label_fn <- rlang::as_function(~ format(.x, big.mark = ","))
 

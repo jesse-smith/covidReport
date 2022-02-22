@@ -72,7 +72,7 @@ case_plot_daily_ped_only <- function(
     set_ts_theme() %>%
     add_daily_scale() %>%
     add_daily_curve_ped() %>%
-    add_covid_events(lab_y = 500L, color = "grey60", size = 3) %>%
+    add_covid_events(lab_y = 800L, color = "grey60", size = 3) %>%
     add_daily_label_ped(total = n_total_ped, new = n_new_ped) %>%
     add_daily_axis_labels() %>%
     add_daily_title_caption_ped(date = date, missing = n_missing)
