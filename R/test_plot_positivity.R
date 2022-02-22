@@ -241,6 +241,7 @@ add_test_pos_title_caption <- function(gg_obj, n_obs, n_missing, date) {
     caption = paste0(
       "Note: Chart excludes tests with missing collection date ",
       "(N = ", missing, "; Total = ", obs, ")\n",
+      "Data reported is lagged by 5 days\n",
       "Data Source: National Electronic Disease Surveillance System (NEDSS)"
     )
   )

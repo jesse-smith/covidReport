@@ -15,7 +15,7 @@
 death_plot_daily_30 <- function(
   data = pos(process_inv(read_inv(date = date))),
   date = NULL,
-  delay = 20
+  delay = 34
 ) {
 
   min_date <- lubridate::as_date("2020-03-08")
@@ -325,7 +325,7 @@ add_daily_title_caption_death_percent <- function(gg_obj, date, missing) {
 
   caption <- paste0(
     "Excludes cases and deaths with missing specimen collection dates ","\n",
-    "Specimen collection dates in the past 20 days are excluded","\n",
+    "Specimen collection dates in the past 34 days are excluded","\n",
     "Data Source: National Electronic Disease Surveillance System (NEDSS)"
   )
 

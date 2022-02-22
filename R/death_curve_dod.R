@@ -262,6 +262,7 @@ add_daily_title_caption_death <- function(gg_obj, date, missing) {
   caption <- paste0(
     "Excludes cases with missing death dates ",
     "(N = ", format(missing, big.mark = ","), ")\n",
+    "Data reported is lagged by 14 days\n",
     "Data Source: National Electronic Disease Surveillance System (NEDSS)"
   )
 
