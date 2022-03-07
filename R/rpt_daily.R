@@ -319,7 +319,6 @@ rpt_daily_mail <- function(
   date = NULL,
   to = c(
     "Liang.Li@shelbycountytn.gov",
-    "Chaitra.Subramanya@shelbycountytn.gov",
     "Allison.Plaxco@shelbycountytn.gov"
   ),
   dir_pptx = coviData::path_create(
@@ -460,12 +459,9 @@ rpt_daily_mail <- function(
   vac_data <- coviData::vac_prep(coviData::read_vac(date = vac_date))
   gc()
 
-  vac_recent <- gt::as_raw_html(vac_table_recent_email(data = coviData:::vac_prep_all(coviData::read_vac(date = vac_date)),
-                                                       date = vac_date))
+  vac_recent <- gt::as_raw_html(vac_table_recent_email())
   gc()
-  vac_ppl <- gt::as_raw_html(vac_table_totals_email(data_all = coviData:::vac_prep_all(coviData::read_vac(date = vac_date)),
-                                                    data_12 = coviData:::vac_prep(coviData::read_vac(date = vac_date)),
-                                                    date = vac_date))
+  vac_ppl <- gt::as_raw_html(vac_table_totals_email())
   gc()
 
   remove(vac_data)
