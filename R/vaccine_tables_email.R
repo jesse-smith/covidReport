@@ -11,8 +11,8 @@
 #'
 #' @export
 vac_table_totals_email <- function(
-  data_all = coviData:::vac_prep_all(coviData::read_vac(date)),
-  data_12 = coviData:::vac_prep(coviData::read_vac(date)),
+  vacs = coviData:::vac_prep(coviData::read_vac(date)),
+  people = coviData:::vac_prep(coviData::read_vac(date), distinct = TRUE),
   date = NULL
 ) {
 
@@ -20,53 +20,29 @@ vac_table_totals_email <- function(
 
   today <- date_vac(date)
 
-
+library("dplyr")
 
   title <- paste0(
     "People Vaccinated (", format(today, "%m/%d/%y"), ")"
   )
-  dose_12 <- vac_count(data_12) %>%
+  count_people <- people %>%
     dplyr::mutate(
-      status = dplyr::if_else(
-        .data[["recip_fully_vacc"]] %in% TRUE,
-        "Completed",
-        "Initiated"
+      status = dplyr::case_when(
+        is.na(.data[["recip_fully_vacc"]]) ~ "Initiated",
+        .data[["recip_fully_vacc"]] == FALSE ~ "Initiated",
+        .data[["recip_fully_vacc"]] == TRUE & is.na(.data[["boost_date"]]) ~ "Completed",
+        .data[["recip_fully_vacc"]] == TRUE & !is.na(.data[["boost_date"]]) ~ "Additional Dose"
       ),
       .before = 1L
     )  %>%
     dplyr::group_by(.data[["status"]]) %>%
-    dplyr::summarize(n = sum(.data[["n"]], na.rm = TRUE)) %>%
+    dplyr::summarize(n = n()) %>%
     dplyr::arrange(dplyr::desc(.data[["status"]])) %>%
     dplyr::mutate(pct_pop = .data[["n"]] / {{ pop }})
 
-  add_doses <- vac_count(data_all, filter_2nd_dose = FALSE) %>%
-    dplyr::mutate(
-      status = dplyr::if_else(
-        .data[["dose_count"]] %in% 3,
-        "Additional Dose",
-        "Drop"
-      ),
-      .before = 1L
-    )  %>%
-    dplyr::group_by(.data[["status"]]) %>%
-    dplyr::summarize(n = sum(.data[["n"]], na.rm = TRUE)) %>%
-    dplyr::arrange(dplyr::desc(.data[["status"]])) %>%
-    dplyr::mutate(pct_pop = .data[["n"]] / {{ pop }}) %>%
-    subset(status != "Drop")
+  count_people$pct_pop <- round(count_people$pct_pop*100, 1)
 
-  additional_doses <- sum(add_doses$n)
-  additional_doses_pct <- sum(add_doses$pct_pop)
-
-  joined_doses <- dplyr::full_join(dose_12, add_doses)
-
-  joined_doses$n <- ifelse(joined_doses$status == "Completed", joined_doses$n-additional_doses, joined_doses$n)
-
-  joined_doses$pct_pop <- ifelse(joined_doses$status == "Completed", joined_doses$pct_pop-additional_doses_pct, joined_doses$pct_pop)
-
-
-  joined_doses$pct_pop <- round(joined_doses$pct_pop*100, 1)
-
-  joined_doses%>%
+  count_people%>%
     janitor::adorn_totals()%>%
       gt::gt() %>%
       gt::cols_label(
@@ -101,7 +77,7 @@ vac_table_totals_email <- function(
 #'
 #' @export
 vac_table_recent_email <- function(
-  data = coviData:::vac_prep_all(coviData::read_vac(date)),
+  data = coviData:::vac_prep(coviData::read_vac(date)),
   date = NULL
 ) {
 
