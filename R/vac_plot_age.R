@@ -37,7 +37,11 @@ vac_plot_age <- function(
     vac_join_age_pop(incl_under_12 = incl_under_12) %>%
     vac_age_fct()%>%
     subset(!is.na(age_grp))%>%
-    subset(age_grp != "0-4")
+    subset(age_grp != "0-4")%>%
+    dplyr::arrange(age_grp, desc(status))%>%
+    mutate(pct_pop = (n_vac/n_pop))%>%
+    group_by(age_grp) %>%
+    mutate(label_y = cumsum(pct_pop))
 
   gg_data %>%
     vac_age_ggplot(by_pop = by_pop) %>%
@@ -45,8 +49,8 @@ vac_plot_age <- function(
     vac_age_axis_limits(by_pop = by_pop) %>%
     add_vac_age_axis_labels(by_pop = by_pop) %>%
     add_vac_age_col(by_pop = by_pop) %>%
-    add_vac_age_col_labels() %>%
-    add_vac_age_scale(by_pop = by_pop) %>%
+   # add_vac_age_col_labels() %>%
+    #add_vac_age_scale(by_pop = by_pop) %>%
     remove_x_grid() %>%
     add_vac_age_title_caption(by_pop = by_pop, date = date)
 }
@@ -58,8 +62,8 @@ vac_age_ggplot <- function(data, by_pop) {
     ggplot2::aes(
       x = .data[["age_grp"]],
       y = !!vac_age_choose_y(by_pop = by_pop),
-      color = .data[["full"]],
-      fill = .data[["full"]]
+      color = .data[["status"]],
+      fill = .data[["status"]]
     )
   )
 }
@@ -93,7 +97,14 @@ add_vac_age_col <- function(gg_obj, by_pop) {
 
   width <- if (by_pop) 0.95 else 0.99
 
-  gg_obj + ggplot2::geom_col(position = "identity", width = width)
+  gg_obj + ggplot2::geom_col()+
+    ggplot2::scale_fill_manual(values=c("dodgerblue","deepskyblue4", "midnightblue"))+
+    ggplot2::scale_color_manual(values=c("dodgerblue","deepskyblue4", "midnightblue"))+
+    ggplot2::guides(fill = ggplot2::guide_legend(reverse=TRUE))+
+    ggplot2::guides(color = ggplot2::guide_legend(reverse=TRUE))+
+    ggplot2::labs(fill = "Status")+
+    ggplot2::labs(color = "Status")+
+    ggplot2::geom_text(ggplot2::aes(y = label_y, label = paste0(round(label_y*100, digits = 2), "%")), vjust = -0.15, color = "black")
 }
 
 add_vac_age_scale <- function(gg_obj, by_pop) {
@@ -154,16 +165,16 @@ add_vac_age_col_labels <- function(gg_obj) {
     ggplot2::aes(
       label = vac_age_label_fn(n = .data[["n_vac"]], pct = !!y),
       color = dplyr::if_else(
-        .data[["full"]],
+        .data[["status"]],
         " ",
-        as.character(.data[["full"]])
+        as.character(.data[["status"]])
       ),
-      fill  = dplyr::if_else(
-        .data[["full"]],
-        as.character(.data[["full"]]),
+      status  = dplyr::if_else(
+        .data[["status"]],
+        as.character(.data[["status"]]),
         " "
       ),
-      vjust = purrr::when(.data[["full"]], . ~ . + 0.1, ~ .)
+      vjust = purrr::when(.data[["status"]], . ~ . + 0.1, ~ .)
     ),
     size = 4.5,
     label.size = 0,
@@ -241,16 +252,19 @@ add_vac_age_title_caption <- function(gg_obj, by_pop, date) {
 vac_count_grp <- function(.data) {
   .data %>%
     coviData::vac_distinct() %>%
-    dplyr::transmute(
-      full = .data[["recip_fully_vacc"]] %in% TRUE,
+    dplyr::transmute(status = dplyr::case_when(
+      is.na(.data[["recip_fully_vacc"]]) ~ "Initiated",
+      .data[["recip_fully_vacc"]] == FALSE ~ "Initiated",
+      .data[["recip_fully_vacc"]] == TRUE & is.na(.data[["boost_date"]]) ~ "Completed",
+      .data[["recip_fully_vacc"]] == TRUE & !is.na(.data[["boost_date"]]) ~ "Additional Dose"
+    ),
       age_grp = .data[["age_at_admin"]] %>% std_age() %>% vac_age_grp()
     ) %>%
-    dplyr::count(.data[["full"]], .data[["age_grp"]]) %>%
-    tidyr::pivot_wider(names_from = "full", values_from = "n") %>%
-    dplyr::mutate(`FALSE` = .data[["FALSE"]] + .data[["TRUE"]]) %>%
+    dplyr::count(.data[["status"]],  .data[["age_grp"]]) %>%
+    tidyr::pivot_wider(names_from = "status", values_from = "n") %>%
     tidyr::pivot_longer(
-      c("FALSE", "TRUE"),
-      names_to = "full",
+      c("Additional Dose", "Completed", "Initiated"),
+      names_to = "status",
       values_to = "n",
       names_transform = list(full = as.logical)
     )
