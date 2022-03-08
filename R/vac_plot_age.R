@@ -98,8 +98,8 @@ add_vac_age_col <- function(gg_obj, by_pop) {
   width <- if (by_pop) 0.95 else 0.99
 
   gg_obj + ggplot2::geom_col()+
-    ggplot2::scale_fill_manual(values=c("dodgerblue","deepskyblue4", "midnightblue"))+
-    ggplot2::scale_color_manual(values=c("dodgerblue","deepskyblue4", "midnightblue"))+
+    ggplot2::scale_fill_manual(values=c("lightskyblue","steelblue3", "midnightblue"))+
+    ggplot2::scale_color_manual(values=c("lightskyblue","steelblue3", "midnightblue"))+
     ggplot2::guides(fill = ggplot2::guide_legend(reverse=TRUE))+
     ggplot2::guides(color = ggplot2::guide_legend(reverse=TRUE))+
     ggplot2::labs(fill = "Status")+
