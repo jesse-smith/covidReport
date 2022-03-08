@@ -104,7 +104,8 @@ add_vac_age_col <- function(gg_obj, by_pop) {
     ggplot2::guides(color = ggplot2::guide_legend(reverse=TRUE))+
     ggplot2::labs(fill = "Status")+
     ggplot2::labs(color = "Status")+
-    ggplot2::geom_text(ggplot2::aes(y = label_y, label = paste0(round(label_y*100, digits = 2), "%")), vjust = -0.15, color = "black")
+    ggplot2::geom_text(ggplot2::aes(y = label_y, label = paste0(round(label_y*100, digits = 2), "%")), vjust = -0.15, color = "black")+
+    ggplot2::scale_y_continuous(labels = scales::percent)
 }
 
 add_vac_age_scale <- function(gg_obj, by_pop) {
