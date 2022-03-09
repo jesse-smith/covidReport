@@ -6,6 +6,100 @@ rpt_vac_pptx <- function(
   )
 ) {
 
+  data = vac_prep(read_vac(date))
+  people = coviData:::vac_prep(coviData::read_vac(date), distinct = TRUE)
+
+  people <- people %>%
+    dplyr::mutate(
+      dose_status = dplyr::case_when(
+        is.na(.data[["recip_fully_vacc"]]) ~ "Initiated",
+        .data[["recip_fully_vacc"]] == FALSE ~ "Initiated",
+        .data[["recip_fully_vacc"]] == TRUE & is.na(.data[["boost_date"]]) ~ "Completed",
+        .data[["recip_fully_vacc"]] == TRUE & !is.na(.data[["boost_date"]]) ~ "Additional Dose"
+      ))
+
+  population <- covidReport::pop_2019
+
+  people$pat_gender <- dplyr::case_when(
+    is.na(people$pat_gender) ~ "Unknown",
+    people$pat_gender == "U" ~ "Unknown",
+    people$pat_gender == "O" ~ "Other",
+    people$pat_gender == "M" ~ "Male",
+    people$pat_gender == "F" ~ "Female"
+  )
+
+  people$race <- dplyr::case_when(
+    people$race == "BLACK OR AFRICAN AMERICAN"  ~ "Black/African American",
+    people$race == "WHITE" ~ "White",
+    people$race == "ASIAN" ~ "Asian/Pacific Islander",
+    TRUE ~ "Other/Unknown"
+  )
+
+  people$ethnicity <- dplyr::case_when(
+    people$ethnicity == "Hispanic Or Latino"  ~ "Hispanic/Latino",
+    people$ethnicity == "Not Hispanic Or Latino" ~ "Not Hispanic/Latino",
+    TRUE ~ "Other/Unknown"
+  )
+
+  sex <- population %>%
+    dplyr::group_by(sex)%>%
+    dplyr::summarise(n = sum(population))%>%
+    dplyr::rename(pat_gender = sex, pop = n)
+
+
+  race <- population %>%
+    dplyr::group_by(race)%>%
+    dplyr::summarise(n = sum(population))%>%
+    dplyr::rename(pop = n)
+
+  ethnicity <- population %>%
+    dplyr::group_by(ethnicity)%>%
+    dplyr::summarise(n = sum(population))%>%
+    dplyr::rename(pop = n)
+
+  library("dplyr")
+
+  gg_sex <- people %>%
+    dplyr::group_by(dose_status, pat_gender)%>%
+    dplyr::summarise(n = n())%>%
+    dplyr::left_join(sex)%>%
+    dplyr::mutate(pct_pop = n/pop)%>%
+    subset(!is.na(pct_pop))
+
+  gg_race <- people %>%
+    dplyr::group_by(dose_status, race)%>%
+    dplyr::summarise(n = n())%>%
+    dplyr::left_join(race)%>%
+    dplyr::mutate(pct_pop = n/pop)%>%
+    subset(!is.na(pct_pop))
+
+  gg_ethnicity <- people %>%
+    dplyr::group_by(dose_status, ethnicity)%>%
+    dplyr::summarise(n = n())%>%
+    dplyr::left_join(ethnicity)%>%
+    dplyr::mutate(pct_pop = n/pop)%>%
+    subset(!is.na(pct_pop))%>%
+    dplyr::arrange(ethnicity, desc(dose_status))%>%
+    dplyr::group_by(ethnicity) %>%
+    dplyr::mutate(label_y = cumsum(pct_pop))
+
+
+  gg_ethnicity%>%
+    ggplot2::ggplot(ggplot2::aes(fill=dose_status, y=pct_pop, x=ethnicity)) +
+    ggplot2::geom_bar(stack="dodge", stat="identity") +
+    ggplot2::scale_fill_manual(values=c("lightskyblue","steelblue3", "midnightblue"))+
+    ggplot2::scale_color_manual(values=c("lightskyblue","steelblue3", "midnightblue"))+
+    ggplot2::guides(fill = ggplot2::guide_legend(reverse=TRUE))+
+    ggplot2::guides(color = ggplot2::guide_legend(reverse=TRUE))+
+    ggplot2::labs(fill = "Status")+
+    ggplot2::labs(color = "Status")+
+    ggplot2::geom_text(ggplot2::aes(y = label_y, label = paste0(round(label_y*100, digits = 2), "%")), vjust = -0.15, color = "black")+
+    ggplot2::scale_y_continuous(labels = scales::percent)+
+    ggthemes::theme_fivethirtyeight(base_size = 14L)
+
+
+
+
 
 # Vaccination tables
   date <- date_vac(date)
@@ -787,8 +881,7 @@ add_vac_title_caption <- function(gg_obj, by_pop, date, demog) {
 #'
 #' @export
 vac_table_totals_new <- function(
-  data_all = coviData:::vac_prep_all(coviData::read_vac(date = date)),
-  data_12 = coviData:::vac_prep(coviData::read_vac(date = date)),
+  people = coviData:::vac_prep(coviData::read_vac(date), distinct = TRUE),
   date = NULL
 ) {
 
@@ -796,53 +889,29 @@ vac_table_totals_new <- function(
 
   today <- date_vac(date)
 
-
+  library("dplyr")
 
   title <- paste0(
     "People Vaccinated (", format(today, "%m/%d/%y"), ")"
   )
-  dose_12 <- vac_count(data_12) %>%
+  count_people <- people %>%
     dplyr::mutate(
-      status = dplyr::if_else(
-        .data[["recip_fully_vacc"]] %in% TRUE,
-        "Completed",
-        "Initiated"
+      status = dplyr::case_when(
+        is.na(.data[["recip_fully_vacc"]]) ~ "Initiated",
+        .data[["recip_fully_vacc"]] == FALSE ~ "Initiated",
+        .data[["recip_fully_vacc"]] == TRUE & is.na(.data[["boost_date"]]) ~ "Completed",
+        .data[["recip_fully_vacc"]] == TRUE & !is.na(.data[["boost_date"]]) ~ "Additional Dose"
       ),
       .before = 1L
     )  %>%
     dplyr::group_by(.data[["status"]]) %>%
-    dplyr::summarize(n = sum(.data[["n"]], na.rm = TRUE)) %>%
+    dplyr::summarize(n = n()) %>%
     dplyr::arrange(dplyr::desc(.data[["status"]])) %>%
     dplyr::mutate(pct_pop = .data[["n"]] / {{ pop }})
 
-  add_doses <- vac_count(data_all, filter_2nd_dose = FALSE) %>%
-    dplyr::mutate(
-      status = dplyr::if_else(
-        .data[["dose_count"]] %in% 3,
-        "Additional Dose",
-        "Drop"
-      ),
-      .before = 1L
-    )  %>%
-    dplyr::group_by(.data[["status"]]) %>%
-    dplyr::summarize(n = sum(.data[["n"]], na.rm = TRUE)) %>%
-    dplyr::arrange(dplyr::desc(.data[["status"]])) %>%
-    dplyr::mutate(pct_pop = .data[["n"]] / {{ pop }}) %>%
-    subset(status != "Drop")
+  count_people$pct_pop <- round(count_people$pct_pop*100, 1)
 
-  additional_doses <- sum(add_doses$n)
-  additional_doses_pct <- sum(add_doses$pct_pop)
-
-  joined_doses <- dplyr::full_join(dose_12, add_doses)
-
-  joined_doses$n <- ifelse(joined_doses$status == "Completed", joined_doses$n-additional_doses, joined_doses$n)
-
-  joined_doses$pct_pop <- ifelse(joined_doses$status == "Completed", joined_doses$pct_pop-additional_doses_pct, joined_doses$pct_pop)
-
-
-  joined_doses$pct_pop <- round(joined_doses$pct_pop*100, 1)
-
-  joined_doses%>%
+  count_people%>%
     janitor::adorn_totals()%>%
 
     flextable::flextable() %>%
