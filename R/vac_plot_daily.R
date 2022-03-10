@@ -116,7 +116,7 @@ vac_plot_daily <- function(
   n_plotted <- sum(gg_data[["n"]], na.rm = TRUE)
   n_missing <- n_total_vac - n_plotted
 
-  n_vac_yest <- nrow(coviData:::vac_prep(coviData::read_vac(date = vac_date - 1)))
+  n_vac_yest <- nrow(coviData:::vac_prep(date = vac_date - 1))
   n_new <- n_total_vac - n_vac_yest
 
   #get number of doses reported in last 7 days
