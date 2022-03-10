@@ -24,28 +24,8 @@ vac_plot_daily <- function(
 
   vac_date <- date
 
-  #this is the processed data, not including the 3rd doses
+
   vac_data <- coviData::vac_prep(coviData::read_vac(date = vac_date))
-
-  #this is the unprocessed dataset
-  vac2 <-coviData::read_vac(date = vac_date)
-  #format vac date
-  vac2$vacc_date <- lubridate::mdy(vac2$vacc_date)
-
-  #standardize zip code
-  vac2$address_zip2 <- vac_parse_zip(vac2$address_zip)
-
-  #restrict to not include "Other" zip
-  vac2_no <- subset(vac2, is.na(vac2$address_zip2) | vac2$address_zip2 != "Other")
-
-
-  #restrict to doses on or after 8/13/21
-  vac_813 <- subset(vac2_no, vac2_no$vacc_date >= lubridate::ymd("2021-08-13"))
-  #restrict to Moderna (207) and Pfizer (208) only
-  vac_813_2 <- subset(vac_813, vac_813$cvx_code %in% c("207", "208"))
-  #restrict to dose = 3
-  vac_third_dose <- subset(vac_813_2, vac_813_2$dose_count %in% "3")
-
 
 
 
@@ -74,15 +54,6 @@ vac_plot_daily <- function(
     divide_by(1) %>%
     round()
 
-  # n_7day_vac <- vac_recent %>%
-  #   as_tbl() %>%
-  #   dplyr::mutate(
-  #     dplyr::across(.fns = ~ as.integer(stringr::str_remove_all(.x, "[^0-9]")))
-  #   ) %>%
-  #   dplyr::pull(2L) %>%
-  #   divide_by(1) %>%
-  #   round()
-
 
 
   delay = 0L
@@ -94,6 +65,7 @@ vac_plot_daily <- function(
 
   dose1 <- subset(vac_data, dose_count == 1)
   dose2 <- subset(vac_data, dose_count == 2)
+  dose3 <- subset(vac_data, dose_count == 3)
 
   gg_data_dose1 <- prep_daily_vac_data(
     data = dose1,
@@ -111,13 +83,10 @@ vac_plot_daily <- function(
   )
   gg_data_dose2$Dose <- "2"
 
-  #the vac date needs to be a character var for the data processing to use it
-  vac_third_dose$vacc_date <- as.character(vac_third_dose$vacc_date)
 
-  vac_third_dose$id <- paste0(vac_third_dose$asiis_pat_id_ptr, vac_third_dose$vacc_date)
 
   gg_data_dose3 <- prep_daily_vac_data(
-    data = vac_third_dose,
+    data = dose3,
     min_date = min_date,
     date = date,
     delay = delay
@@ -142,12 +111,12 @@ vac_plot_daily <- function(
 
   gg_data2 <- dplyr::full_join(gg_data, avg)
 
-  n_dose3 <- nrow(vac_third_dose)
+  n_dose3 <- nrow(dose3)
   n_total_vac <- n_dose3 + n_vac_dose1_2
   n_plotted <- sum(gg_data[["n"]], na.rm = TRUE)
   n_missing <- n_total_vac - n_plotted
 
-  n_vac_yest <- nrow(coviData:::vac_prep_all(coviData::read_vac(date = vac_date - 1)))
+  n_vac_yest <- nrow(coviData:::vac_prep(coviData::read_vac(date = vac_date - 1)))
   n_new <- n_total_vac - n_vac_yest
 
   #get number of doses reported in last 7 days
