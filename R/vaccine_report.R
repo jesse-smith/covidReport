@@ -6,6 +6,11 @@ rpt_vac_pptx <- function(
   )
 ) {
 
+
+  date <- date_vac(date)
+  vac_date <- date
+
+
   data = vac_prep(read_vac(date))
   people = coviData:::vac_prep(coviData::read_vac(date), distinct = TRUE)
 
@@ -57,6 +62,14 @@ rpt_vac_pptx <- function(
     dplyr::summarise(n = sum(population))%>%
     dplyr::rename(pop = n)
 
+  population$age_group <- as.double(population$age) %>%
+    vac_age_grp()
+
+  age_group <- population %>%
+    dplyr::group_by(age_group)%>%
+    dplyr::summarise(n = sum(population))%>%
+    dplyr::rename(pop = n)
+
   library("dplyr")
 
   gg_sex <- people %>%
@@ -64,14 +77,20 @@ rpt_vac_pptx <- function(
     dplyr::summarise(n = n())%>%
     dplyr::left_join(sex)%>%
     dplyr::mutate(pct_pop = n/pop)%>%
-    subset(!is.na(pct_pop))
+    subset(!is.na(pct_pop))%>%
+    dplyr::arrange(pat_gender, desc(dose_status))%>%
+    dplyr::group_by(pat_gender) %>%
+    dplyr::mutate(label_y = cumsum(pct_pop))
 
   gg_race <- people %>%
     dplyr::group_by(dose_status, race)%>%
     dplyr::summarise(n = n())%>%
     dplyr::left_join(race)%>%
     dplyr::mutate(pct_pop = n/pop)%>%
-    subset(!is.na(pct_pop))
+    subset(!is.na(pct_pop))%>%
+    dplyr::arrange(race, desc(dose_status))%>%
+    dplyr::group_by(race) %>%
+    dplyr::mutate(label_y = cumsum(pct_pop))
 
   gg_ethnicity <- people %>%
     dplyr::group_by(dose_status, ethnicity)%>%
@@ -82,20 +101,229 @@ rpt_vac_pptx <- function(
     dplyr::arrange(ethnicity, desc(dose_status))%>%
     dplyr::group_by(ethnicity) %>%
     dplyr::mutate(label_y = cumsum(pct_pop))
+  library("ggplot2")
+
+  people$age_group <- as.double(people$age_at_admin) %>%
+    vac_age_grp()
+
+  gg_age <- people %>%
+    dplyr::group_by(dose_status, age_group)%>%
+    dplyr::summarise(n = n())%>%
+    dplyr::left_join(age_group)%>%
+    dplyr::mutate(pct_pop = n/pop)%>%
+    subset(!is.na(pct_pop))%>%
+    dplyr::arrange(age_group, desc(dose_status))%>%
+    dplyr::group_by(age_group) %>%
+    dplyr::mutate(label_y = cumsum(pct_pop))
 
 
-  gg_ethnicity%>%
-    ggplot2::ggplot(ggplot2::aes(fill=dose_status, y=pct_pop, x=ethnicity)) +
+  library("ggplot2")
+
+
+
+  #start age table
+  people$age_group <- ifelse(is.na(people$age_group) | people$age_group == "0-4", "Other/Unknown", people$age_group)
+
+  additional_dose <- people %>%
+    dplyr::group_by(dose_status, age_group)%>%
+    dplyr::summarise(n = n()) %>%
+    subset(dose_status == "Additional Dose") %>%
+    dplyr::rename("Additional Dose" = n)
+
+  completed <- people %>%
+    dplyr::group_by(dose_status, age_group)%>%
+    dplyr::summarise(n = n()) %>%
+    subset(dose_status == "Completed") %>%
+    dplyr::rename("Completed" = n)
+
+  initiated <- people %>%
+    dplyr::group_by(dose_status, age_group)%>%
+    dplyr::summarise(n = n()) %>%
+    subset(dose_status == "Initiated") %>%
+    dplyr::rename("Initiated" = n)
+
+  age_table <- left_join(initiated, completed, by = "age_group")%>%
+    left_join(additional_dose, by = "age_group") %>%
+    dplyr::select(age_group, "Initiated", "Completed", "Additional Dose")%>%
+    janitor::adorn_totals()%>%
+    flextable::flextable() %>%
+    flextable::set_header_labels(
+      age_group = "Age Group"
+    ) %>%
+    fmt_covid_table(total = TRUE) %>%
+    flextable::autofit()
+
+  vac_age <- vac_plot_age(date = date)
+
+  #Start sex plot and table
+
+  sex_plot <- gg_sex%>%
+    ggplot2::ggplot(ggplot2::aes(fill=dose_status, y=pct_pop, x=pat_gender)) +
     ggplot2::geom_bar(stack="dodge", stat="identity") +
-    ggplot2::scale_fill_manual(values=c("lightskyblue","steelblue3", "midnightblue"))+
-    ggplot2::scale_color_manual(values=c("lightskyblue","steelblue3", "midnightblue"))+
+    ggplot2::scale_fill_manual(values=c("deepskyblue4","steelblue3", "midnightblue"))+
+    ggplot2::scale_color_manual(values=c("deepskyblue4","steelblue3", "midnightblue"))+
     ggplot2::guides(fill = ggplot2::guide_legend(reverse=TRUE))+
     ggplot2::guides(color = ggplot2::guide_legend(reverse=TRUE))+
     ggplot2::labs(fill = "Status")+
     ggplot2::labs(color = "Status")+
-    ggplot2::geom_text(ggplot2::aes(y = label_y, label = paste0(round(label_y*100, digits = 2), "%")), vjust = -0.15, color = "black")+
-    ggplot2::scale_y_continuous(labels = scales::percent)+
-    ggthemes::theme_fivethirtyeight(base_size = 14L)
+    ggplot2::geom_text(ggplot2::aes(y = label_y, label = paste0(round(pct_pop*100, digits = 1), "%")), vjust = 1.2, color = "white")+
+    ggplot2::labs(fill = "Status")+
+    ggplot2::ggtitle("Population Up to Date with COVID-19 Vaccination by Sex")+
+    ggplot2::labs(x="Sex", y= "% Population")+
+    ggplot2::labs(subtitle = format(as.Date(date), "%B %d, %Y"))+
+    ggthemes::theme_fivethirtyeight()+
+    theme(axis.title = element_text(face="bold")) +
+    theme(plot.title = element_text(hjust = 0.5))+
+    theme(plot.subtitle = element_text(hjust = 0.5, size = 14))+
+    ggplot2::scale_y_continuous(labels = scales::percent)
+
+  additional_dose <- people %>%
+    dplyr::group_by(dose_status, pat_gender)%>%
+    dplyr::summarise(n = n()) %>%
+    subset(dose_status == "Additional Dose") %>%
+    dplyr::rename("Additional Dose" = n)
+
+  completed <- people %>%
+    dplyr::group_by(dose_status, pat_gender)%>%
+    dplyr::summarise(n = n()) %>%
+    subset(dose_status == "Completed") %>%
+    dplyr::rename("Completed" = n)
+
+  initiated <- people %>%
+    dplyr::group_by(dose_status, pat_gender)%>%
+    dplyr::summarise(n = n()) %>%
+    subset(dose_status == "Initiated") %>%
+    dplyr::rename("Initiated" = n)
+
+  sex_table <- left_join(initiated, completed, by = "pat_gender")%>%
+    left_join(additional_dose, by = "pat_gender") %>%
+    dplyr::select(pat_gender, "Initiated", "Completed", "Additional Dose")%>%
+    janitor::adorn_totals()%>%
+
+    flextable::flextable() %>%
+    flextable::set_header_labels(
+      pat_gender = "Sex"
+    ) %>%
+    fmt_covid_table(total = TRUE) %>%
+    flextable::autofit()
+
+  #end sex plot and table
+
+
+
+
+  #Start race plot and table
+
+  race_plot <- gg_race%>%
+    ggplot2::ggplot(ggplot2::aes(fill=dose_status, y=pct_pop, x=race)) +
+    ggplot2::geom_bar(stack="dodge", stat="identity") +
+    ggplot2::scale_fill_manual(values=c("deepskyblue4","steelblue3", "midnightblue"))+
+    ggplot2::scale_color_manual(values=c("deepskyblue4","steelblue3", "midnightblue"))+
+    ggplot2::guides(fill = ggplot2::guide_legend(reverse=TRUE))+
+    ggplot2::guides(color = ggplot2::guide_legend(reverse=TRUE))+
+    ggplot2::labs(fill = "Status")+
+    ggplot2::labs(color = "Status")+
+    ggplot2::geom_text(ggplot2::aes(y = label_y, label = paste0(round(pct_pop*100, digits = 1), "%")), vjust = 1.2, color = "white")+
+    ggplot2::labs(fill = "Status")+
+    ggplot2::ggtitle("Population Up to Date with COVID-19 Vaccination by Race")+
+    ggplot2::labs(x="Race", y= "% Population")+
+    ggplot2::labs(subtitle = format(as.Date(date), "%B %d, %Y"))+
+    ggthemes::theme_fivethirtyeight()+
+    theme(axis.title = element_text(face="bold")) +
+    theme(plot.title = element_text(hjust = 0.5))+
+    theme(plot.subtitle = element_text(hjust = 0.5, size = 14))+
+    ggplot2::scale_y_continuous(labels = scales::percent)
+
+  additional_dose <- people %>%
+    dplyr::group_by(dose_status, race)%>%
+    dplyr::summarise(n = n()) %>%
+    subset(dose_status == "Additional Dose") %>%
+    dplyr::rename("Additional Dose" = n)
+
+  completed <- people %>%
+    dplyr::group_by(dose_status, race)%>%
+    dplyr::summarise(n = n()) %>%
+    subset(dose_status == "Completed") %>%
+    dplyr::rename("Completed" = n)
+
+  initiated <- people %>%
+    dplyr::group_by(dose_status, race)%>%
+    dplyr::summarise(n = n()) %>%
+    subset(dose_status == "Initiated") %>%
+    dplyr::rename("Initiated" = n)
+
+  race_table <- left_join(initiated, completed, by = "race")%>%
+    left_join(additional_dose, by = "race") %>%
+    dplyr::select(race, "Initiated", "Completed", "Additional Dose")%>%
+    janitor::adorn_totals()%>%
+
+    flextable::flextable() %>%
+    flextable::set_header_labels(
+      pat_gender = "Race"
+    ) %>%
+    fmt_covid_table(total = TRUE) %>%
+    flextable::autofit()
+
+  #end race plot and table
+
+
+
+
+  #Start ethnicity plot and table
+
+  ethnicity_plot <- gg_ethnicity%>%
+    ggplot2::ggplot(ggplot2::aes(fill=dose_status, y=pct_pop, x=ethnicity)) +
+    ggplot2::geom_bar(stack="dodge", stat="identity") +
+    ggplot2::scale_fill_manual(values=c("deepskyblue4","steelblue3", "midnightblue"))+
+    ggplot2::scale_color_manual(values=c("deepskyblue4","steelblue3", "midnightblue"))+
+    ggplot2::guides(fill = ggplot2::guide_legend(reverse=TRUE))+
+    ggplot2::guides(color = ggplot2::guide_legend(reverse=TRUE))+
+    ggplot2::labs(fill = "Status")+
+    ggplot2::labs(color = "Status")+
+    ggplot2::geom_text(ggplot2::aes(y = label_y, label = paste0(round(pct_pop*100, digits = 1), "%")), vjust = 1.2, color = "white")+
+    ggplot2::labs(fill = "Status")+
+    ggplot2::ggtitle("Population Up to Date with COVID-19 Vaccination by Ethnicity")+
+    ggplot2::labs(x="Ethnicity", y= "% Population")+
+    ggplot2::labs(subtitle = format(as.Date(date), "%B %d, %Y"))+
+    ggthemes::theme_fivethirtyeight()+
+    theme(axis.title = element_text(face="bold")) +
+    theme(plot.title = element_text(hjust = 0.5))+
+    theme(plot.subtitle = element_text(hjust = 0.5, size = 14))+
+    ggplot2::scale_y_continuous(labels = scales::percent)
+
+  additional_dose <- people %>%
+    dplyr::group_by(dose_status, ethnicity)%>%
+    dplyr::summarise(n = n()) %>%
+    subset(dose_status == "Additional Dose") %>%
+    dplyr::rename("Additional Dose" = n)
+
+  completed <- people %>%
+    dplyr::group_by(dose_status, ethnicity)%>%
+    dplyr::summarise(n = n()) %>%
+    subset(dose_status == "Completed") %>%
+    dplyr::rename("Completed" = n)
+
+    initiated <- people %>%
+    dplyr::group_by(dose_status, ethnicity)%>%
+    dplyr::summarise(n = n()) %>%
+    subset(dose_status == "Initiated") %>%
+    dplyr::rename("Initiated" = n)
+
+ethnicity_table <- left_join(initiated, completed, by = "ethnicity")%>%
+    left_join(additional_dose, by = "ethnicity") %>%
+    dplyr::select(ethnicity, "Initiated", "Completed", "Additional Dose")%>%
+  janitor::adorn_totals()%>%
+    flextable::flextable() %>%
+    flextable::set_header_labels(
+      ethnicity = "Ethnicity"
+    ) %>%
+    fmt_covid_table(total = TRUE) %>%
+    flextable::autofit()
+
+#end ethnicity plot and table
+
+
+
 
 
 
@@ -122,285 +350,285 @@ vac_age <- vac_plot_age(date = vac_date)
 #vac_map_pct <- vac_map_pct(date = vac_date)
 
 
-#Start processing data for tables
-vac_data <- read_vac(vac_date)
-
-vac_data$address_zip2 <- vac_parse_zip(vac_data$address_zip)
-
-vac_data$shelby_resident <- ifelse(is.na(vac_data$address_zip2)
-                                   | vac_data$address_zip2 != "Other", "Yes", "No")
-
-vac_data2 <- subset(vac_data, shelby_resident != "No")
-
-vac_data2 <- subset(vac_data2, dose_count<= 2)
-
-vac_data2$recip_fully_vacc <- ifelse(vac_data2$dose_count == 2
-                                     & (vac_data2$cvx_code == 207
-                                        |vac_data2$cvx_code == 208
-                                        |vac_data2$cvx_code == 217
-                                        |vac_data2$cvx_code == 218), 1,0)
-
-
-vac_data2$recip_fully_vacc <- ifelse(vac_data2$dose_count == 1
-                                     & (vac_data2$cvx_code == 210 |vac_data2$cvx_code == 212), 1,
-                                     vac_data2$recip_fully_vacc)
-
-vac_data2 <- subset(vac_data2, (cvx_code != 210 & cvx_code != 212) | dose_count < 2)
-
-#sum(vac_data2$recip_fully_vacc == 0)
-
-vac_people <- data.table::setorder(vac_data2, -dose_count)
-
-
-vac_people <- dplyr::distinct(vac_people, asiis_pat_id_ptr, .keep_all = TRUE)
-#sum(vac_people$dose_count == 2)
-
-
-
-
-library("dplyr")
-
-.data = vac_prep(read_vac(vac_date))
-by_pop = TRUE
-incl_under_12 = FALSE
-
-by_pop <- coviData::assert_bool(by_pop)
-incl_under_12 <- coviData::assert_bool(incl_under_12)
-
-gg_data <- .data %>%
-  vac_count_grp() %>%
-  vac_join_age_pop(incl_under_12 = incl_under_12) %>%
-  vac_age_fct()
-
-atleast1_age <- gg_data %>% subset(full == FALSE)
-fully_age <- gg_data %>% subset(full == TRUE)
-
-fully_age$fully_vac <- fully_age$n_vac
-fully_age <- fully_age %>% dplyr::select(-full, -n_vac, -n_pop)
-
-atleast1_age$atleast1 <- atleast1_age$n_vac
-atleast1_age <- atleast1_age %>% dplyr::select(-full, -n_vac, -n_pop)
-
-
-age_draft <- dplyr::full_join(atleast1_age, fully_age)
-age_draft2 <- subset(age_draft, age_grp != "0-4")
-
-count_atleast1 <- nrow(vac_people)
-
-count_fullyvac <- sum(vac_people$recip_fully_vacc == 1)
-
-#make a data frame just for the other/missing
-age_grp <- c("Other/Unknown")
-atleast1 <- count_atleast1 - sum(age_draft2$atleast1)
-fully_vac <- count_fullyvac - sum(age_draft2$fully_vac)
-
-o_u <- data.frame(age_grp, atleast1, fully_vac)
-
-age_table <- dplyr::full_join(age_draft2, o_u)%>%
-  janitor::adorn_totals()%>%
-  flextable::flextable() %>%
-  flextable::set_header_labels(
-    age_grp = "Age Group",
-    atleast1 = "Atleast 1 Dose",
-    fully_vac = "Fully Vaccinated"
-  ) %>%
-  fmt_covid_table(total = TRUE) %>%
-  flextable::autofit()%>%
-  flextable::fontsize(size = 16, part = "all")
-
-
-
-
-
-#START SEX PLOT
-vac_people$pat_gender <- ifelse(vac_people$pat_gender == "F", "Female", vac_people$pat_gender)
-
-vac_people$pat_gender <- ifelse(vac_people$pat_gender == "M", "Male", vac_people$pat_gender)
-
-vac_people$pat_gender <- ifelse(is.na(vac_people$pat_gender) | vac_people$pat_gender == "O"
-                                | vac_people$pat_gender == "U", "Other/Unknown",
-                                vac_people$pat_gender)
-
-full_sex <- vac_people %>% group_by(pat_gender, recip_fully_vacc)%>%
-  summarize(n = n())%>% dplyr::rename(sex = pat_gender, full = recip_fully_vacc, n_vac = n)%>%
-  subset(full==1)
-
-atleast1_sex <- vac_people %>% group_by(pat_gender)%>%
-  summarize(n = n())%>% dplyr::rename(sex = pat_gender, n_vac = n)
-atleast1_sex$full <- 0
-
-sex <- dplyr::full_join(full_sex, atleast1_sex)
-
-sex$n_pop <- ifelse(sex$sex == "Female", 491704, 445462)
-sex$n_pop <- ifelse(sex$sex == "Other/Unknown", NA, sex$n_pop)
-
-#recip_fully_vac needs to be true or false
-sex$full <- ifelse(sex$full == 1, TRUE, FALSE )
-
-#subset to exclude other/unknown
-gg_data <- subset(sex, sex != "Other/Unknown")
-
-gg_data <- data.table::setorder(gg_data, full)
-
-sex_plot <- gg_data%>%
-  vac_sex_ggplot(by_pop = by_pop) %>%
-  set_covid_theme() %>%
-  vac_age_axis_limits(by_pop = by_pop) %>%
-  add_vac_axis_labels(by_pop = by_pop, demog = "Sex") %>%
-  add_vac_age_col(by_pop = by_pop) %>%
-  add_vac_age_col_labels() %>%
-  add_vac_age_scale(by_pop = by_pop) %>%
-  remove_x_grid() %>%
-  add_vac_title_caption(by_pop = by_pop, date = date, demog = "Sex")
-
-#make sex table
-full_sex$fully_vac <- full_sex$n_vac
-full_sex <- full_sex %>% dplyr::select(-full, -n_vac)
-
-atleast1_sex$atleast1 <- atleast1_sex$n_vac
-atleast1_sex <- atleast1_sex %>% dplyr::select(-full, -n_vac)
-
-sex_table <- dplyr::full_join(atleast1_sex, full_sex)%>%
-  janitor::adorn_totals()%>%
-  flextable::flextable() %>%
-  flextable::set_header_labels(
-    sex = "Sex",
-    atleast1 = "Atleast 1 Dose",
-    fully_vac = "Fully Vaccinated"
-  ) %>%
-  fmt_covid_table(total = TRUE) %>%
-  flextable::autofit()
-
-
-
-
-#START RACE PLOT
-vac_people$race <- ifelse(vac_people$race == "ASIAN", "Asian", vac_people$race)
-
-vac_people$race <- ifelse(vac_people$race == "WHITE", "White", vac_people$race)
-
-vac_people$race <- ifelse(vac_people$race == "BLACK OR AFRICAN AMERICAN", "Black/African American", vac_people$race)
-
-vac_people$race <- ifelse(is.na(vac_people$race) | vac_people$race == "OTHER/MULTIRACIAL"
-                          | vac_people$race == "UNKNOWN", "Other/Unknown",
-                          vac_people$race)
-
-
-full_race <- vac_people %>% group_by(race, recip_fully_vacc)%>%
-  summarize(n = n())%>% dplyr::rename(full = recip_fully_vacc, n_vac = n)%>%
-  subset(full==1)
-
-atleast1_race <- vac_people %>% group_by(race)%>%
-  summarize(n = n())%>% dplyr::rename(n_vac = n)
-atleast1_race$full <- 0
-
-race <- dplyr::full_join(full_race, atleast1_race)
-
-race$n_pop <- ifelse(race$race == "Asian", 26200, 0)
-race$n_pop <- ifelse(race$race == "Black/African American", 504715, race$n_pop)
-race$n_pop <- ifelse(race$race == "White", 365798, race$n_pop)
-race$n_pop <- ifelse(race$race == "Other/Unknown", NA, race$n_pop)
-
-
-
-
-#recip_fully_vac needs to be true or false
-race$full <- ifelse(race$full == 1, TRUE, FALSE )
-
-#subset to exclude other/unknown
-gg_data <- subset(race, race != "Other/Unknown")
-
-gg_data <- data.table::setorder(gg_data, full)
-
-race_plot <- gg_data%>%
-  vac_race_ggplot(by_pop = by_pop) %>%
-  set_covid_theme() %>%
-  vac_age_axis_limits(by_pop = by_pop) %>%
-  add_vac_axis_labels(by_pop = by_pop, demog = "Race") %>%
-  add_vac_age_col(by_pop = by_pop) %>%
-  add_vac_age_col_labels() %>%
-  add_vac_age_scale(by_pop = by_pop) %>%
-  remove_x_grid() %>%
-  add_vac_title_caption(by_pop = by_pop, date = date, demog = "Race")
-
-#make race table
-full_race$fully_vac <- full_race$n_vac
-full_race <- full_race %>% dplyr::select(-full, -n_vac)
-
-atleast1_race$atleast1 <- atleast1_race$n_vac
-atleast1_race <- atleast1_race %>% dplyr::select(-full, -n_vac)
-
-race_table <- dplyr::full_join(atleast1_race, full_race)%>%
-  janitor::adorn_totals()%>%
-
-    flextable::flextable() %>%
-    flextable::set_header_labels(
-      race = "Race",
-      atleast1 = "Atleast 1 Dose",
-      fully_vac = "Fully Vaccinated"
-    ) %>%
-    fmt_covid_table(total = TRUE) %>%
-    flextable::autofit()
-
-
-
-
-#START ETHNICITY
-
-vac_people$ethnicity <- ifelse(vac_people$ethnicity == "Hispanic Or Latino", "Hispanic or Latino", vac_people$ethnicity)
-
-vac_people$ethnicity <- ifelse(vac_people$ethnicity == "Not Hispanic Or Latino", "Not Hispanic or Latino", vac_people$ethnicity)
-
-full_eth <- vac_people %>% group_by(ethnicity, recip_fully_vacc)%>%
-  summarize(n = n())%>% dplyr::rename(full = recip_fully_vacc, n_vac = n)%>%
-  subset(full==1)
-
-atleast1_eth <- vac_people %>% group_by(ethnicity)%>%
-  summarize(n = n())%>% dplyr::rename(n_vac = n)
-atleast1_eth$full <- 0
-
-ethnicity <- dplyr::full_join(full_eth, atleast1_eth)
-
-ethnicity$n_pop <- ifelse(ethnicity$ethnicity == "Hispanic or Latino", 62125, 875041)
-ethnicity$n_pop <- ifelse(ethnicity$ethnicity == "Unknown", NA, ethnicity$n_pop)
-
-#recip_fully_vac needs to be true or false
-ethnicity$full <- ifelse(ethnicity$full == 1, TRUE, FALSE )
-
-#subset to exclude other/unknown
-gg_data <- subset(ethnicity, ethnicity != "Unknown")
-
-gg_data <- data.table::setorder(gg_data, full)
-
-ethnicity_plot <- gg_data%>%
-  vac_ethnicity_ggplot(by_pop = by_pop) %>%
-  set_covid_theme() %>%
-  vac_age_axis_limits(by_pop = by_pop) %>%
-  add_vac_axis_labels(by_pop = by_pop, demog = "Ethnicity") %>%
-  add_vac_age_col(by_pop = by_pop) %>%
-  add_vac_age_col_labels() %>%
-  add_vac_age_scale(by_pop = by_pop) %>%
-  remove_x_grid() %>%
-  add_vac_title_caption(by_pop = by_pop, date = date, demog = "Ethnicity")
-
-#make ethnicity table
-full_eth$fully_vac <- full_eth$n_vac
-full_eth <- full_eth %>% dplyr::select(-full, -n_vac)
-
-atleast1_eth$atleast1 <- atleast1_eth$n_vac
-atleast1_eth <- atleast1_eth %>% dplyr::select(-full, -n_vac)
-
-ethnicity_table <- dplyr::full_join(atleast1_eth, full_eth)%>%
-  janitor::adorn_totals()%>%
-  flextable::flextable() %>%
-  flextable::set_header_labels(
-    ethnicity = "Ethnicity",
-    atleast1 = "Atleast 1 Dose",
-    fully_vac = "Fully Vaccinated"
-  ) %>%
-  fmt_covid_table(total = TRUE) %>%
-  flextable::autofit()
-
+# #Start processing data for tables
+# vac_data <- read_vac(vac_date)
+#
+# vac_data$address_zip2 <- vac_parse_zip(vac_data$address_zip)
+#
+# vac_data$shelby_resident <- ifelse(is.na(vac_data$address_zip2)
+#                                    | vac_data$address_zip2 != "Other", "Yes", "No")
+#
+# vac_data2 <- subset(vac_data, shelby_resident != "No")
+#
+# vac_data2 <- subset(vac_data2, dose_count<= 2)
+#
+# vac_data2$recip_fully_vacc <- ifelse(vac_data2$dose_count == 2
+#                                      & (vac_data2$cvx_code == 207
+#                                         |vac_data2$cvx_code == 208
+#                                         |vac_data2$cvx_code == 217
+#                                         |vac_data2$cvx_code == 218), 1,0)
+#
+#
+# vac_data2$recip_fully_vacc <- ifelse(vac_data2$dose_count == 1
+#                                      & (vac_data2$cvx_code == 210 |vac_data2$cvx_code == 212), 1,
+#                                      vac_data2$recip_fully_vacc)
+#
+# vac_data2 <- subset(vac_data2, (cvx_code != 210 & cvx_code != 212) | dose_count < 2)
+#
+# #sum(vac_data2$recip_fully_vacc == 0)
+#
+# vac_people <- data.table::setorder(vac_data2, -dose_count)
+#
+#
+# vac_people <- dplyr::distinct(vac_people, asiis_pat_id_ptr, .keep_all = TRUE)
+# #sum(vac_people$dose_count == 2)
+#
+#
+#
+#
+# library("dplyr")
+#
+# .data = vac_prep(read_vac(vac_date))
+# by_pop = TRUE
+# incl_under_12 = FALSE
+#
+# by_pop <- coviData::assert_bool(by_pop)
+# incl_under_12 <- coviData::assert_bool(incl_under_12)
+#
+# gg_data <- .data %>%
+#   vac_count_grp() %>%
+#   vac_join_age_pop(incl_under_12 = incl_under_12) %>%
+#   vac_age_fct()
+#
+# atleast1_age <- gg_data %>% subset(full == FALSE)
+# fully_age <- gg_data %>% subset(full == TRUE)
+#
+# fully_age$fully_vac <- fully_age$n_vac
+# fully_age <- fully_age %>% dplyr::select(-full, -n_vac, -n_pop)
+#
+# atleast1_age$atleast1 <- atleast1_age$n_vac
+# atleast1_age <- atleast1_age %>% dplyr::select(-full, -n_vac, -n_pop)
+#
+#
+# age_draft <- dplyr::full_join(atleast1_age, fully_age)
+# age_draft2 <- subset(age_draft, age_grp != "0-4")
+#
+# count_atleast1 <- nrow(vac_people)
+#
+# count_fullyvac <- sum(vac_people$recip_fully_vacc == 1)
+#
+# #make a data frame just for the other/missing
+# age_grp <- c("Other/Unknown")
+# atleast1 <- count_atleast1 - sum(age_draft2$atleast1)
+# fully_vac <- count_fullyvac - sum(age_draft2$fully_vac)
+#
+# o_u <- data.frame(age_grp, atleast1, fully_vac)
+#
+# age_table <- dplyr::full_join(age_draft2, o_u)%>%
+#   janitor::adorn_totals()%>%
+#   flextable::flextable() %>%
+#   flextable::set_header_labels(
+#     age_grp = "Age Group",
+#     atleast1 = "Atleast 1 Dose",
+#     fully_vac = "Fully Vaccinated"
+#   ) %>%
+#   fmt_covid_table(total = TRUE) %>%
+#   flextable::autofit()%>%
+#   flextable::fontsize(size = 16, part = "all")
+#
+#
+#
+#
+#
+# #START SEX PLOT
+# vac_people$pat_gender <- ifelse(vac_people$pat_gender == "F", "Female", vac_people$pat_gender)
+#
+# vac_people$pat_gender <- ifelse(vac_people$pat_gender == "M", "Male", vac_people$pat_gender)
+#
+# vac_people$pat_gender <- ifelse(is.na(vac_people$pat_gender) | vac_people$pat_gender == "O"
+#                                 | vac_people$pat_gender == "U", "Other/Unknown",
+#                                 vac_people$pat_gender)
+#
+# full_sex <- vac_people %>% group_by(pat_gender, recip_fully_vacc)%>%
+#   summarize(n = n())%>% dplyr::rename(sex = pat_gender, full = recip_fully_vacc, n_vac = n)%>%
+#   subset(full==1)
+#
+# atleast1_sex <- vac_people %>% group_by(pat_gender)%>%
+#   summarize(n = n())%>% dplyr::rename(sex = pat_gender, n_vac = n)
+# atleast1_sex$full <- 0
+#
+# sex <- dplyr::full_join(full_sex, atleast1_sex)
+#
+# sex$n_pop <- ifelse(sex$sex == "Female", 491704, 445462)
+# sex$n_pop <- ifelse(sex$sex == "Other/Unknown", NA, sex$n_pop)
+#
+# #recip_fully_vac needs to be true or false
+# sex$full <- ifelse(sex$full == 1, TRUE, FALSE )
+#
+# #subset to exclude other/unknown
+# gg_data <- subset(sex, sex != "Other/Unknown")
+#
+# gg_data <- data.table::setorder(gg_data, full)
+#
+# sex_plot <- gg_data%>%
+#   vac_sex_ggplot(by_pop = by_pop) %>%
+#   set_covid_theme() %>%
+#   vac_age_axis_limits(by_pop = by_pop) %>%
+#   add_vac_axis_labels(by_pop = by_pop, demog = "Sex") %>%
+#   add_vac_age_col(by_pop = by_pop) %>%
+#   add_vac_age_col_labels() %>%
+#   add_vac_age_scale(by_pop = by_pop) %>%
+#   remove_x_grid() %>%
+#   add_vac_title_caption(by_pop = by_pop, date = date, demog = "Sex")
+#
+# #make sex table
+# full_sex$fully_vac <- full_sex$n_vac
+# full_sex <- full_sex %>% dplyr::select(-full, -n_vac)
+#
+# atleast1_sex$atleast1 <- atleast1_sex$n_vac
+# atleast1_sex <- atleast1_sex %>% dplyr::select(-full, -n_vac)
+#
+# sex_table <- dplyr::full_join(atleast1_sex, full_sex)%>%
+#   janitor::adorn_totals()%>%
+#   flextable::flextable() %>%
+#   flextable::set_header_labels(
+#     sex = "Sex",
+#     atleast1 = "Atleast 1 Dose",
+#     fully_vac = "Fully Vaccinated"
+#   ) %>%
+#   fmt_covid_table(total = TRUE) %>%
+#   flextable::autofit()
+#
+#
+#
+#
+# #START RACE PLOT
+# vac_people$race <- ifelse(vac_people$race == "ASIAN", "Asian", vac_people$race)
+#
+# vac_people$race <- ifelse(vac_people$race == "WHITE", "White", vac_people$race)
+#
+# vac_people$race <- ifelse(vac_people$race == "BLACK OR AFRICAN AMERICAN", "Black/African American", vac_people$race)
+#
+# vac_people$race <- ifelse(is.na(vac_people$race) | vac_people$race == "OTHER/MULTIRACIAL"
+#                           | vac_people$race == "UNKNOWN", "Other/Unknown",
+#                           vac_people$race)
+#
+#
+# full_race <- vac_people %>% group_by(race, recip_fully_vacc)%>%
+#   summarize(n = n())%>% dplyr::rename(full = recip_fully_vacc, n_vac = n)%>%
+#   subset(full==1)
+#
+# atleast1_race <- vac_people %>% group_by(race)%>%
+#   summarize(n = n())%>% dplyr::rename(n_vac = n)
+# atleast1_race$full <- 0
+#
+# race <- dplyr::full_join(full_race, atleast1_race)
+#
+# race$n_pop <- ifelse(race$race == "Asian", 26200, 0)
+# race$n_pop <- ifelse(race$race == "Black/African American", 504715, race$n_pop)
+# race$n_pop <- ifelse(race$race == "White", 365798, race$n_pop)
+# race$n_pop <- ifelse(race$race == "Other/Unknown", NA, race$n_pop)
+#
+#
+#
+#
+# #recip_fully_vac needs to be true or false
+# race$full <- ifelse(race$full == 1, TRUE, FALSE )
+#
+# #subset to exclude other/unknown
+# gg_data <- subset(race, race != "Other/Unknown")
+#
+# gg_data <- data.table::setorder(gg_data, full)
+#
+# race_plot <- gg_data%>%
+#   vac_race_ggplot(by_pop = by_pop) %>%
+#   set_covid_theme() %>%
+#   vac_age_axis_limits(by_pop = by_pop) %>%
+#   add_vac_axis_labels(by_pop = by_pop, demog = "Race") %>%
+#   add_vac_age_col(by_pop = by_pop) %>%
+#   add_vac_age_col_labels() %>%
+#   add_vac_age_scale(by_pop = by_pop) %>%
+#   remove_x_grid() %>%
+#   add_vac_title_caption(by_pop = by_pop, date = date, demog = "Race")
+#
+# #make race table
+# full_race$fully_vac <- full_race$n_vac
+# full_race <- full_race %>% dplyr::select(-full, -n_vac)
+#
+# atleast1_race$atleast1 <- atleast1_race$n_vac
+# atleast1_race <- atleast1_race %>% dplyr::select(-full, -n_vac)
+#
+# race_table <- dplyr::full_join(atleast1_race, full_race)%>%
+#   janitor::adorn_totals()%>%
+#
+#     flextable::flextable() %>%
+#     flextable::set_header_labels(
+#       race = "Race",
+#       atleast1 = "Atleast 1 Dose",
+#       fully_vac = "Fully Vaccinated"
+#     ) %>%
+#     fmt_covid_table(total = TRUE) %>%
+#     flextable::autofit()
+#
+#
+#
+#
+# #START ETHNICITY
+#
+# vac_people$ethnicity <- ifelse(vac_people$ethnicity == "Hispanic Or Latino", "Hispanic or Latino", vac_people$ethnicity)
+#
+# vac_people$ethnicity <- ifelse(vac_people$ethnicity == "Not Hispanic Or Latino", "Not Hispanic or Latino", vac_people$ethnicity)
+#
+# full_eth <- vac_people %>% group_by(ethnicity, recip_fully_vacc)%>%
+#   summarize(n = n())%>% dplyr::rename(full = recip_fully_vacc, n_vac = n)%>%
+#   subset(full==1)
+#
+# atleast1_eth <- vac_people %>% group_by(ethnicity)%>%
+#   summarize(n = n())%>% dplyr::rename(n_vac = n)
+# atleast1_eth$full <- 0
+#
+# ethnicity <- dplyr::full_join(full_eth, atleast1_eth)
+#
+# ethnicity$n_pop <- ifelse(ethnicity$ethnicity == "Hispanic or Latino", 62125, 875041)
+# ethnicity$n_pop <- ifelse(ethnicity$ethnicity == "Unknown", NA, ethnicity$n_pop)
+#
+# #recip_fully_vac needs to be true or false
+# ethnicity$full <- ifelse(ethnicity$full == 1, TRUE, FALSE )
+#
+# #subset to exclude other/unknown
+# gg_data <- subset(ethnicity, ethnicity != "Unknown")
+#
+# gg_data <- data.table::setorder(gg_data, full)
+#
+# ethnicity_plot <- gg_data%>%
+#   vac_ethnicity_ggplot(by_pop = by_pop) %>%
+#   set_covid_theme() %>%
+#   vac_age_axis_limits(by_pop = by_pop) %>%
+#   add_vac_axis_labels(by_pop = by_pop, demog = "Ethnicity") %>%
+#   add_vac_age_col(by_pop = by_pop) %>%
+#   add_vac_age_col_labels() %>%
+#   add_vac_age_scale(by_pop = by_pop) %>%
+#   remove_x_grid() %>%
+#   add_vac_title_caption(by_pop = by_pop, date = date, demog = "Ethnicity")
+#
+# #make ethnicity table
+# full_eth$fully_vac <- full_eth$n_vac
+# full_eth <- full_eth %>% dplyr::select(-full, -n_vac)
+#
+# atleast1_eth$atleast1 <- atleast1_eth$n_vac
+# atleast1_eth <- atleast1_eth %>% dplyr::select(-full, -n_vac)
+#
+# ethnicity_table <- dplyr::full_join(atleast1_eth, full_eth)%>%
+#   janitor::adorn_totals()%>%
+#   flextable::flextable() %>%
+#   flextable::set_header_labels(
+#     ethnicity = "Ethnicity",
+#     atleast1 = "Atleast 1 Dose",
+#     fully_vac = "Fully Vaccinated"
+#   ) %>%
+#   fmt_covid_table(total = TRUE) %>%
+#   flextable::autofit()
+#
 
 
 
