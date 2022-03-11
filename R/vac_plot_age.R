@@ -41,9 +41,12 @@ vac_plot_age <- function(
     dplyr::arrange(age_grp, desc(status))%>%
     dplyr::mutate(pct_pop = (n_vac/n_pop))%>%
     dplyr::group_by(age_grp) %>%
-    dplyr::mutate(label_y = cumsum(pct_pop))%>%
+    dplyr::mutate(cum_total = cumsum(pct_pop))%>%
     dplyr::mutate(label_y = ifelse(
-      pct_pop < 0.01, NA, label_y
+      pct_pop < 0.01, NA, cum_total
+    ))%>%
+    dplyr::mutate(label_tot = ifelse(
+      status == "Additional Dose", cum_total, NA
     ))
 
   gg_data %>%
@@ -108,6 +111,7 @@ add_vac_age_col <- function(gg_obj, by_pop) {
     ggplot2::labs(fill = "Status")+
     ggplot2::labs(color = "Status")+
     ggplot2::geom_text(ggplot2::aes(y = label_y, label = paste0(round(pct_pop*100, digits = 1), "%")), vjust = 1.2, color = "white")+
+    ggplot2::geom_text(ggplot2::aes(y = label_tot, label = paste0("Total: ", round(label_tot*100, digits = 1), "%")), vjust = -1, color = "black")+
     ggplot2::scale_y_continuous(labels = scales::percent)
 }
 
