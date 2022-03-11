@@ -12,19 +12,32 @@
 #'
 #' @export
 vac_plot_goal <- function(
-  data = coviData::vac_prep(coviData::read_vac(date = date)),
+  data = coviData::vac_prep(date = date, distinct = TRUE),
   date = NULL,
   n_goal = 0.7 * n_max,
   n_max = 937166
 ) {
   # Get counts
-  counts <- vac_count(data)
+  #counts <- vac_count(data)
 
-  n_initiated <- sum(counts[["n"]], na.rm = TRUE)
-  n_completed <- counts %>%
-    dplyr::filter(.data[["recip_fully_vacc"]]) %>%
-    dplyr::pull("n") %>%
-    sum(na.rm = TRUE)
+  data <- data %>%
+    dplyr::mutate(
+      dose_status = dplyr::case_when(
+        is.na(.data[["recip_fully_vacc"]]) ~ "Initiated",
+        .data[["recip_fully_vacc"]] == FALSE ~ "Initiated",
+        .data[["recip_fully_vacc"]] == TRUE & is.na(.data[["boost_date"]]) ~ "Completed",
+        .data[["recip_fully_vacc"]] == TRUE & !is.na(.data[["boost_date"]]) ~ "Additional Dose"
+      ))
+
+  n_initiated <- sum(data$dose_status == "Initiated", na.rm = TRUE)
+  n_completed <- sum(data$dose_status == "Completed", na.rm = TRUE)
+  n_additional <- sum(data$dose_status == "Additional Dose", na.rm = TRUE)
+
+  n_completed2 <- n_additional + n_completed
+  n_initiated2 <- n_additional + n_completed + n_initiated
+
+  n_initiated <- n_initiated2
+  n_completed <- n_completed2
 
   date_updated <- date_vac(date)
 
@@ -37,13 +50,15 @@ vac_plot_goal <- function(
     add_vaccination_polygon() %>%
     add_vaccination_count_fill(
       n_initiated = n_initiated,
-      n_completed = n_completed
+      n_completed = n_completed,
+      n_additional = n_additional
     ) %>%
     add_vaccination_goal_marker(n_goal = n_goal, n_max = n_max) %>%
     add_axis_labels(ylab = "People") %>%
     add_vaccination_labels(
       n_initiated = n_initiated,
       n_completed = n_completed,
+      n_additional = n_additional,
       n_max = n_max
     ) %>%
     add_vaccination_title_caption(
@@ -73,23 +88,20 @@ add_vaccination_polygon <- function(gg_obj) {
   gg_obj + ggplot2::geom_polygon(fill = "grey83")
 }
 
-add_vaccination_count_fill <- function(gg_obj, n_initiated, n_completed) {
+add_vaccination_count_fill <- function(gg_obj, n_initiated, n_completed, n_additional) {
 
   # Create fill polygon
   y_initiated <- rlang::expr(pmin(.data[["y"]], n_initiated))
   y_completed <- rlang::expr(pmin(.data[["y"]], n_completed))
+  y_additional <- rlang::expr(pmin(.data[["y"]], n_additional))
 
   # Create and assign fill colors
-  pal_indigo <- ggsci::pal_material("indigo", n = 10L, reverse = TRUE)
 
-  pal_indigo <- ggsci::pal_material("indigo", n = 10L, reverse = TRUE)
-  pal_purple <- ggsci::pal_material("deep-purple", n = 10L, reverse = TRUE)
-  indigo <- pal_indigo(6L)[[6L]]
-  purple <- pal_purple(2L)[[2L]]
 
   gg_obj +
-    ggplot2::geom_polygon(ggplot2::aes(y = !!y_initiated), fill = indigo) +
-    ggplot2::geom_polygon(ggplot2::aes(y = !!y_completed), fill = purple)
+    ggplot2::geom_polygon(ggplot2::aes(y = !!y_initiated), fill = "midnightblue") +
+    ggplot2::geom_polygon(ggplot2::aes(y = !!y_completed), fill = "steelblue3")+
+    ggplot2::geom_polygon(ggplot2::aes(y = !!y_additional), fill = "deepskyblue4")
 }
 
 add_vaccination_goal_marker <- function(gg_obj, n_goal, n_max) {
@@ -127,6 +139,7 @@ add_vaccination_labels <- function(
   gg_obj,
   n_initiated,
   n_completed,
+  n_additional,
   n_max
 ) {
 
@@ -146,13 +159,19 @@ add_vaccination_labels <- function(
     get_vaccination_label_x_coord(gg_obj, n_completed, side = "right")
   ))
 
-  x_both_pct <- c(x_init_pct, x_comp_pct)
+  x_add_pct <- mean(c(
+    get_vaccination_label_x_coord(gg_obj, n_additional, side = "left"),
+    get_vaccination_label_x_coord(gg_obj, n_additional, side = "right")
+  ))
+
+  x_both_pct <- c(x_init_pct, x_comp_pct, x_add_pct)
 
   x_pct <- x_both_pct[which.min(abs(x_both_pct - 0.5))]
 
   # Get goal percentage
   pct_init <- round(100 * n_initiated / n_max, digits = 1L)
   pct_comp <- round(100 * n_completed / n_max, digits = 1L)
+  pct_add <- round(100 * n_additional / n_max, digits = 1L)
 
   # Create label text
   label_init <- paste0(
@@ -162,20 +181,25 @@ add_vaccination_labels <- function(
   )
   label_comp <- paste0(
     "Residents Vaccinated (Completed): ",
-    format(n_completed, big.mark = ",", scientific = FALSE), "\n",
-    "(", pct_comp, "% of population)"
+    format(n_completed - n_additional, big.mark = ",", scientific = FALSE), "\n",
+    "(", pct_comp - pct_add, "% of population)"
+  )
+  label_add <- paste0(
+    "Residents Vaccinated (Additional Dose): ",
+    format(n_additional, big.mark = ",", scientific = FALSE), "\n",
+    "(", pct_add, "% of population)"
   )
 
   gg_obj +
     ggplot2::annotate(
       "label",
       x = x_pct,
-      y = c(n_initiated, n_completed),
-      label = c(label_init, label_comp),
-      color = c(indigo, purple),
+      y = c(n_initiated, n_completed, n_additional),
+      label = c(label_init, label_comp, label_add),
+      color = c("midnightblue", "steelblue3", "deepskyblue4"),
       fill = "#f0f0f0",
       label.size = 1,
-      vjust = c(0, 1),
+      vjust = c(0, 1, 1),
       fontface = "bold",
       size = 5
     )
