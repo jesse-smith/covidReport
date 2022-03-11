@@ -197,7 +197,7 @@ rpt_vac_pptx <- function(
     theme(axis.title = element_text(face="bold")) +
     theme(plot.title = element_text(hjust = 0.5))+
     theme(plot.subtitle = element_text(hjust = 0.5, size = 14))+
-    ggplot2::scale_y_continuous(labels = scales::percent) +
+    ggplot2::scale_y_continuous(limits = c(0,1), labels = scales::percent) +
     theme(
       panel.grid.major.x = element_blank(),
       panel.grid.minor.x = element_blank()
@@ -259,7 +259,7 @@ rpt_vac_pptx <- function(
     theme(axis.title = element_text(face="bold")) +
     theme(plot.title = element_text(hjust = 0.5))+
     theme(plot.subtitle = element_text(hjust = 0.5, size = 14))+
-    ggplot2::scale_y_continuous(labels = scales::percent)+
+    ggplot2::scale_y_continuous(limits = c(0,1), labels = scales::percent) +
     theme(
       panel.grid.major.x = element_blank(),
       panel.grid.minor.x = element_blank()
@@ -321,7 +321,7 @@ rpt_vac_pptx <- function(
     theme(axis.title = element_text(face="bold")) +
     theme(plot.title = element_text(hjust = 0.5))+
     theme(plot.subtitle = element_text(hjust = 0.5, size = 14))+
-    ggplot2::scale_y_continuous(labels = scales::percent)+
+    ggplot2::scale_y_continuous(limits = c(0,1), labels = scales::percent) +
     theme(
       panel.grid.major.x = element_blank(),
       panel.grid.minor.x = element_blank()
