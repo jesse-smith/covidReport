@@ -22,7 +22,7 @@
 #'
 #' @export
 vac_plot_age <- function(
-  .data = vac_prep(read_vac(date)),
+  .data = vac_prep(date = date),
   date = NULL,
   by_pop = TRUE,
   incl_under_12 = TRUE
@@ -41,7 +41,10 @@ vac_plot_age <- function(
     dplyr::arrange(age_grp, desc(status))%>%
     dplyr::mutate(pct_pop = (n_vac/n_pop))%>%
     dplyr::group_by(age_grp) %>%
-    dplyr::mutate(label_y = cumsum(pct_pop))
+    dplyr::mutate(label_y = cumsum(pct_pop))%>%
+    dplyr::mutate(label_y = ifelse(
+      pct_pop < 0.01, NA, label_y
+    ))
 
   gg_data %>%
     vac_age_ggplot(by_pop = by_pop) %>%
