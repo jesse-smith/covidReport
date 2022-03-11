@@ -25,7 +25,7 @@ vac_plot_daily <- function(
   vac_date <- date
 
 
-  vac_data <- coviData::vac_prep(coviData::read_vac(date = vac_date))
+  vac_data <- coviData::vac_prep(date = vac_date)
 
 
 

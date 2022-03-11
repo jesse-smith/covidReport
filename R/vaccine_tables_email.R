@@ -11,7 +11,7 @@
 #'
 #' @export
 vac_table_totals_email <- function(
-  people = coviData:::vac_prep(coviData::read_vac(date), distinct = TRUE),
+  people = coviData:::vac_prep(date = date, distinct = TRUE),
   date = NULL
 ) {
 
@@ -76,7 +76,7 @@ library("dplyr")
 #'
 #' @export
 vac_table_recent_email <- function(
-  data = coviData:::vac_prep(coviData::read_vac(date)),
+  data = coviData:::vac_prep(date = date),
   date = NULL
 ) {
 
