@@ -80,7 +80,13 @@ rpt_vac_pptx <- function(
     subset(!is.na(pct_pop))%>%
     dplyr::arrange(pat_gender, desc(dose_status))%>%
     dplyr::group_by(pat_gender) %>%
-    dplyr::mutate(label_y = cumsum(pct_pop))
+    dplyr::mutate(cum_total = cumsum(pct_pop))%>%
+    dplyr::mutate(label_y = ifelse(
+      pct_pop < 0.01, NA, cum_total
+    ))%>%
+    dplyr::mutate(label_tot = ifelse(
+      dose_status == "Additional Dose", cum_total, NA
+    ))
 
   gg_race <- people %>%
     dplyr::group_by(dose_status, race)%>%
@@ -90,7 +96,13 @@ rpt_vac_pptx <- function(
     subset(!is.na(pct_pop))%>%
     dplyr::arrange(race, desc(dose_status))%>%
     dplyr::group_by(race) %>%
-    dplyr::mutate(label_y = cumsum(pct_pop))
+    dplyr::mutate(cum_total = cumsum(pct_pop))%>%
+    dplyr::mutate(label_y = ifelse(
+      pct_pop < 0.01, NA, cum_total
+    ))%>%
+    dplyr::mutate(label_tot = ifelse(
+      dose_status == "Additional Dose", cum_total, NA
+    ))
 
   gg_ethnicity <- people %>%
     dplyr::group_by(dose_status, ethnicity)%>%
@@ -100,7 +112,16 @@ rpt_vac_pptx <- function(
     subset(!is.na(pct_pop))%>%
     dplyr::arrange(ethnicity, desc(dose_status))%>%
     dplyr::group_by(ethnicity) %>%
-    dplyr::mutate(label_y = cumsum(pct_pop))
+    dplyr::mutate(cum_total = cumsum(pct_pop))%>%
+    dplyr::mutate(label_y = ifelse(
+      pct_pop < 0.01, NA, cum_total
+    ))%>%
+    dplyr::mutate(label_tot = ifelse(
+      dose_status == "Additional Dose", cum_total, NA
+    ))
+
+
+
   library("ggplot2")
 
   people$age_group <- as.double(people$age_at_admin) %>%
@@ -167,6 +188,7 @@ rpt_vac_pptx <- function(
     ggplot2::labs(fill = "Status")+
     ggplot2::labs(color = "Status")+
     ggplot2::geom_text(ggplot2::aes(y = label_y, label = paste0(round(pct_pop*100, digits = 1), "%")), vjust = 1.2, color = "white")+
+    ggplot2::geom_text(ggplot2::aes(y = label_tot, label = paste0("Total: ", round(label_tot*100, digits = 1), "%")), vjust = -1, color = "black")+
     ggplot2::labs(fill = "Status")+
     ggplot2::ggtitle("Population Up to Date with COVID-19 Vaccination by Sex")+
     ggplot2::labs(x="Sex", y= "% Population")+
@@ -175,7 +197,11 @@ rpt_vac_pptx <- function(
     theme(axis.title = element_text(face="bold")) +
     theme(plot.title = element_text(hjust = 0.5))+
     theme(plot.subtitle = element_text(hjust = 0.5, size = 14))+
-    ggplot2::scale_y_continuous(labels = scales::percent)
+    ggplot2::scale_y_continuous(labels = scales::percent) +
+    theme(
+      panel.grid.major.x = element_blank(),
+      panel.grid.minor.x = element_blank()
+    )
 
   additional_dose <- people %>%
     dplyr::group_by(dose_status, pat_gender)%>%
@@ -224,6 +250,7 @@ rpt_vac_pptx <- function(
     ggplot2::labs(fill = "Status")+
     ggplot2::labs(color = "Status")+
     ggplot2::geom_text(ggplot2::aes(y = label_y, label = paste0(round(pct_pop*100, digits = 1), "%")), vjust = 1.2, color = "white")+
+    ggplot2::geom_text(ggplot2::aes(y = label_tot, label = paste0("Total: ", round(label_tot*100, digits = 1), "%")), vjust = -1, color = "black")+
     ggplot2::labs(fill = "Status")+
     ggplot2::ggtitle("Population Up to Date with COVID-19 Vaccination by Race")+
     ggplot2::labs(x="Race", y= "% Population")+
@@ -232,7 +259,11 @@ rpt_vac_pptx <- function(
     theme(axis.title = element_text(face="bold")) +
     theme(plot.title = element_text(hjust = 0.5))+
     theme(plot.subtitle = element_text(hjust = 0.5, size = 14))+
-    ggplot2::scale_y_continuous(labels = scales::percent)
+    ggplot2::scale_y_continuous(labels = scales::percent)+
+    theme(
+      panel.grid.major.x = element_blank(),
+      panel.grid.minor.x = element_blank()
+    )
 
   additional_dose <- people %>%
     dplyr::group_by(dose_status, race)%>%
@@ -281,6 +312,7 @@ rpt_vac_pptx <- function(
     ggplot2::labs(fill = "Status")+
     ggplot2::labs(color = "Status")+
     ggplot2::geom_text(ggplot2::aes(y = label_y, label = paste0(round(pct_pop*100, digits = 1), "%")), vjust = 1.2, color = "white")+
+    ggplot2::geom_text(ggplot2::aes(y = label_tot, label = paste0("Total: ", round(label_tot*100, digits = 1), "%")), vjust = -1, color = "black")+
     ggplot2::labs(fill = "Status")+
     ggplot2::ggtitle("Population Up to Date with COVID-19 Vaccination by Ethnicity")+
     ggplot2::labs(x="Ethnicity", y= "% Population")+
@@ -289,7 +321,11 @@ rpt_vac_pptx <- function(
     theme(axis.title = element_text(face="bold")) +
     theme(plot.title = element_text(hjust = 0.5))+
     theme(plot.subtitle = element_text(hjust = 0.5, size = 14))+
-    ggplot2::scale_y_continuous(labels = scales::percent)
+    ggplot2::scale_y_continuous(labels = scales::percent)+
+    theme(
+      panel.grid.major.x = element_blank(),
+      panel.grid.minor.x = element_blank()
+    )
 
   additional_dose <- people %>%
     dplyr::group_by(dose_status, ethnicity)%>%
@@ -339,7 +375,6 @@ vaccinated_people <- vac_table_totals_new(date = vac_date)
 
 vac_plot <- vac_plot_daily(date = vac_date)
 
-vac_age <- vac_plot_age(date = vac_date)
 
 #vac_map_pct <- vac_map_pct(date = vac_date)
 
@@ -623,7 +658,7 @@ pptx
 #'
 #' @export
 vac_table_totals_new <- function(
-  people = coviData:::vac_prep(coviData::read_vac(date), distinct = TRUE),
+  people = coviData:::vac_prep(date = date, distinct = TRUE),
   date = NULL
 ) {
 
@@ -689,7 +724,7 @@ vac_table_totals_new <- function(
 #'
 #' @export
 vac_table_recent_new <- function(
-  data = coviData:::vac_prep_all(coviData::read_vac(date = date)),
+  data = coviData:::vac_prep(date = date),
   date = NULL
 ) {
 
