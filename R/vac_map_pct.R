@@ -11,7 +11,7 @@
 #'
 #' @export
 vac_map_pct <- function(
-  data = coviData::vac_prep(coviData::read_vac(date = date)),
+  data = coviData::vac_prep(date = date),
   date = NULL,
   zip_path = coviData::path_create(
     "O:/EPI/Shapefiles 07.2014/MergedZips",
