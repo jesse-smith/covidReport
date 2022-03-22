@@ -27,7 +27,6 @@ vac_fully_map_pct <- function(
   }
 
   counts <- data %>%
-    vac_filter_residents() %>%
     vac_distinct() %>%
     dplyr::filter(.data[["recip_fully_vacc"]] == TRUE) %>%
     dplyr::transmute(
