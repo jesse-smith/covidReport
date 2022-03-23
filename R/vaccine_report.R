@@ -190,7 +190,7 @@ rpt_vac_pptx <- function(
     ggplot2::geom_text(ggplot2::aes(y = label_y, label = paste0(round(pct_pop*100, digits = 1), "%")), vjust = 1.2, color = "white")+
     ggplot2::geom_text(ggplot2::aes(y = label_tot, label = paste0("Total: ", round(label_tot*100, digits = 1), "%")), vjust = -1, color = "black")+
     ggplot2::labs(fill = "Status")+
-    ggplot2::ggtitle("Population Up to Date with COVID-19 Vaccination by Sex")+
+    ggplot2::ggtitle("Population Vaccinated by Sex")+
     ggplot2::labs(x="Sex", y= "% Population")+
     ggplot2::labs(subtitle = format(as.Date(date), "%B %d, %Y"))+
     ggthemes::theme_fivethirtyeight()+
@@ -252,7 +252,7 @@ rpt_vac_pptx <- function(
     ggplot2::geom_text(ggplot2::aes(y = label_y, label = paste0(round(pct_pop*100, digits = 1), "%")), vjust = 1.2, color = "white")+
     ggplot2::geom_text(ggplot2::aes(y = label_tot, label = paste0("Total: ", round(label_tot*100, digits = 1), "%")), vjust = -1, color = "black")+
     ggplot2::labs(fill = "Status")+
-    ggplot2::ggtitle("Population Up to Date with COVID-19 Vaccination by Race")+
+    ggplot2::ggtitle("Population Vaccinated by Race")+
     ggplot2::labs(x="Race", y= "% Population")+
     ggplot2::labs(subtitle = format(as.Date(date), "%B %d, %Y"))+
     ggthemes::theme_fivethirtyeight()+
@@ -314,7 +314,7 @@ rpt_vac_pptx <- function(
     ggplot2::geom_text(ggplot2::aes(y = label_y, label = paste0(round(pct_pop*100, digits = 1), "%")), vjust = 1.2, color = "white")+
     ggplot2::geom_text(ggplot2::aes(y = label_tot, label = paste0("Total: ", round(label_tot*100, digits = 1), "%")), vjust = -1, color = "black")+
     ggplot2::labs(fill = "Status")+
-    ggplot2::ggtitle("Population Up to Date with COVID-19 Vaccination by Ethnicity")+
+    ggplot2::ggtitle("Population Vaccinated by Ethnicity")+
     ggplot2::labs(x="Ethnicity", y= "% Population")+
     ggplot2::labs(subtitle = format(as.Date(date), "%B %d, %Y"))+
     ggthemes::theme_fivethirtyeight()+
