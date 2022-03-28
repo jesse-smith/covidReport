@@ -66,9 +66,9 @@ rpt_daily_pptx <- function(
   case_plt_daily_all <- case_plot_daily_ped_all(pos_ppl, date = date)
   gc(verbose = FALSE)
 
-  # Daily ped slide
-  case_plt_daily_ped <- case_plot_daily_ped_only (pos_ppl, date = date)
-  gc(verbose = FALSE)
+  # # Daily ped slide
+  # case_plt_daily_ped <- case_plot_daily_ped_only (pos_ppl, date = date)
+  # gc(verbose = FALSE)
 
   # Confirmed/Probable slide
   case_tbl_cp <- case_table_confirmed_probable(pos_ppl, date = date)
@@ -136,13 +136,13 @@ rpt_daily_pptx <- function(
       location = officer::ph_location_type("pic")
     )
 
-  # Create daily ped slide
-  pptx <- pptx %>%
-    officer::add_slide("Picture only", master) %>%
-    officer::ph_with(
-      value = case_plt_daily_ped,
-      location = officer::ph_location_type("pic")
-    )
+  # # Create daily ped slide
+  # pptx <- pptx %>%
+  #   officer::add_slide("Picture only", master) %>%
+  #   officer::ph_with(
+  #     value = case_plt_daily_ped,
+  #     location = officer::ph_location_type("pic")
+  #   )
 
   # Create confirmed/probable slide
   cp_title <- "COVID-19 Cases and Deaths by Status"
@@ -369,8 +369,11 @@ rpt_daily_mail <- function(
   n_ped_active <- NROW(filter_active(filter_peds(pos(inv))))
   n_ped_30 <- NROW(filter_active(filter_peds(pos(inv)), days = 30L))
   inv_yest = process_inv(read_inv(date-1))
+  inv_week = process_inv(read_inv(date-7))
 
-  n_ped_new <- n_ped_total - NROW(filter_peds(pos(inv_yest)))
+#  n_ped_new <- n_ped_total - NROW(filter_peds(pos(inv_yest)))
+
+  n_ped_new <- n_ped_total - NROW(filter_peds(pos(inv_week)))
 
   remove(pcr, inv, inv_yest)
   gc()
@@ -515,6 +518,8 @@ rpt_daily_mail <- function(
   str_ped_new <- format(n_ped_new, big.mark = ",")
   str_ped_total <- format(n_ped_total, big.mark = ",")
 
+
+
   body <- paste0(
     intro,
     vac_msg,
@@ -524,10 +529,10 @@ rpt_daily_mail <- function(
     "New Cases: ", str_ppl_new, "<br>",
     "Total Deaths: ", str_deaths,
     "<br><br>",
-    "Cumulative Pediatric Cases: ", str_ped_total, "<br>",
+    #"Cumulative Pediatric Cases: ", str_ped_total, "<br>",
     "Pediatric Cases in the Last 30 Days: ", str_ped_30, "<br>",
     "Active Pediatric Cases: ", str_ped_active, "<br>",
-    "New Pediatric Cases: ", str_ped_new,
+   # "New Pediatric Cases: ", str_ped_new,
     "<br><br>",
     "% Vaccinated of Goal: ", str_pct_vac_goal, "<br>",
     "% Vaccinated of Population: ", str_pct_vac, "<br>",
@@ -548,6 +553,42 @@ rpt_daily_mail <- function(
     "<br><br>",
     "<i>Note: This email was generated automatically</i>"
   )
+
+  if (weekdays(lubridate::today()) == "Tuesday") {
+    body <- paste0(
+      intro,
+      vac_msg,
+      "<br><br>",
+      "Total Tests: ", str_test_total, "<br>",
+      "Total Cases: ", str_ppl_pos, "<br>",
+      "New Cases: ", str_ppl_new, "<br>",
+      "Total Deaths: ", str_deaths,
+      "<br><br>",
+      "Cumulative Pediatric Cases: ", str_ped_total, "<br>",
+      "Pediatric Cases in the Last 30 Days: ", str_ped_30, "<br>",
+      "Active Pediatric Cases: ", str_ped_active, "<br>",
+      "New Pediatric Cases (7 days): ", str_ped_new,
+      "<br><br>",
+      "% Vaccinated of Goal: ", str_pct_vac_goal, "<br>",
+      "% Vaccinated of Population: ", str_pct_vac, "<br>",
+      "Total People Vaccinated: ", str_ppl_vac, "<br>",
+      "Vaccinations per day (7-day average): ", str_avg_vac, "<br>",
+      "Reported cases per day (7-day average): ", str_avg_case,
+      "<br><br>",
+      vac_recent, "<br>",
+      vac_ppl,
+      "<br><br>",
+      "Thanks!",
+      "<br><br>",
+      "<h3>Supplementary Numbers: Delete Before Sending</h3>", "<br>",
+      test_tbl_total, "<br>",
+      ppl_tbl_total, "<br>",
+      cp_tbl, "<br>",
+      active_tbl,
+      "<br><br>",
+      "<i>Note: This email was generated automatically</i>"
+    )
+  }
 
   # Get powerpoints if available
   ppt_path <- fs::dir_ls(
