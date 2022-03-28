@@ -138,7 +138,7 @@ rpt_vac_pptx <- function(
     dplyr::mutate(label_y = cumsum(pct_pop))
 
 
-  library("ggplot2")
+
 
 
 
@@ -175,6 +175,7 @@ rpt_vac_pptx <- function(
     flextable::autofit()
 
   vac_age <- vac_plot_age(date = date)
+  vac_age_utd <- vac_up_to_date(date = date)
 
   #Start sex plot and table
 
@@ -506,6 +507,14 @@ pptx <- pptx %>%
     location = officer::ph_location_type("pic")
   )
 
+
+# Create vac by age plot slide
+pptx <- pptx %>%
+  officer::add_slide("Picture only", master) %>%
+  officer::ph_with(
+    value = vac_age_utd,
+    location = officer::ph_location_type("pic")
+  )
 
 
 # Create vaccinations by sex table slide
