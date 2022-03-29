@@ -369,7 +369,7 @@ rpt_daily_mail <- function(
   n_ped_active <- NROW(filter_active(filter_peds(pos(inv))))
   n_ped_30 <- NROW(filter_active(filter_peds(pos(inv)), days = 30L))
   inv_yest = process_inv(read_inv(date-1))
-  inv_week = process_inv(read_inv(date-7))
+  inv_week = process_inv(read_inv(date-14))
 
 #  n_ped_new <- n_ped_total - NROW(filter_peds(pos(inv_yest)))
 
@@ -567,7 +567,7 @@ rpt_daily_mail <- function(
       "Cumulative Pediatric Cases: ", str_ped_total, "<br>",
       "Pediatric Cases in the Last 30 Days: ", str_ped_30, "<br>",
       "Active Pediatric Cases: ", str_ped_active, "<br>",
-      "New Pediatric Cases (7 days): ", str_ped_new,
+      "New Pediatric Cases (14 days): ", str_ped_new,
       "<br><br>",
       "% Vaccinated of Goal: ", str_pct_vac_goal, "<br>",
       "% Vaccinated of Population: ", str_pct_vac, "<br>",
