@@ -567,7 +567,7 @@ rpt_daily_mail <- function(
       "Cumulative Pediatric Cases: ", str_ped_total, "<br>",
       "Pediatric Cases in the Last 30 Days: ", str_ped_30, "<br>",
       "Active Pediatric Cases: ", str_ped_active, "<br>",
-      "New Pediatric Cases (14 days): ", str_ped_new,
+      "New Pediatric Cases (Reported in last 14 days): ", str_ped_new,
       "<br><br>",
       "% Vaccinated of Goal: ", str_pct_vac_goal, "<br>",
       "% Vaccinated of Population: ", str_pct_vac, "<br>",
