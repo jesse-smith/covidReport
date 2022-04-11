@@ -14,7 +14,7 @@
 #' @return An `rpptx` object
 #'
 #' @export
-rpt_daily_pptx <- function(
+rpt_weekly_pptx <- function(
   date = NULL,
   dir = coviData::path_create(
     "V:/EPI DATA ANALYTICS TEAM/COVID SANDBOX REDCAP DATA/Status Report",
@@ -59,15 +59,15 @@ rpt_daily_pptx <- function(
   gc(verbose = FALSE)
 
   # Cumulative case slide
-  case_plt_cumulative <- case_plot_cumulative(pos_ppl, date = date)
+  case_plt_cumulative <- case_plot_cumulative_week(pos_ppl, date = date)
   gc(verbose = FALSE)
 
   # Daily case slide
-  case_plt_daily_all <- case_plot_daily_ped_all(pos_ppl, date = date)
+  case_plt_daily_all <- case_plot_daily_week(pos_ppl, date = date)
   gc(verbose = FALSE)
 
   # 30-Day case slide
-  case_plt_recent <- case_plot_daily_recent(pos_ppl, date = date)
+  case_plt_recent <- case_plot_daily_recent_week(pos_ppl, date = date)
   gc(verbose = FALSE)
 
   # # Daily ped slide
@@ -112,7 +112,7 @@ rpt_daily_pptx <- function(
   date_ppt <- format(date, "%B %d, %Y")
 
   # Create title slide
-  title <- "COVID-19 Daily Status Report"
+  title <- "COVID-19 Weekly Status Report"
   pptx <- pptx %>%
     officer::add_slide("Title Slide", master) %>%
     officer::ph_with(
@@ -300,7 +300,7 @@ rpt_daily_pptx <- function(
   if (!is.null(dir)) {
     path <- coviData::path_create(
       dir,
-      paste0("daily_status_report_", date, ".pptx")
+      paste0("weekly_status_report_", date, ".pptx")
     )
     print(pptx, target = path)
     attr(pptx, "path") <- path
@@ -327,7 +327,7 @@ rpt_daily_pptx <- function(
 #'   \code{\link[coviData:process-nbs]{process_pcr()}}
 #'
 #' @export
-rpt_daily_mail <- function(
+rpt_weekly_mail <- function(
   date = NULL,
   to = c(
     "Liang.Li@shelbycountytn.gov",
@@ -383,7 +383,7 @@ rpt_daily_mail <- function(
   inv_yest = process_inv(read_inv(date-1))
   inv_week = process_inv(read_inv(date-14))
 
-#  n_ped_new <- n_ped_total - NROW(filter_peds(pos(inv_yest)))
+  #  n_ped_new <- n_ped_total - NROW(filter_peds(pos(inv_yest)))
 
   n_ped_new <- n_ped_total - NROW(filter_peds(pos(inv_week)))
 
@@ -544,7 +544,7 @@ rpt_daily_mail <- function(
     #"Cumulative Pediatric Cases: ", str_ped_total, "<br>",
     "Pediatric Cases in the Last 30 Days: ", str_ped_30, "<br>",
     "Active Pediatric Cases: ", str_ped_active, "<br>",
-   # "New Pediatric Cases: ", str_ped_new,
+    # "New Pediatric Cases: ", str_ped_new,
     "<br><br>",
     "% Vaccinated of Goal: ", str_pct_vac_goal, "<br>",
     "% Vaccinated of Population: ", str_pct_vac, "<br>",
