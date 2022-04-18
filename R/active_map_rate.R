@@ -78,6 +78,28 @@ active_map_rate <- function(
   str_mp <- format(n_mapped, big.mark = ",")
   str_ms <- format(n_missing, big.mark = ",")
 
+  #addition 4/18: find n of the lowest and highest zip codes and censor lowest if less than 10
+  gg_data$max <- dplyr::case_when(
+    gg_data[["rate"]] ==  max(gg_data[["rate"]], na.rm = TRUE) ~ gg_data[["n"]]
+  )
+
+  gg_data$min <- dplyr::case_when(
+    gg_data[["rate"]] ==  min(gg_data[["rate"]], na.rm = TRUE) ~ gg_data[["n"]]
+  )
+
+  n_min <- ifelse(min(gg_data[["min"]], na.rm = TRUE)>= 10 , min(gg_data[["min"]], na.rm = TRUE),
+                  "Censored")
+  n_max <- min(gg_data[["max"]], na.rm = TRUE)
+  #end addition 4/18
+
+  #get the max zip code
+  gg_data$zipmax <- dplyr::case_when(
+    gg_data[["rate"]] ==  max(gg_data[["rate"]], na.rm = TRUE) ~ gg_data[["zip"]]
+  )
+  zip_max <- max(gg_data[["zipmax"]], na.rm = TRUE)
+
+
+
 
   rate_total <- 1e5 * n_total / 937166
   rate_min <- min(gg_data[["rate"]], na.rm = TRUE)
@@ -86,6 +108,8 @@ active_map_rate <- function(
   str_rt_t <- round(rate_total, digits = 1L)
   str_rt_min <- round(rate_min, digits = 1L)
   str_rt_max <- round(rate_max, digits = 1L)
+
+
 
   caption <- paste0(
     "Data Source: National Electronic Disease Surveillance System (NEDSS)\n",
@@ -103,9 +127,10 @@ active_map_rate <- function(
   breaks <- scale_breaks(rate_min, rate_max)[[1L]]
 
   label <- paste0(
-    "Shelby Co. Total: ", str_rt_t, "\n",
-    "Lowest ZIP: ", str_rt_min, "\n",
-    "Highest ZIP: ", str_rt_max
+    "Shelby Co. Total Rate: ", str_rt_t, "\n",
+    "Lowest ZIP Rate: ", str_rt_min, ", N: ", n_min, "\n",
+    "Highest ZIP: ", zip_max, "\n",
+    "Rate: ", str_rt_max, ", N: ", n_max
   )
 
   zip_plt <- ggplot2::ggplot(
