@@ -116,8 +116,7 @@ active_map_rate <- function(
     "Total = ", str_t, " Mapped = ", str_mp,
     " (Other/Missing ZIP = ", str_ms, ")\n",
     # "Data shown on a continuous color scale from 0% to 80%\n",
-    "Rates calculated with ACS 2019 5 Year population estimates\n",
-    "Highest ZIP: ", zip_max, " - ", "Rate: ", str_rt_max, ", N: ", n_max
+    "Rates calculated with ACS 2019 5 Year population estimates\n"
   )
 
   pal_n <- 9L
@@ -130,7 +129,7 @@ active_map_rate <- function(
   label <- paste0(
     "Shelby Co. Total Rate: ", str_rt_t, "\n",
     "Lowest ZIP: ", str_rt_min, "\n",
-    "Highest ZIP: ", str_rt_max
+    "Highest ZIP: ", str_rt_max, ", N: ", n_max
   )
 
   zip_plt <- ggplot2::ggplot(
