@@ -101,8 +101,8 @@ rpt_weekly_pptx <- function(
   gc(verbose = FALSE)
 
   # Investigations slide
-  inv_tbl_total <- inv_table_total(pos_ppl, date = date)
-  gc(verbose = FALSE)
+  # inv_tbl_total <- inv_table_total(pos_ppl, date = date)
+  # gc(verbose = FALSE)
 
   remove(pos_ppl, pcr_subset)
   gc(verbose = FALSE)
@@ -275,27 +275,27 @@ rpt_weekly_pptx <- function(
     )
 
   # Create investigations slide
-  inv_title <- "COVID-19 Case Investigations"
-  pptx <- pptx %>%
-    officer::add_slide("Table", master) %>%
-    officer::ph_with(
-      value = inv_title,
-      location = officer::ph_location_type("title")
-    ) %>%
-    officer::ph_with(
-      value = date_ppt,
-      location = officer::ph_location_type("subTitle")
-    ) %>%
-    officer::ph_with(
-      value = inv_tbl_total,
-      location = ph_location_table(
-        inv_tbl_total,
-        pptx,
-        layout = "Table",
-        pos_h = FALSE,
-        valign = 1
-      )
-    )
+  # inv_title <- "COVID-19 Case Investigations"
+  # pptx <- pptx %>%
+  #   officer::add_slide("Table", master) %>%
+  #   officer::ph_with(
+  #     value = inv_title,
+  #     location = officer::ph_location_type("title")
+  #   ) %>%
+  #   officer::ph_with(
+  #     value = date_ppt,
+  #     location = officer::ph_location_type("subTitle")
+  #   ) %>%
+  #   officer::ph_with(
+  #     value = inv_tbl_total,
+  #     location = ph_location_table(
+  #       inv_tbl_total,
+  #       pptx,
+  #       layout = "Table",
+  #       pos_h = FALSE,
+  #       valign = 1
+  #     )
+  #   )
 
   if (!is.null(dir)) {
     path <- coviData::path_create(
