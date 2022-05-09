@@ -151,7 +151,7 @@ rpt_demog_pptx <- function(
     )
 
   # Create active age slide
-  active_age_title <- "Active COVID-19 Cases by Age"
+  active_age_title <- "14-Day COVID-19 Cases by Age"
   pptx <- pptx %>%
     officer::add_slide("Two Content", master) %>%
     officer::ph_with(
@@ -177,7 +177,7 @@ rpt_demog_pptx <- function(
     )
 
   # Create active sex slide
-  active_sex_title <- "Active COVID-19 Cases by Sex"
+  active_sex_title <- "14-Day COVID-19 Cases by Sex"
   pptx <- pptx %>%
     officer::add_slide("Two Content", master) %>%
     officer::ph_with(
@@ -203,7 +203,7 @@ rpt_demog_pptx <- function(
     )
 
   # Create active race slide
-  active_race_title <- "Active COVID-19 Cases by Race"
+  active_race_title <- "14-Day COVID-19 Cases by Race"
   pptx <- pptx %>%
     officer::add_slide("Two Content", master) %>%
     officer::ph_with(
@@ -229,7 +229,7 @@ rpt_demog_pptx <- function(
     )
 
   # Create active ethnicity slide
-  active_eth_title <- "Active COVID-19 Cases by Ethnicity"
+  active_eth_title <- "14-Day COVID-19 Cases by Ethnicity"
   pptx <- pptx %>%
     officer::add_slide("Two Content", master) %>%
     officer::ph_with(
@@ -258,7 +258,7 @@ rpt_demog_pptx <- function(
 
 
   # Create active peds sex slide
-  active_peds_sex_title <- "Active Pediatric COVID-19 Cases by Sex"
+  active_peds_sex_title <- "14-Day Pediatric COVID-19 Cases by Sex"
   pptx <- pptx %>%
     officer::add_slide("Two Content", master) %>%
     officer::ph_with(
@@ -284,7 +284,7 @@ rpt_demog_pptx <- function(
     )
 
   # Create active peds race slide
-  active_peds_race_title <- "Active Pediatric COVID-19 Cases by Race"
+  active_peds_race_title <- "14-Day Pediatric COVID-19 Cases by Race"
   pptx <- pptx %>%
     officer::add_slide("Two Content", master) %>%
     officer::ph_with(
@@ -310,7 +310,7 @@ rpt_demog_pptx <- function(
     )
 
   # Create active peds ethnicity slide
-  active_peds_eth_title <- "Active Pediatric COVID-19 Cases by Ethnicity"
+  active_peds_eth_title <- "14-Day Pediatric COVID-19 Cases by Ethnicity"
   pptx <- pptx %>%
     officer::add_slide("Two Content", master) %>%
     officer::ph_with(
