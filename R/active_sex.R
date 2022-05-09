@@ -15,7 +15,7 @@ active_plot_sex <- function(
   date <- date_inv(date)
   data %>%
     active_calc_sex(date = date) %>%
-    demog_plot_("Active Case Rates", grp = "sex", date = date)
+    demog_plot_("14-Day Case Rates", grp = "sex", date = date)
 }
 
 #' Tabluate Active Cases by Sex

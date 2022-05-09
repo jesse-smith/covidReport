@@ -15,7 +15,7 @@ active_plot_race <- function(
   date <- date_inv(date)
   data %>%
     active_calc_race(date = date) %>%
-    demog_plot_("Active Case Rates", grp = "race", date = date)
+    demog_plot_("14-Day Case Rates", grp = "race", date = date)
 }
 
 #' Tabluate Active Cases by Race

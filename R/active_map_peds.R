@@ -180,7 +180,7 @@ active_ped_map_rate <- function(
       fontface = "bold"
     ) +
     ggplot2::scale_fill_gradientn(
-      name = "Active Cases per 100k",
+      name = "14-Day Cases per 100k",
       breaks = breaks,
       oob = scales::oob_squish,
       colors = pal,
@@ -212,7 +212,7 @@ active_ped_map_rate <- function(
 
   set_covid_theme(zip_plt) %>%
     add_title_caption(
-      title = "Active Pediatric Cases by ZIP Code",
+      title = "14-Day Pediatric Cases by ZIP Code",
       subtitle = format(date, "%m/%d/%Y"),
       caption = caption
     ) %>%

@@ -15,7 +15,7 @@ active_plot_ethnicity <- function(
   date <- date_inv(date)
   data %>%
     active_calc_ethnicity(date = date) %>%
-    demog_plot_("Active Case Rates", grp = "ethnicity", date = date)
+    demog_plot_("14-Day Case Rates", grp = "ethnicity", date = date)
 }
 
 #' Tabluate Active Cases by Ethnicity

@@ -212,28 +212,28 @@ rpt_daily_pptx <- function(
       )
     )
 
-  # Create active slide
-  active_title <- "Active COVID-19 Cases"
-  pptx <- pptx %>%
-    officer::add_slide("Table", master) %>%
-    officer::ph_with(
-      value = active_title,
-      location = officer::ph_location_type("title")
-    ) %>%
-    officer::ph_with(
-      value = date_ppt,
-      location = officer::ph_location_type("subTitle")
-    ) %>%
-    officer::ph_with(
-      value = case_tbl_active,
-      location = ph_location_table(
-        case_tbl_active,
-        pptx,
-        layout = "Table",
-        pos_h = FALSE,
-        valign = 1
-      )
-    )
+  # # Create active slide
+  # active_title <- "Active COVID-19 Cases"
+  # pptx <- pptx %>%
+  #   officer::add_slide("Table", master) %>%
+  #   officer::ph_with(
+  #     value = active_title,
+  #     location = officer::ph_location_type("title")
+  #   ) %>%
+  #   officer::ph_with(
+  #     value = date_ppt,
+  #     location = officer::ph_location_type("subTitle")
+  #   ) %>%
+  #   officer::ph_with(
+  #     value = case_tbl_active,
+  #     location = ph_location_table(
+  #       case_tbl_active,
+  #       pptx,
+  #       layout = "Table",
+  #       pos_h = FALSE,
+  #       valign = 1
+  #     )
+  #   )
 
   # Create test table slide
   test_tbl_title <- "COVID-19 PCR Tests"
@@ -543,7 +543,7 @@ rpt_daily_mail <- function(
     "<br><br>",
     #"Cumulative Pediatric Cases: ", str_ped_total, "<br>",
     "Pediatric Cases in the Last 30 Days: ", str_ped_30, "<br>",
-    "Active Pediatric Cases: ", str_ped_active, "<br>",
+    "14-Day Pediatric Cases: ", str_ped_active, "<br>",
    # "New Pediatric Cases: ", str_ped_new,
     "<br><br>",
     "% Vaccinated of Goal: ", str_pct_vac_goal, "<br>",
@@ -578,7 +578,7 @@ rpt_daily_mail <- function(
       "<br><br>",
       "Cumulative Pediatric Cases: ", str_ped_total, "<br>",
       "Pediatric Cases in the Last 30 Days: ", str_ped_30, "<br>",
-      "Active Pediatric Cases: ", str_ped_active, "<br>",
+      "14-Day Pediatric Cases: ", str_ped_active, "<br>",
       "New Pediatric Cases (Reported in last 14 days): ", str_ped_new,
       "<br><br>",
       "% Vaccinated of Goal: ", str_pct_vac_goal, "<br>",
