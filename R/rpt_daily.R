@@ -471,16 +471,13 @@ rpt_daily_mail <- function(
   } else {
     vac_msg <- ""
   }
-  vac_data <- coviData::vac_prep(coviData::read_vac(date = vac_date))
-  gc()
 
+  #Read vac tables
   vac_recent <- gt::as_raw_html(vac_table_recent_email())
   gc()
   vac_ppl <- gt::as_raw_html(vac_table_totals_email())
   gc()
 
-  remove(vac_data)
-  gc()
 
   # Vaccination numbers
   n_ppl_vac <- vac_ppl %>%
