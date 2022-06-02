@@ -32,6 +32,11 @@ vac_plot_age <- function(
 
   date <- date_vac(date)
 
+
+
+
+
+
   gg_data <- .data %>%
     vac_count_grp() %>%
     vac_join_age_pop(incl_under_12 = incl_under_12) %>%
@@ -43,10 +48,10 @@ vac_plot_age <- function(
     dplyr::group_by(age_grp) %>%
     dplyr::mutate(cum_total = cumsum(pct_pop))%>%
     dplyr::mutate(label_y = ifelse(
-      pct_pop < 0.01, NA, cum_total
+      pct_pop < 0.0175, NA, cum_total
     ))%>%
     dplyr::mutate(label_tot = ifelse(
-      status == "Additional Dose", cum_total, NA
+      status == "Additional Dose (Multiple)", cum_total, NA
     ))
 
   gg_data %>%
@@ -104,8 +109,8 @@ add_vac_age_col <- function(gg_obj, by_pop) {
   width <- if (by_pop) 0.95 else 0.99
 
   gg_obj + ggplot2::geom_col()+
-    ggplot2::scale_fill_manual(values=c("deepskyblue4","steelblue3", "midnightblue"))+
-    ggplot2::scale_color_manual(values=c("deepskyblue4","steelblue3", "midnightblue"))+
+    ggplot2::scale_fill_manual(values=c("slategray4", "deepskyblue4","steelblue3", "midnightblue"))+
+    ggplot2::scale_color_manual(values=c("slategray4","deepskyblue4","steelblue3", "midnightblue"))+
     ggplot2::guides(fill = ggplot2::guide_legend(reverse=TRUE))+
     ggplot2::guides(color = ggplot2::guide_legend(reverse=TRUE))+
     ggplot2::labs(fill = "Status")+
@@ -161,7 +166,7 @@ add_vac_age_scale <- function(gg_obj, by_pop) {
 add_vac_age_axis_labels <- function(gg_obj, by_pop) {
   by_pop <- coviData::assert_bool(by_pop)
 
-  ylab <- dplyr::if_else(by_pop, "% Population", "% Vaccinations")
+  ylab <- dplyr::if_else(by_pop, "% Population Vaccinated by Age Group", "% Vaccinations")
   add_axis_labels(gg_obj, xlab = "Age", ylab = ylab)
 }
 
@@ -257,21 +262,24 @@ add_vac_age_title_caption <- function(gg_obj, by_pop, date) {
   )
 }
 
+
+
 vac_count_grp <- function(.data) {
   .data %>%
     coviData::vac_distinct() %>%
     dplyr::transmute(status = dplyr::case_when(
       is.na(.data[["recip_fully_vacc"]]) ~ "Initiated",
       .data[["recip_fully_vacc"]] == FALSE ~ "Initiated",
-      .data[["recip_fully_vacc"]] == TRUE & is.na(.data[["boost_date"]]) ~ "Completed",
-      .data[["recip_fully_vacc"]] == TRUE & !is.na(.data[["boost_date"]]) ~ "Additional Dose"
+      .data[["recip_fully_vacc"]] == TRUE & is.na(.data[["boost_dose1"]]) & is.na(.data[["boost_dose2"]]) ~ "Completed",
+      .data[["recip_fully_vacc"]] == TRUE & !is.na(.data[["boost_dose2"]]) ~ "Additional Dose (Multiple)",
+      .data[["recip_fully_vacc"]] == TRUE & !is.na(.data[["boost_dose1"]]) ~ "Additional Dose (One)"
     ),
       age_grp = .data[["age_at_admin"]] %>% std_age() %>% vac_age_grp()
     ) %>%
     dplyr::count(.data[["status"]],  .data[["age_grp"]]) %>%
     tidyr::pivot_wider(names_from = "status", values_from = "n") %>%
     tidyr::pivot_longer(
-      c("Additional Dose", "Completed", "Initiated"),
+      c("Additional Dose (Multiple)", "Additional Dose (One)", "Completed", "Initiated"),
       names_to = "status",
       values_to = "n",
       names_transform = list(full = as.logical)

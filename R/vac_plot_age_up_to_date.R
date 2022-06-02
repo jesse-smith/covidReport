@@ -75,7 +75,7 @@ gg_data <- vac_ind %>%
   tidyr::pivot_wider(names_from = "utd", values_from = "n") %>%
 
   tidyr::pivot_longer(
-    c("Not up to date", "Undetermined", "Up to date"),
+    c("Not up to date", "Up to date"),
     names_to = "utd",
     values_to = "n",
     names_transform = list(full = as.logical)
@@ -89,12 +89,10 @@ gg_data <- vac_ind %>%
 
 
 ce <- gg_data %>%
-  arrange(age_grp, rev(utd))%>%subset(utd != "Undetermined")
+  arrange(age_grp, rev(utd))
 
 
-undetermined <- gg_data %>%
-  arrange(age_grp, rev(utd))%>%subset(utd == "Undetermined")
-undetermined <- sum(undetermined$n, na.rm = TRUE)
+
 ce <- ce %>%
   group_by(age_grp) %>%
   mutate(label_y = cumsum(pct_pop)) %>%
@@ -129,7 +127,6 @@ ce%>%
 add_daily_vac_title_caption <- function(gg_obj, date) {
 
   caption <- paste0(
-    "Excludes those with undetermined vaccination status", "\n",
     #"(N = ", format(missing, big.mark = ","), ")\n",
     "Data Source: Tennessee Immunization Information System (TennIIS)"
   )

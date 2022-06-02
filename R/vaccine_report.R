@@ -19,8 +19,9 @@ rpt_vac_pptx <- function(
       dose_status = dplyr::case_when(
         is.na(.data[["recip_fully_vacc"]]) ~ "Initiated",
         .data[["recip_fully_vacc"]] == FALSE ~ "Initiated",
-        .data[["recip_fully_vacc"]] == TRUE & is.na(.data[["boost_date"]]) ~ "Completed",
-        .data[["recip_fully_vacc"]] == TRUE & !is.na(.data[["boost_date"]]) ~ "Additional Dose"
+        .data[["recip_fully_vacc"]] == TRUE & is.na(.data[["boost_dose1"]]) & is.na(.data[["boost_dose2"]]) ~ "Completed",
+        .data[["recip_fully_vacc"]] == TRUE & !is.na(.data[["boost_dose2"]]) ~ "Additional Dose (Multiple)",
+        .data[["recip_fully_vacc"]] == TRUE & !is.na(.data[["boost_dose1"]]) ~ "Additional Dose (One)"
       ))
 
   population <- covidReport::pop_2019
@@ -85,7 +86,7 @@ rpt_vac_pptx <- function(
       pct_pop < 0.01, NA, cum_total
     ))%>%
     dplyr::mutate(label_tot = ifelse(
-      dose_status == "Additional Dose", cum_total, NA
+      dose_status == "Additional Dose (Multiple)", cum_total, NA
     ))
 
   gg_race <- people %>%
@@ -101,7 +102,7 @@ rpt_vac_pptx <- function(
       pct_pop < 0.01, NA, cum_total
     ))%>%
     dplyr::mutate(label_tot = ifelse(
-      dose_status == "Additional Dose", cum_total, NA
+      dose_status == "Additional Dose (Multiple)", cum_total, NA
     ))
 
   gg_ethnicity <- people %>%
@@ -117,7 +118,7 @@ rpt_vac_pptx <- function(
       pct_pop < 0.01, NA, cum_total
     ))%>%
     dplyr::mutate(label_tot = ifelse(
-      dose_status == "Additional Dose", cum_total, NA
+      dose_status == "Additional Dose (Multiple)", cum_total, NA
     ))
 
 
@@ -145,11 +146,17 @@ rpt_vac_pptx <- function(
   #start age table
   people$age_group <- ifelse(is.na(people$age_group) | people$age_group == "0-4", "Other/Unknown", people$age_group)
 
-  additional_dose <- people %>%
+  additional_dose_one <- people %>%
     dplyr::group_by(dose_status, age_group)%>%
     dplyr::summarise(n = n()) %>%
-    subset(dose_status == "Additional Dose") %>%
-    dplyr::rename("Additional Dose" = n)
+    subset(dose_status == "Additional Dose (One)") %>%
+    dplyr::rename("Additional Dose (One)" = n)
+
+  additional_dose_multiple <- people %>%
+    dplyr::group_by(dose_status, age_group)%>%
+    dplyr::summarise(n = n()) %>%
+    subset(dose_status == "Additional Dose (Multiple)") %>%
+    dplyr::rename("Additional Dose (Multiple)" = n)
 
   completed <- people %>%
     dplyr::group_by(dose_status, age_group)%>%
@@ -164,8 +171,9 @@ rpt_vac_pptx <- function(
     dplyr::rename("Initiated" = n)
 
   age_table <- left_join(initiated, completed, by = "age_group")%>%
-    left_join(additional_dose, by = "age_group") %>%
-    dplyr::select(age_group, "Initiated", "Completed", "Additional Dose")%>%
+    left_join(additional_dose_one, by = "age_group") %>%
+    left_join(additional_dose_multiple, by = "age_group") %>%
+    dplyr::select(age_group, "Initiated", "Completed", "Additional Dose (One)", "Additional Dose (Multiple)")%>%
     janitor::adorn_totals()%>%
     flextable::flextable() %>%
     flextable::set_header_labels(
@@ -179,11 +187,13 @@ rpt_vac_pptx <- function(
 
   #Start sex plot and table
 
+  unknown_gender <- sum(people$pat_gender == "Other" | people$pat_gender == "Unknown")
+
   sex_plot <- gg_sex%>%
     ggplot2::ggplot(ggplot2::aes(fill=dose_status, y=pct_pop, x=pat_gender)) +
     ggplot2::geom_bar(stack="dodge", stat="identity") +
-    ggplot2::scale_fill_manual(values=c("deepskyblue4","steelblue3", "midnightblue"))+
-    ggplot2::scale_color_manual(values=c("deepskyblue4","steelblue3", "midnightblue"))+
+    ggplot2::scale_fill_manual(values=c("slategray4", "deepskyblue4","steelblue3", "midnightblue"))+
+    ggplot2::scale_color_manual(values=c("slategray4","deepskyblue4","steelblue3", "midnightblue"))+
     ggplot2::guides(fill = ggplot2::guide_legend(reverse=TRUE))+
     ggplot2::guides(color = ggplot2::guide_legend(reverse=TRUE))+
     ggplot2::labs(fill = "Status")+
@@ -192,11 +202,15 @@ rpt_vac_pptx <- function(
     ggplot2::geom_text(ggplot2::aes(y = label_tot, label = paste0("Total: ", round(label_tot*100, digits = 1), "%")), vjust = -1, color = "black")+
     ggplot2::labs(fill = "Status")+
     ggplot2::ggtitle("Population Vaccinated by Sex")+
-    ggplot2::labs(x="Sex", y= "% Population")+
-    ggplot2::labs(subtitle = format(as.Date(date), "%B %d, %Y"))+
+    ggplot2::labs(x="Sex", y= "% Population Vaccinated by Sex")+
+    ggplot2::labs(subtitle = format(as.Date(date), "%B %d, %Y"),
+                  caption = paste0(
+                    "Note: Excludes vaccinated individuals with other/unknown sex (n = ", format(unknown_gender, big.mark = ","), ")."
+                  ))+
     ggthemes::theme_fivethirtyeight()+
     theme(axis.title = element_text(face="bold")) +
     theme(plot.title = element_text(hjust = 0.5))+
+    theme(plot.caption = element_text(hjust = 0.5))+
     theme(plot.subtitle = element_text(hjust = 0.5, size = 14))+
     ggplot2::scale_y_continuous(limits = c(0,1), labels = scales::percent) +
     theme(
@@ -204,11 +218,17 @@ rpt_vac_pptx <- function(
       panel.grid.minor.x = element_blank()
     )
 
-  additional_dose <- people %>%
+  additional_dose_multiple <- people %>%
     dplyr::group_by(dose_status, pat_gender)%>%
     dplyr::summarise(n = n()) %>%
-    subset(dose_status == "Additional Dose") %>%
-    dplyr::rename("Additional Dose" = n)
+    subset(dose_status == "Additional Dose (Multiple)") %>%
+    dplyr::rename("Additional Dose (Multiple)" = n)
+
+  additional_dose_one <- people %>%
+    dplyr::group_by(dose_status, pat_gender)%>%
+    dplyr::summarise(n = n()) %>%
+    subset(dose_status == "Additional Dose (One)") %>%
+    dplyr::rename("Additional Dose (One)" = n)
 
   completed <- people %>%
     dplyr::group_by(dose_status, pat_gender)%>%
@@ -223,8 +243,9 @@ rpt_vac_pptx <- function(
     dplyr::rename("Initiated" = n)
 
   sex_table <- left_join(initiated, completed, by = "pat_gender")%>%
-    left_join(additional_dose, by = "pat_gender") %>%
-    dplyr::select(pat_gender, "Initiated", "Completed", "Additional Dose")%>%
+    left_join(additional_dose_one, by = "pat_gender") %>%
+    left_join(additional_dose_multiple, by = "pat_gender") %>%
+    dplyr::select(pat_gender, "Initiated", "Completed", "Additional Dose (One)", "Additional Dose (Multiple)")%>%
     janitor::adorn_totals()%>%
 
     flextable::flextable() %>%
@@ -241,11 +262,13 @@ rpt_vac_pptx <- function(
 
   #Start race plot and table
 
+  unknown_race <- sum(people$race == "Other/Unknown")
+
   race_plot <- gg_race%>%
     ggplot2::ggplot(ggplot2::aes(fill=dose_status, y=pct_pop, x=race)) +
     ggplot2::geom_bar(stack="dodge", stat="identity") +
-    ggplot2::scale_fill_manual(values=c("deepskyblue4","steelblue3", "midnightblue"))+
-    ggplot2::scale_color_manual(values=c("deepskyblue4","steelblue3", "midnightblue"))+
+    ggplot2::scale_fill_manual(values=c("slategray4", "deepskyblue4","steelblue3", "midnightblue"))+
+    ggplot2::scale_color_manual(values=c("slategray4", "deepskyblue4","steelblue3", "midnightblue"))+
     ggplot2::guides(fill = ggplot2::guide_legend(reverse=TRUE))+
     ggplot2::guides(color = ggplot2::guide_legend(reverse=TRUE))+
     ggplot2::labs(fill = "Status")+
@@ -254,11 +277,15 @@ rpt_vac_pptx <- function(
     ggplot2::geom_text(ggplot2::aes(y = label_tot, label = paste0("Total: ", round(label_tot*100, digits = 1), "%")), vjust = -1, color = "black")+
     ggplot2::labs(fill = "Status")+
     ggplot2::ggtitle("Population Vaccinated by Race")+
-    ggplot2::labs(x="Race", y= "% Population")+
-    ggplot2::labs(subtitle = format(as.Date(date), "%B %d, %Y"))+
+    ggplot2::labs(x="Race", y= "% Population Vaccinated by Race")+
+    ggplot2::labs(subtitle = format(as.Date(date), "%B %d, %Y"),
+                  caption = paste0(
+                    "Note: Excludes vaccinated individuals with other/unknown race (n = ", format(unknown_race, big.mark = ","), ")."
+                  ))+
     ggthemes::theme_fivethirtyeight()+
     theme(axis.title = element_text(face="bold")) +
     theme(plot.title = element_text(hjust = 0.5))+
+    theme(plot.caption = element_text(hjust = 0.5))+
     theme(plot.subtitle = element_text(hjust = 0.5, size = 14))+
     ggplot2::scale_y_continuous(limits = c(0,1), labels = scales::percent) +
     theme(
@@ -266,11 +293,17 @@ rpt_vac_pptx <- function(
       panel.grid.minor.x = element_blank()
     )
 
-  additional_dose <- people %>%
+  additional_dose_one <- people %>%
     dplyr::group_by(dose_status, race)%>%
     dplyr::summarise(n = n()) %>%
-    subset(dose_status == "Additional Dose") %>%
-    dplyr::rename("Additional Dose" = n)
+    subset(dose_status == "Additional Dose (One)") %>%
+    dplyr::rename("Additional Dose (One)" = n)
+
+  additional_dose_multiple <- people %>%
+    dplyr::group_by(dose_status, race)%>%
+    dplyr::summarise(n = n()) %>%
+    subset(dose_status == "Additional Dose (Multiple)") %>%
+    dplyr::rename("Additional Dose (Multiple)" = n)
 
   completed <- people %>%
     dplyr::group_by(dose_status, race)%>%
@@ -285,8 +318,9 @@ rpt_vac_pptx <- function(
     dplyr::rename("Initiated" = n)
 
   race_table <- left_join(initiated, completed, by = "race")%>%
-    left_join(additional_dose, by = "race") %>%
-    dplyr::select(race, "Initiated", "Completed", "Additional Dose")%>%
+    left_join(additional_dose_one, by = "race") %>%
+    left_join(additional_dose_multiple, by = "race") %>%
+    dplyr::select(race, "Initiated", "Completed", "Additional Dose (One)", "Additional Dose (Multiple)")%>%
     janitor::adorn_totals()%>%
 
     flextable::flextable() %>%
@@ -303,11 +337,13 @@ rpt_vac_pptx <- function(
 
   #Start ethnicity plot and table
 
+  unknown_ethnicity <- sum(people$ethnicity == "Other/Unknown")
+
   ethnicity_plot <- gg_ethnicity%>%
     ggplot2::ggplot(ggplot2::aes(fill=dose_status, y=pct_pop, x=ethnicity)) +
     ggplot2::geom_bar(stack="dodge", stat="identity") +
-    ggplot2::scale_fill_manual(values=c("deepskyblue4","steelblue3", "midnightblue"))+
-    ggplot2::scale_color_manual(values=c("deepskyblue4","steelblue3", "midnightblue"))+
+    ggplot2::scale_fill_manual(values=c("slategray4", "deepskyblue4","steelblue3", "midnightblue"))+
+    ggplot2::scale_color_manual(values=c("slategray4", "deepskyblue4","steelblue3", "midnightblue"))+
     ggplot2::guides(fill = ggplot2::guide_legend(reverse=TRUE))+
     ggplot2::guides(color = ggplot2::guide_legend(reverse=TRUE))+
     ggplot2::labs(fill = "Status")+
@@ -316,11 +352,15 @@ rpt_vac_pptx <- function(
     ggplot2::geom_text(ggplot2::aes(y = label_tot, label = paste0("Total: ", round(label_tot*100, digits = 1), "%")), vjust = -1, color = "black")+
     ggplot2::labs(fill = "Status")+
     ggplot2::ggtitle("Population Vaccinated by Ethnicity")+
-    ggplot2::labs(x="Ethnicity", y= "% Population")+
-    ggplot2::labs(subtitle = format(as.Date(date), "%B %d, %Y"))+
+    ggplot2::labs(x="Ethnicity", y= "% Population Vaccinated by Ethnicity")+
+    ggplot2::labs(subtitle = format(as.Date(date), "%B %d, %Y"),
+                  caption = paste0(
+                    "Note: Excludes vaccinated individuals with other/unknown ethnicity (n = ", format(unknown_ethnicity, big.mark = ","), ")."
+                  ))+
     ggthemes::theme_fivethirtyeight()+
     theme(axis.title = element_text(face="bold")) +
     theme(plot.title = element_text(hjust = 0.5))+
+    theme(plot.caption = element_text(hjust = 0.5))+
     theme(plot.subtitle = element_text(hjust = 0.5, size = 14))+
     ggplot2::scale_y_continuous(limits = c(0,1), labels = scales::percent) +
     theme(
@@ -328,11 +368,18 @@ rpt_vac_pptx <- function(
       panel.grid.minor.x = element_blank()
     )
 
-  additional_dose <- people %>%
+  additional_dose_one <- people %>%
     dplyr::group_by(dose_status, ethnicity)%>%
     dplyr::summarise(n = n()) %>%
-    subset(dose_status == "Additional Dose") %>%
-    dplyr::rename("Additional Dose" = n)
+    subset(dose_status == "Additional Dose (One)") %>%
+    dplyr::rename("Additional Dose (One)" = n)
+
+
+  additional_dose_multiple <- people %>%
+    dplyr::group_by(dose_status, ethnicity)%>%
+    dplyr::summarise(n = n()) %>%
+    subset(dose_status == "Additional Dose (Multiple)") %>%
+    dplyr::rename("Additional Dose (Multiple)" = n)
 
   completed <- people %>%
     dplyr::group_by(dose_status, ethnicity)%>%
@@ -347,8 +394,9 @@ rpt_vac_pptx <- function(
     dplyr::rename("Initiated" = n)
 
 ethnicity_table <- left_join(initiated, completed, by = "ethnicity")%>%
-    left_join(additional_dose, by = "ethnicity") %>%
-    dplyr::select(ethnicity, "Initiated", "Completed", "Additional Dose")%>%
+    left_join(additional_dose_one, by = "ethnicity") %>%
+    left_join(additional_dose_multiple, by = "ethnicity") %>%
+    dplyr::select(ethnicity, "Initiated", "Completed", "Additional Dose (One)", "Additional Dose (Multiple)")%>%
   janitor::adorn_totals()%>%
     flextable::flextable() %>%
     flextable::set_header_labels(
@@ -685,8 +733,9 @@ vac_table_totals_new <- function(
       status = dplyr::case_when(
         is.na(.data[["recip_fully_vacc"]]) ~ "Initiated",
         .data[["recip_fully_vacc"]] == FALSE ~ "Initiated",
-        .data[["recip_fully_vacc"]] == TRUE & is.na(.data[["boost_date"]]) ~ "Completed",
-        .data[["recip_fully_vacc"]] == TRUE & !is.na(.data[["boost_date"]]) ~ "Additional Dose"
+        .data[["recip_fully_vacc"]] == TRUE & is.na(.data[["boost_dose1"]]) & is.na(.data[["boost_dose2"]]) ~ "Completed",
+        .data[["recip_fully_vacc"]] == TRUE & !is.na(.data[["boost_dose2"]]) ~ "Additional Dose (Multiple)",
+        .data[["recip_fully_vacc"]] == TRUE & !is.na(.data[["boost_dose1"]]) ~ "Additional Dose (One)"
       ),
       .before = 1L
     )  %>%

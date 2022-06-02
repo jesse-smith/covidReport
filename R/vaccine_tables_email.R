@@ -29,8 +29,9 @@ library("dplyr")
       status = dplyr::case_when(
         is.na(.data[["recip_fully_vacc"]]) ~ "Initiated",
         .data[["recip_fully_vacc"]] == FALSE ~ "Initiated",
-        .data[["recip_fully_vacc"]] == TRUE & is.na(.data[["boost_date"]]) ~ "Completed",
-        .data[["recip_fully_vacc"]] == TRUE & !is.na(.data[["boost_date"]]) ~ "Additional Dose"
+        .data[["recip_fully_vacc"]] == TRUE & is.na(.data[["boost_dose1"]]) & is.na(.data[["boost_dose2"]]) ~ "Completed",
+        .data[["recip_fully_vacc"]] == TRUE & !is.na(.data[["boost_dose2"]]) ~ "Additional Dose (Multiple)",
+        .data[["recip_fully_vacc"]] == TRUE & !is.na(.data[["boost_dose1"]]) ~ "Additional Dose (One)"
       ),
       .before = 1L
     )  %>%
