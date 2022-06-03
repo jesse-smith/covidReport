@@ -89,6 +89,22 @@ rpt_vac_pptx <- function(
       dose_status == "Additional Dose (Multiple)", cum_total, NA
     ))
 
+  gg_sex2 <- people %>%
+    dplyr::group_by(status, pat_gender)%>%
+    dplyr::summarise(n = n())%>%
+    dplyr::left_join(sex)%>%
+    dplyr::mutate(pct_pop = n/pop)%>%
+    subset(!is.na(pct_pop))%>%
+    dplyr::arrange(pat_gender, desc(status))%>%
+    dplyr::group_by(pat_gender) %>%
+    dplyr::mutate(cum_total = cumsum(pct_pop))%>%
+    dplyr::mutate(label_y = ifelse(
+      pct_pop < 0.01, NA, cum_total
+    ))%>%
+    dplyr::mutate(label_tot = ifelse(
+      status == "Not up to date", cum_total, NA
+    ))
+
   gg_race <- people %>%
     dplyr::group_by(dose_status, race)%>%
     dplyr::summarise(n = n())%>%
@@ -105,6 +121,23 @@ rpt_vac_pptx <- function(
       dose_status == "Additional Dose (Multiple)", cum_total, NA
     ))
 
+
+  gg_race2 <- people %>%
+    dplyr::group_by(status, race)%>%
+    dplyr::summarise(n = n())%>%
+    dplyr::left_join(race)%>%
+    dplyr::mutate(pct_pop = n/pop)%>%
+    subset(!is.na(pct_pop))%>%
+    dplyr::arrange(race, desc(status))%>%
+    dplyr::group_by(race) %>%
+    dplyr::mutate(cum_total = cumsum(pct_pop))%>%
+    dplyr::mutate(label_y = ifelse(
+      pct_pop < 0.01, NA, cum_total
+    ))%>%
+    dplyr::mutate(label_tot = ifelse(
+      status == "Not up to date", cum_total, NA
+    ))
+
   gg_ethnicity <- people %>%
     dplyr::group_by(dose_status, ethnicity)%>%
     dplyr::summarise(n = n())%>%
@@ -119,6 +152,22 @@ rpt_vac_pptx <- function(
     ))%>%
     dplyr::mutate(label_tot = ifelse(
       dose_status == "Additional Dose (Multiple)", cum_total, NA
+    ))
+
+  gg_ethnicity2 <- people %>%
+    dplyr::group_by(status, ethnicity)%>%
+    dplyr::summarise(n = n())%>%
+    dplyr::left_join(ethnicity)%>%
+    dplyr::mutate(pct_pop = n/pop)%>%
+    subset(!is.na(pct_pop))%>%
+    dplyr::arrange(ethnicity, desc(status))%>%
+    dplyr::group_by(ethnicity) %>%
+    dplyr::mutate(cum_total = cumsum(pct_pop))%>%
+    dplyr::mutate(label_y = ifelse(
+      pct_pop < 0.01, NA, cum_total
+    ))%>%
+    dplyr::mutate(label_tot = ifelse(
+      status == "Not up to date", cum_total, NA
     ))
 
 
@@ -218,6 +267,37 @@ rpt_vac_pptx <- function(
       panel.grid.minor.x = element_blank()
     )
 
+  sex_plot2 <- gg_sex2%>%
+    ggplot2::ggplot(ggplot2::aes(fill=status, y=pct_pop, x=pat_gender)) +
+    ggplot2::geom_bar(stack="dodge", stat="identity") +
+    ggplot2::scale_fill_manual(values=c("midnightblue","deepskyblue3"))+
+    ggplot2::scale_color_manual(values=c("midnightblue","deepskyblue3"))+
+    ggplot2::guides(fill = ggplot2::guide_legend(reverse=TRUE))+
+    ggplot2::guides(color = ggplot2::guide_legend(reverse=TRUE))+
+    ggplot2::labs(fill = "Status")+
+    ggplot2::labs(color = "Status")+
+    ggplot2::geom_text(ggplot2::aes(y = label_y, label = paste0(round(pct_pop*100, digits = 1), "%")), vjust = 1.2, color = "white")+
+    ggplot2::geom_text(ggplot2::aes(y = label_tot, label = paste0("Total: ", round(label_tot*100, digits = 1), "%")), vjust = -1, color = "black")+
+    ggplot2::labs(fill = "Status")+
+    ggplot2::ggtitle("Population Up to Date with COVID-19 Vaccination by Sex")+
+    ggplot2::labs(x="Sex", y= "% Population Vaccinated by Sex")+
+    ggplot2::labs(subtitle = format(as.Date(date), "%B %d, %Y"),
+                  caption = paste0(
+                    "Note: Excludes vaccinated individuals with other/unknown sex (n = ", format(unknown_gender, big.mark = ","), ")."
+                  ))+
+    ggthemes::theme_fivethirtyeight()+
+    theme(axis.title = element_text(face="bold")) +
+    theme(plot.title = element_text(hjust = 0.5))+
+    theme(plot.caption = element_text(hjust = 0.5))+
+    theme(plot.subtitle = element_text(hjust = 0.5, size = 14))+
+    ggplot2::scale_y_continuous(limits = c(0,1), labels = scales::percent) +
+    theme(
+      panel.grid.major.x = element_blank(),
+      panel.grid.minor.x = element_blank()
+    )
+
+
+
   additional_dose_multiple <- people %>%
     dplyr::group_by(dose_status, pat_gender)%>%
     dplyr::summarise(n = n()) %>%
@@ -293,6 +373,37 @@ rpt_vac_pptx <- function(
       panel.grid.minor.x = element_blank()
     )
 
+
+
+  race_plot2 <- gg_race2%>%
+    ggplot2::ggplot(ggplot2::aes(fill=status, y=pct_pop, x=race)) +
+    ggplot2::geom_bar(stack="dodge", stat="identity") +
+    ggplot2::scale_fill_manual(values=c("midnightblue","deepskyblue3"))+
+    ggplot2::scale_color_manual(values=c("midnightblue","deepskyblue3"))+
+    ggplot2::guides(fill = ggplot2::guide_legend(reverse=TRUE))+
+    ggplot2::guides(color = ggplot2::guide_legend(reverse=TRUE))+
+    ggplot2::labs(fill = "Status")+
+    ggplot2::labs(color = "Status")+
+    ggplot2::geom_text(ggplot2::aes(y = label_y, label = paste0(round(pct_pop*100, digits = 1), "%")), vjust = 1.2, color = "white")+
+    ggplot2::geom_text(ggplot2::aes(y = label_tot, label = paste0("Total: ", round(label_tot*100, digits = 1), "%")), vjust = -1, color = "black")+
+    ggplot2::labs(fill = "Status")+
+    ggplot2::ggtitle("Population Up to Date with COVID-19 Vaccination by Race")+
+    ggplot2::labs(x="Race", y= "% Population Vaccinated by Race")+
+    ggplot2::labs(subtitle = format(as.Date(date), "%B %d, %Y"),
+                  caption = paste0(
+                    "Note: Excludes vaccinated individuals with other/unknown race (n = ", format(unknown_race, big.mark = ","), ")."
+                  ))+
+    ggthemes::theme_fivethirtyeight()+
+    theme(axis.title = element_text(face="bold")) +
+    theme(plot.title = element_text(hjust = 0.5))+
+    theme(plot.caption = element_text(hjust = 0.5))+
+    theme(plot.subtitle = element_text(hjust = 0.5, size = 14))+
+    ggplot2::scale_y_continuous(limits = c(0,1), labels = scales::percent) +
+    theme(
+      panel.grid.major.x = element_blank(),
+      panel.grid.minor.x = element_blank()
+    )
+
   additional_dose_one <- people %>%
     dplyr::group_by(dose_status, race)%>%
     dplyr::summarise(n = n()) %>%
@@ -352,6 +463,36 @@ rpt_vac_pptx <- function(
     ggplot2::geom_text(ggplot2::aes(y = label_tot, label = paste0("Total: ", round(label_tot*100, digits = 1), "%")), vjust = -1, color = "black")+
     ggplot2::labs(fill = "Status")+
     ggplot2::ggtitle("Population Vaccinated by Ethnicity")+
+    ggplot2::labs(x="Ethnicity", y= "% Population Vaccinated by Ethnicity")+
+    ggplot2::labs(subtitle = format(as.Date(date), "%B %d, %Y"),
+                  caption = paste0(
+                    "Note: Excludes vaccinated individuals with other/unknown ethnicity (n = ", format(unknown_ethnicity, big.mark = ","), ")."
+                  ))+
+    ggthemes::theme_fivethirtyeight()+
+    theme(axis.title = element_text(face="bold")) +
+    theme(plot.title = element_text(hjust = 0.5))+
+    theme(plot.caption = element_text(hjust = 0.5))+
+    theme(plot.subtitle = element_text(hjust = 0.5, size = 14))+
+    ggplot2::scale_y_continuous(limits = c(0,1), labels = scales::percent) +
+    theme(
+      panel.grid.major.x = element_blank(),
+      panel.grid.minor.x = element_blank()
+    )
+
+
+  ethnicity_plot2 <- gg_ethnicity2%>%
+    ggplot2::ggplot(ggplot2::aes(fill=status, y=pct_pop, x=ethnicity)) +
+    ggplot2::geom_bar(stack="dodge", stat="identity") +
+    ggplot2::scale_fill_manual(values=c("midnightblue","deepskyblue3"))+
+    ggplot2::scale_color_manual(values=c("midnightblue","deepskyblue3"))+
+    ggplot2::guides(fill = ggplot2::guide_legend(reverse=TRUE))+
+    ggplot2::guides(color = ggplot2::guide_legend(reverse=TRUE))+
+    ggplot2::labs(fill = "Status")+
+    ggplot2::labs(color = "Status")+
+    ggplot2::geom_text(ggplot2::aes(y = label_y, label = paste0(round(pct_pop*100, digits = 1), "%")), vjust = 1.2, color = "white")+
+    ggplot2::geom_text(ggplot2::aes(y = label_tot, label = paste0("Total: ", round(label_tot*100, digits = 1), "%")), vjust = -1, color = "black")+
+    ggplot2::labs(fill = "Status")+
+    ggplot2::ggtitle("Population Up to Date with COVID-19 Vaccination by Ethnicity")+
     ggplot2::labs(x="Ethnicity", y= "% Population Vaccinated by Ethnicity")+
     ggplot2::labs(subtitle = format(as.Date(date), "%B %d, %Y"),
                   caption = paste0(

@@ -66,6 +66,7 @@ vac_plot_daily <- function(
   dose1 <- subset(vac_data, dose_count == 1)
   dose2 <- subset(vac_data, dose_count == 2)
   dose3 <- subset(vac_data, dose_count == 3)
+  dose4 <- subset(vac_data, dose_count == 4)
 
   gg_data_dose1 <- prep_daily_vac_data(
     data = dose1,
@@ -94,32 +95,69 @@ vac_plot_daily <- function(
   gg_data_dose3$Dose <- "3"
 
 
+  gg_data_dose4 <- prep_daily_vac_data(
+    data = dose4,
+    min_date = min_date,
+    date = date,
+    delay = delay
+  )
+  gg_data_dose4$Dose <- "4"
 
 
+  #output daily vaccint counts to v drive for google sheets
+  data_dose1 <- gg_data_dose1%>%
+    dplyr::rename(dose1 = n)%>%
+    dplyr::select(vac_date, dose1)
 
-  gg_data1 <- dplyr:: full_join(gg_data_dose1, gg_data_dose3)
+  data_dose2 <- gg_data_dose2%>%
+    dplyr::rename(dose2 = n)%>%
+    dplyr::select(vac_date, dose2)
 
-  gg_data <- dplyr::full_join(gg_data_dose2, gg_data1)
+  data_dose3 <- gg_data_dose3%>%
+    dplyr::rename(dose3 = n)%>%
+    dplyr::select(vac_date, dose3)
 
-  avg1 <- dplyr::full_join(gg_data_dose1, gg_data_dose3, by="vac_date")
+  data_dose4 <- gg_data_dose4%>%
+    dplyr::rename(dose4 = n)%>%
+    dplyr::select(vac_date, dose4)
 
-  avg <- dplyr::full_join(avg1, gg_data_dose2, by="vac_date")
+  all <- dplyr::left_join(data_dose1, data_dose2)%>%
+    dplyr::left_join(data_dose3)%>%
+    dplyr::left_join(data_dose4)
 
-  avg$avg_total <- avg$avg + avg$avg.x + avg$avg.y
+  all$total <- all$dose1 + all$dose2 + all$dose3 + all$dose4
+
+  write.csv(all, file = paste0("//c19links/COVID-19/EPI DATA ANALYTICS TEAM/COVID SANDBOX REDCAP DATA/COVID-19 Vaccine Reporting/daily vac counts/dose_counts_", date, ".csv"))
+  #end output daily vaccint counts to v drive for google sheets
+
+  gg_data <- dplyr::full_join(gg_data_dose1, gg_data_dose2)%>%
+    dplyr::full_join(gg_data_dose3)%>%
+    dplyr::full_join(gg_data_dose4)
+
+
+  avg <- dplyr::full_join(gg_data_dose1, gg_data_dose2, by="vac_date")%>%
+    dplyr::full_join(gg_data_dose3, by="vac_date")%>%
+    dplyr::full_join(gg_data_dose4, by="vac_date")
+
+  avg$avg_total <- avg$avg.x + avg$avg.y + avg$avg.x.x + avg$avg.y.y
 
   avg <- avg %>% dplyr::select(vac_date, avg_total)
 
   gg_data2 <- dplyr::full_join(gg_data, avg)
 
+  n_dose4 <- nrow(dose4)
   n_dose3 <- nrow(dose3)
-  n_total_vac <- n_dose3 + n_vac_dose1_2
+  n_dose2 <- nrow(dose2)
+  n_dose1 <- nrow(dose1)
+
+  n_total_vac <- n_dose4 + n_dose3 + n_dose2 + n_dose1
   n_plotted <- sum(gg_data[["n"]], na.rm = TRUE)
   n_missing <- n_total_vac - n_plotted
 
   n_vac_yest <- nrow(coviData:::vac_prep(date = vac_date - 1))
   n_new <- n_total_vac - n_vac_yest
 
-  #get number of doses reported in last 7 days
+  #get number of doses administered in last 7 days
   last_7_day <- subset(gg_data, (date-6) <= gg_data$vac_date & gg_data$vac_date <= date)
   n_7day_vac <- sum(last_7_day$n)
 
@@ -128,7 +166,7 @@ vac_plot_daily <- function(
 
   try_plot <- ggplot2::ggplot(gg_data2, ggplot2::aes(x = vac_date, y = n, fill = fct_rev(Dose))) +
     ggplot2::geom_col()+
-    scale_fill_manual(values=c("midnightblue","deepskyblue3", "cadetblue2"))+
+    scale_fill_manual(values=c("slategray4", "midnightblue","deepskyblue3", "cadetblue2"))+
     labs(fill = "Dose") +
     ggplot2::geom_line(
       ggplot2::aes(y = .data[["avg_total"]]),
@@ -345,7 +383,7 @@ add_daily_vac_axis_labels <- function(gg_obj) {
 add_daily_vac_title_caption <- function(gg_obj, date, missing) {
 
   caption <- paste0(
-    "Excludes all vaccinations before 12/15/2020 and additional doses before 08/13/2021", "\n",
+    "Excludes all vaccinations before 12/15/2020 and additional doses before FDA Approval", "\n",
     #"(N = ", format(missing, big.mark = ","), ")\n",
     "Data Source: Tennessee Immunization Information System (TennIIS)"
   )
@@ -380,7 +418,9 @@ add_vac_events <- function(gg_obj, lab_y, ...) {
     add_event("2021-06-12", "Masks Mandatory in Government Buildings/Public Transportation", lab_y = lab_y, ...) %>%
     add_event("2021-07-10", "Mask Recomendations for Unvaccinated People", lab_y = lab_y, ...) %>%
     add_event("2021-08-09", "Masks Mandatory Indoors for Schools", lab_y = lab_y, ...) %>%
+    add_event("2021-08-13", "FDA Authorizes Additional Dose", lab_y = lab_y, ...)%>%
     add_event("2021-08-20", "Masks Mandatory for Public Indoor Settings", lab_y = lab_y, ...)%>%
     add_event("2021-10-27", "Masks Mandatory in Schools and Highly Recommended for Public Indoor Settings", lab_y = lab_y, ...) %>%
-    add_event("2021-12-01", "Masks Mandatory for Schools Covered by ADA and Highly Recommended in All Other Schools", lab_y = lab_y, ...)
+    add_event("2021-12-01", "Masks Mandatory for Schools Covered by ADA and Highly Recommended in All Other Schools", lab_y = lab_y, ...)%>%
+    add_event("2022-03-29", "FDA Authorizes Second Additional Dose, Based on Age and Immune Status", lab_y = lab_y, ...)
 }
