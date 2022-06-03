@@ -19,6 +19,8 @@ vac_fully_map_pct <- function(
   )
 ) {
 
+  date <- date_vac(date)
+
   if (!rlang::is_installed("RColorBrewer") || !rlang::is_installed("sf")) {
     rlang::abort(paste(
       "The {RColorBrewer} and {sf} packages must be installed",
@@ -55,6 +57,9 @@ vac_fully_map_pct <- function(
     )
 
   n_total <- sum(counts[["n"]], na.rm = TRUE)
+
+  #output daily zip vaccine counts to v drive for google sheets
+  write.csv(counts, file = paste0("//c19links/COVID-19/EPI DATA ANALYTICS TEAM/COVID SANDBOX REDCAP DATA/COVID-19 Vaccine Reporting/daily vac counts/zip_count_FULLYvac_", date, ".csv"))
 
   gg_data <- counts %>%
     dplyr::full_join(covidReport::zip_shape, by = "zip") %>%

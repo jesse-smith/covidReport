@@ -110,7 +110,7 @@ ce%>%
   geom_text(aes(y = total_label, label = paste0("Total: ", round(total_label*100, digits = 1), "%")), vjust = -1, color = "black")+
   ggplot2::labs(fill = "Status")+
   ggplot2::ggtitle("Population Up to Date with COVID-19 Vaccination by Age")+
-  ggplot2::labs(x="Age Group", y= "% Population")+
+  ggplot2::labs(x="Age Group", y= "% Population Vaccinated by Age Group")+
   ggplot2::labs(subtitle = format(as.Date(date), "%B %d, %Y"))+
   ggthemes::theme_fivethirtyeight()+
   theme(axis.title = element_text(face="bold")) +
