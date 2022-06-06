@@ -480,15 +480,8 @@ rpt_daily_mail <- function(
 
 
   # Vaccination numbers
-  n_ppl_vac <- vac_ppl %>%
-    as_tbl() %>%
-    dplyr::mutate(
-      dplyr::across(.fns = ~ as.integer(stringr::str_remove_all(.x, "[^0-9]")))
-    ) %>%
-    dplyr::pull("N")
+  n_ppl_vac <- nrow(vac_prep(distinct = TRUE))
   n_pct_vac <- round(100*n_ppl_vac/937166, digits = 1)
-  n_ppl_vac <- n_ppl_vac[[4]]
-  n_pct_vac <- n_pct_vac[[4]]
   n_pct_vac_goal <- round(100*n_ppl_vac/700000, digits = 1)
   n_avg_vac <- vac_recent %>%
     as_tbl() %>%
