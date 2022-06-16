@@ -70,7 +70,7 @@ add_cumulative_weekly_label <- function(gg_obj, total, new) {
 
   label <- paste0(
     "Total Cases = ", format(total, big.mark = ","), "\n",
-    "7-Day New Cases = ", format(new, big.mark = ",")
+    "7-Day New Reported Cases = ", format(new, big.mark = ",")
   )
 
   gg_obj +

@@ -55,5 +55,36 @@ gs_timeseries <- function(
     dplyr::ungroup() %>%
     dplyr::select(dt = "test_date", "test_pct_pos_wk")
 
-  dplyr::left_join(inv_dt, pcr_dt, by = "dt")
+ # dplyr::left_join(inv_dt, pcr_dt, by = "dt")
+
+
+
+
+  date1 <- date-6
+  date2 <- date-5
+  date3 <- date-4
+  date4 <- date-3
+  date5 <- date-2
+  date6 <- date-1
+  date7 <- date
+
+  dt <- c(date1, date2, date3, date4, date5, date6, date7)
+
+  n1 <- NROW(pos(process_inv(read_inv(date = date1))))
+  n2 <- NROW(pos(process_inv(read_inv(date = date2))))
+  n3 <- NROW(pos(process_inv(read_inv(date = date3))))
+  n4 <- NROW(pos(process_inv(read_inv(date = date4))))
+  n5 <- NROW(pos(process_inv(read_inv(date = date5))))
+  n6 <- NROW(pos(process_inv(read_inv(date = date6))))
+  n7 <- NROW(pos(process_inv(read_inv(date = date7))))
+
+
+  cumulative_count <- c(n1, n2, n3, n4, n5, n6, n7)
+
+  total_counts <- data.frame(dt, cumulative_count)
+
+
+  dplyr::left_join(total_counts, inv_dt, by = "dt")%>%
+    dplyr::left_join(pcr_dt, by = "dt")
+
 }
