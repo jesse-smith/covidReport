@@ -84,7 +84,7 @@ gs_timeseries <- function(
   total_counts <- data.frame(dt, cumulative_count)
 
 
-  dplyr::left_join(total_counts, inv_dt, by = "dt")%>%
-    dplyr::left_join(pcr_dt, by = "dt")
+  dplyr::left_join(pcr_dt, inv_dt, by = "dt")%>%
+    dplyr::left_join(total_counts, by = "dt")
 
 }
