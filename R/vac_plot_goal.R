@@ -20,6 +20,8 @@ vac_plot_goal <- function(
   # Get counts
   #counts <- vac_count(data)
 
+  date <- date_vac(date)
+
   data <- data %>%
     dplyr::mutate(
       dose_status = dplyr::case_when(
@@ -29,6 +31,10 @@ vac_plot_goal <- function(
         .data[["recip_fully_vacc"]] == TRUE & !is.na(.data[["boost_dose2"]]) ~ "Additional Dose (Multiple)",
         .data[["recip_fully_vacc"]] == TRUE & !is.na(.data[["boost_dose1"]]) ~ "Additional Dose (One)"
       ))
+
+
+
+
 
   n_initiated <- sum(data$dose_status == "Initiated", na.rm = TRUE)
   n_completed <- sum(data$dose_status == "Completed", na.rm = TRUE)
@@ -197,7 +203,7 @@ add_vaccination_labels <- function(
   label_comp <- paste0(
     "Residents Vaccinated (Completed): ",
     format(n_completed - n_additional1 - n_additional2, big.mark = ",", scientific = FALSE), "\n",
-    "(", pct_comp - pct_add1 - pct_add2, "% of population)"
+    "(", pct_comp - pct_add1, "% of population)"
   )
   label_add1 <- paste0(
     "Residents Vaccinated (One Additional Dose): ",
