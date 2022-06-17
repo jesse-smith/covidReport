@@ -85,6 +85,6 @@ gs_timeseries <- function(
 
 
   dplyr::left_join(pcr_dt, inv_dt, by = "dt")%>%
-    dplyr::left_join(total_counts, by = "dt")
+    dplyr::full_join(total_counts, by = "dt")
 
 }
