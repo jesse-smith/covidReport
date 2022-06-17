@@ -202,7 +202,7 @@ add_vaccination_labels <- function(
   )
   label_comp <- paste0(
     "Residents Vaccinated (Completed): ",
-    format(n_completed - n_additional1 - n_additional2, big.mark = ",", scientific = FALSE), "\n",
+    format(n_completed - n_additional1, big.mark = ",", scientific = FALSE), "\n",
     "(", pct_comp - pct_add1, "% of population)"
   )
   label_add1 <- paste0(
