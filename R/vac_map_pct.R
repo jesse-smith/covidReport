@@ -55,9 +55,6 @@ vac_map_pct <- function(
       n = dplyr::if_else(.data[["n"]] == 0L, NA_integer_, .data[["n"]])
     )
 
-  #output daily zip vaccine counts to v drive for google sheets
-  write.csv(counts, file = paste0("//c19links/COVID-19/EPI DATA ANALYTICS TEAM/COVID SANDBOX REDCAP DATA/COVID-19 Vaccine Reporting/daily vac counts/zip_count_atleast1_", date, ".csv"))
-
 
   n_total <- sum(counts[["n"]], na.rm = TRUE)
 
@@ -75,6 +72,14 @@ vac_map_pct <- function(
         NA_character_
       )
     )
+
+
+  data_out <- gg_data %>%
+    dplyr::select(zip, n, vac_pct)
+
+  #output daily zip vaccine counts to v drive for google sheets
+  write.csv(data_out, file = paste0("//c19links/COVID-19/EPI DATA ANALYTICS TEAM/COVID SANDBOX REDCAP DATA/COVID-19 Vaccine Reporting/daily vac counts/zip_count_atleast1_", date, ".csv"))
+
 
   n_mapped_all <-  gg_data %>%
     dplyr::filter(.data[["zip"]] != "Other", !is.na(.data[["zip"]])) %>%

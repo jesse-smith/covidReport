@@ -737,7 +737,12 @@ pptx <- pptx %>%
     location = officer::ph_location_type("pic")
   )
 
-
+pptx <- pptx %>%
+  officer::add_slide("Picture only", master) %>%
+  officer::ph_with(
+    value = sex_plot2,
+    location = officer::ph_location_type("pic")
+  )
 
 
 
@@ -769,6 +774,13 @@ pptx <- pptx %>%
   officer::add_slide("Picture only", master) %>%
   officer::ph_with(
     value = race_plot,
+    location = officer::ph_location_type("pic")
+  )
+
+pptx <- pptx %>%
+  officer::add_slide("Picture only", master) %>%
+  officer::ph_with(
+    value = race_plot2,
     location = officer::ph_location_type("pic")
   )
 
@@ -805,6 +817,12 @@ pptx <- pptx %>%
     location = officer::ph_location_type("pic")
   )
 
+pptx <- pptx %>%
+  officer::add_slide("Picture only", master) %>%
+  officer::ph_with(
+    value = ethnicity_plot2,
+    location = officer::ph_location_type("pic")
+  )
 
 
 # Create vac daily plot slide
