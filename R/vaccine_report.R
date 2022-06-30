@@ -193,7 +193,9 @@ rpt_vac_pptx <- function(
 
 
   #start age table
-  people$age_group <- ifelse(is.na(people$age_group) | people$age_group == "0-4", "Other/Unknown", people$age_group)
+  people$age_group <- ifelse(people$age_group == "0-4", "00-04", people$age_group)
+
+  people$age_group <- ifelse(is.na(people$age_group), "Unknown", people$age_group)
 
   additional_dose_one <- people %>%
     dplyr::group_by(dose_status, age_group)%>%
@@ -223,7 +225,7 @@ rpt_vac_pptx <- function(
     left_join(additional_dose_one, by = "age_group") %>%
     left_join(additional_dose_multiple, by = "age_group") %>%
     dplyr::select(age_group, "Initiated", "Completed", "Additional Dose (One)", "Additional Dose (Multiple)")%>%
-    janitor::adorn_totals()%>%
+    janitor::adorn_totals(where = c("row", "col"))%>%
     flextable::flextable() %>%
     flextable::set_header_labels(
       age_group = "Age Group"
@@ -326,7 +328,7 @@ rpt_vac_pptx <- function(
     left_join(additional_dose_one, by = "pat_gender") %>%
     left_join(additional_dose_multiple, by = "pat_gender") %>%
     dplyr::select(pat_gender, "Initiated", "Completed", "Additional Dose (One)", "Additional Dose (Multiple)")%>%
-    janitor::adorn_totals()%>%
+    janitor::adorn_totals(where = c("row", "col"))%>%
 
     flextable::flextable() %>%
     flextable::set_header_labels(
@@ -432,7 +434,12 @@ rpt_vac_pptx <- function(
     left_join(additional_dose_one, by = "race") %>%
     left_join(additional_dose_multiple, by = "race") %>%
     dplyr::select(race, "Initiated", "Completed", "Additional Dose (One)", "Additional Dose (Multiple)")%>%
-    janitor::adorn_totals()%>%
+
+    dplyr::arrange(match(race, c("Black/African American", "White", "Asian/Pacific Islander",
+                                 "Other/Multiracial", "Unknown")))%>%
+
+
+    janitor::adorn_totals(where = c("row", "col"))%>%
 
     flextable::flextable() %>%
     flextable::set_header_labels(

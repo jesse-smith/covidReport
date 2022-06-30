@@ -42,7 +42,7 @@ vac_plot_age <- function(
     vac_join_age_pop(incl_under_12 = incl_under_12) %>%
     vac_age_fct()%>%
     subset(!is.na(age_grp))%>%
-    subset(age_grp != "0-4")%>%
+    #subset(age_grp != "0-4")%>%
     dplyr::arrange(age_grp, desc(status))%>%
     dplyr::mutate(pct_pop = (n_vac/n_pop))%>%
     dplyr::group_by(age_grp) %>%

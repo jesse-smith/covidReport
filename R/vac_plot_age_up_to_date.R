@@ -83,8 +83,8 @@ gg_data <- vac_ind %>%
   dplyr::left_join(pop_by_age)%>%
   dplyr::mutate(
     pct_pop = (n/pop), .keep = "all"
-  )%>%
-  subset(age_grp != "0-4")
+  )#%>%
+  #subset(age_grp != "0-4")
 
 
 
