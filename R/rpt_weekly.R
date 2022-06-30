@@ -111,6 +111,11 @@ rpt_weekly_pptx <- function(
   master <- "HD Blue and White"
   date_ppt <- format(date, "%B %d, %Y")
 
+  date_last <- date - 6
+  date_last_ppt <- format(date_last, "%B %d, %Y")
+
+  str_date_range <- paste(date_ppt, "-",date_last_ppt)
+
   # Create title slide
   title <- "COVID-19 Weekly Status Report"
   pptx <- pptx %>%
@@ -120,7 +125,7 @@ rpt_weekly_pptx <- function(
       location = officer::ph_location_type("ctrTitle")
     ) %>%
     officer::ph_with(
-      value = date_ppt,
+      value = str_date_range,
       location = officer::ph_location_type("subTitle")
     )
 
@@ -349,10 +354,14 @@ rpt_weekly_mail <- function(
 
   date <- date_inv(date)
 
+  date_last <- date - 6
+
   str_date <- format(date, "%m/%d/%y")
 
-  subject <- paste("COVID-19 Weekly Status Report for", str_date)
-  intro <- paste("Attached is the Weekly COVID-19 status report for", str_date)
+  str_date_last <- format(date_last, "%m/%d/%y")
+
+  subject <- paste("COVID-19 Weekly Status Report for", str_date_last, "-", str_date)
+  intro <- paste("Attached is the Weekly COVID-19 status report for", str_date_last, "-", str_date)
 
   # if (weekdays(date) %in% c("Saturday", "Sunday")) {
   #   subject <- paste("COVID-19 Numbers for", str_date)
@@ -531,12 +540,12 @@ rpt_weekly_mail <- function(
     "<br><br>",
     "Total Tests: ", str_test_total, "<br>",
     "Total Cases: ", str_ppl_pos, "<br>",
-    "New Cases (reported in last 7 days): ", str_ppl_new, "<br>",
+    "New Reported Cases (7-day total): ", str_ppl_new, "<br>",
     "Total Deaths: ", str_deaths,
     "<br><br>",
     #"Cumulative Pediatric Cases: ", str_ped_total, "<br>",
-    "Pediatric Cases in the Last 30 Days: ", str_ped_30, "<br>",
-    "14-Day Pediatric Cases: ", str_ped_active, "<br>",
+    "Pediatric Cases Tested within 30 Days: ", str_ped_30, "<br>",
+    "Pediatric Cases Tested within 14 Days: ", str_ped_active, "<br>",
     # "New Pediatric Cases: ", str_ped_new,
     "<br><br>",
     "% Vaccinated of Goal: ", str_pct_vac_goal, "<br>",
