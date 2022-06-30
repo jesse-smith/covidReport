@@ -50,17 +50,17 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">rpt_daily_mail</span><span class="op">(</span>
-  date <span class="op">=</span> <span class="cn">NULL</span>,
-  to <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Jesse.Smith@shelbycountytn.gov"</span>, <span class="st">"Chaitra.Subramanya@shelbycountytn.gov"</span>,
-    <span class="st">"Allison.Plaxco@shelbycountytn.gov"</span><span class="op">)</span>,
- 
-    dir_pptx <span class="op">=</span> <span class="fu">coviData</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/coviData/man/path_create.html" class="external-link">path_create</a></span><span class="op">(</span><span class="st">"V:/EPI DATA ANALYTICS TEAM/COVID SANDBOX REDCAP DATA/Status Report"</span>,
-    <span class="st">"automated"</span><span class="op">)</span>,
-  demog <span class="op">=</span> <span class="fu">rlang</span><span class="fu">::</span><span class="fu"><a href="https://rlang.r-lib.org/reference/is_true.html" class="external-link">is_true</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/weekday.POSIXt.html" class="external-link">weekdays</a></span><span class="op">(</span><span class="fu">date_inv</span><span class="op">(</span><span class="va">date</span><span class="op">)</span><span class="op">)</span> <span class="op">==</span> <span class="st">"Tuesday"</span><span class="op">)</span>,
-  inv <span class="op">=</span> <span class="fu">process_inv</span><span class="op">(</span><span class="fu">read_inv</span><span class="op">(</span><span class="va">date</span><span class="op">)</span><span class="op">)</span>,
-  pcr <span class="op">=</span> <span class="fu">process_pcr</span><span class="op">(</span><span class="fu">read_pcr</span><span class="op">(</span><span class="va">date</span><span class="op">)</span>, inv <span class="op">=</span> <span class="va">inv</span><span class="op">)</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">rpt_daily_mail</span><span class="op">(</span></span>
+<span>  date <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  to <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Jesse.Smith@shelbycountytn.gov"</span>, <span class="st">"Chaitra.Subramanya@shelbycountytn.gov"</span>,</span>
+<span>    <span class="st">"Allison.Plaxco@shelbycountytn.gov"</span><span class="op">)</span>,</span>
+<span> </span>
+<span>    dir_pptx <span class="op">=</span> <span class="fu">coviData</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/coviData/man/path_create.html" class="external-link">path_create</a></span><span class="op">(</span><span class="st">"V:/EPI DATA ANALYTICS TEAM/COVID SANDBOX REDCAP DATA/Status Report"</span>,</span>
+<span>    <span class="st">"automated"</span><span class="op">)</span>,</span>
+<span>  demog <span class="op">=</span> <span class="fu">rlang</span><span class="fu">::</span><span class="fu"><a href="https://rlang.r-lib.org/reference/is_true.html" class="external-link">is_true</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/weekday.POSIXt.html" class="external-link">weekdays</a></span><span class="op">(</span><span class="fu">date_inv</span><span class="op">(</span><span class="va">date</span><span class="op">)</span><span class="op">)</span> <span class="op">==</span> <span class="st">"Tuesday"</span><span class="op">)</span>,</span>
+<span>  inv <span class="op">=</span> <span class="fu">process_inv</span><span class="op">(</span><span class="fu">read_inv</span><span class="op">(</span><span class="va">date</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  pcr <span class="op">=</span> <span class="fu">process_pcr</span><span class="op">(</span><span class="fu">read_pcr</span><span class="op">(</span><span class="va">date</span><span class="op">)</span>, inv <span class="op">=</span> <span class="va">inv</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -105,7 +105,7 @@ on Tuesdays only.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
 </div>
 
       </footer></div>
