@@ -22,7 +22,7 @@
 gs_timeseries <- function(
   inv = process_inv(read_inv(date = date)),
   pcr = process_pcr(read_pcr(date = date), inv = inv),
-  delay = 5L,
+  delay = 7L,
   date = NULL
 ) {
   date <- date_inv(date)
@@ -83,8 +83,13 @@ gs_timeseries <- function(
 
   total_counts <- data.frame(dt, cumulative_count)
 
+  #format the columns for easy use
+  pcr_dt$test_pct_pos_wk <- formattable::percent(pcr_dt$test_pct_pos_wk, digits = 1)
+  inv_dt$case_test_dt_avg <- round(inv_dt$case_test_dt_avg, digits = 0)
 
-  dplyr::left_join(pcr_dt, inv_dt, by = "dt")%>%
-    dplyr::full_join(total_counts, by = "dt")
+
+  dplyr::full_join(total_counts, inv_dt, by = "dt")%>%
+    dplyr::left_join(pcr_dt, by = "dt")%>%
+    dplyr::arrange(dt)
 
 }
