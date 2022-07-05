@@ -38,7 +38,8 @@ rpt_vac_pptx <- function(
     people$race == "BLACK OR AFRICAN AMERICAN"  ~ "Black/African American",
     people$race == "WHITE" ~ "White",
     people$race == "ASIAN" ~ "Asian/Pacific Islander",
-    TRUE ~ "Other/Unknown"
+    people$race == "OTHER/MULTIRACIAL" ~ "Other/Multiracial",
+    TRUE ~ "Unknown"
   )
 
   people$ethnicity <- dplyr::case_when(
@@ -344,7 +345,7 @@ rpt_vac_pptx <- function(
 
   #Start race plot and table
 
-  unknown_race <- sum(people$race == "Other/Unknown")
+  unknown_race <- sum(people$race == "Other/Multiracial" | people$race == "Unknown")
 
   race_plot <- gg_race%>%
     ggplot2::ggplot(ggplot2::aes(fill=dose_status, y=pct_pop, x=race)) +
@@ -545,7 +546,7 @@ ethnicity_table <- left_join(initiated, completed, by = "ethnicity")%>%
     left_join(additional_dose_one, by = "ethnicity") %>%
     left_join(additional_dose_multiple, by = "ethnicity") %>%
     dplyr::select(ethnicity, "Initiated", "Completed", "Additional Dose (One)", "Additional Dose (Multiple)")%>%
-  janitor::adorn_totals()%>%
+  janitor::adorn_totals(where = c("row", "col"))%>%
     flextable::flextable() %>%
     flextable::set_header_labels(
       ethnicity = "Ethnicity"
