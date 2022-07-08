@@ -80,6 +80,13 @@ gg_data <- vac_ind %>%
     values_to = "n",
     names_transform = list(full = as.logical)
   )%>%
+
+
+  dplyr::mutate(n = ifelse(
+    is.na(n), 0, n
+  ))%>%
+
+
   dplyr::left_join(pop_by_age)%>%
   dplyr::mutate(
     pct_pop = (n/pop), .keep = "all"
