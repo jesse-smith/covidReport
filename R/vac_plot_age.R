@@ -44,6 +44,11 @@ vac_plot_age <- function(
     subset(!is.na(age_grp))%>%
     #subset(age_grp != "0-4")%>%
     dplyr::arrange(age_grp, desc(status))%>%
+
+    dplyr::mutate(n_vac = ifelse(
+      is.na(n_vac), 0, n_vac
+    ))%>%
+
     dplyr::mutate(pct_pop = (n_vac/n_pop))%>%
     dplyr::group_by(age_grp) %>%
     dplyr::mutate(cum_total = cumsum(pct_pop))%>%
