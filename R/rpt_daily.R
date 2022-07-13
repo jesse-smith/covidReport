@@ -381,7 +381,18 @@ rpt_daily_mail <- function(
   n_ped_active <- NROW(filter_active(filter_peds(pos(inv))))
   n_ped_30 <- NROW(filter_active(filter_peds(pos(inv)), days = 30L))
   inv_yest = process_inv(read_inv(date-1))
+  inv_last_week = process_inv(read_inv(date-7))
   inv_week = process_inv(read_inv(date-14))
+
+  death_today <- NROW(filter_deaths(pos(inv)))
+  death_yest <- NROW(filter_deaths(pos(inv_yest)))
+  death_last_week <- NROW(filter_deaths(pos(inv_last_week)))
+
+  new_death_yest <- death_today - death_yest
+  new_death_last_week <- death_today - death_last_week
+
+  avg_new_death_last_week <- round((death_today - death_last_week)/7, digits = 2)
+
 
 #  n_ped_new <- n_ped_total - NROW(filter_peds(pos(inv_yest)))
 
@@ -519,7 +530,8 @@ rpt_daily_mail <- function(
   str_ped_active <- format(n_ped_active, big.mark = ",")
   str_ped_new <- format(n_ped_new, big.mark = ",")
   str_ped_total <- format(n_ped_total, big.mark = ",")
-
+  str_new_death <- format(new_death_yest, big.mark = ",")
+  str_new_death_avg <- format(avg_new_death_last_week, big.mark = ",")
 
 
   body <- paste0(
@@ -529,7 +541,9 @@ rpt_daily_mail <- function(
     "Total Tests: ", str_test_total, "<br>",
     "Total Cases: ", str_ppl_pos, "<br>",
     "New Cases: ", str_ppl_new, "<br>",
-    "Total Deaths: ", str_deaths,
+    "Total Deaths: ", str_deaths,"<br>",
+    "New Reported Deaths: ", str_new_death,"<br>",
+    "Reported deaths per day (7-day average): ", str_new_death_avg,"<br>",
     "<br><br>",
     #"Cumulative Pediatric Cases: ", str_ped_total, "<br>",
     "Pediatric Cases in the Last 30 Days: ", str_ped_30, "<br>",
