@@ -406,6 +406,7 @@ rpt_weekly_mail <- function(
   death_yest <- NROW(filter_deaths(pos(inv_yest)))
   death_last_week <- NROW(filter_deaths(pos(inv_last_week)))
 
+  new_death_last_week <- death_today - death_last_week
   avg_new_death_last_week <- round((death_today - death_last_week)/7, digits = 2)
 
   remove(pcr, inv)
@@ -540,7 +541,7 @@ rpt_weekly_mail <- function(
   str_ped_active <- format(n_ped_active, big.mark = ",")
   str_ped_new <- format(n_ped_new, big.mark = ",")
   str_ped_total <- format(n_ped_total, big.mark = ",")
-  str_new_death <- format(death_last_week, big.mark = ",")
+  str_new_death <- format(new_death_last_week, big.mark = ",")
   str_new_death_avg <- format(avg_new_death_last_week, big.mark = ",")
 
 
