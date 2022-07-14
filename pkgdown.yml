@@ -2,7 +2,7 @@ pandoc: 2.7.3
 pkgdown: 2.0.5
 pkgdown_sha: ~
 articles: {}
-last_built: 2022-07-13T17:08Z
+last_built: 2022-07-14T13:08Z
 urls:
   reference: https://jesse-smith.github.io/covidReport/reference
   article: https://jesse-smith.github.io/covidReport/articles
