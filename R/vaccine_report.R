@@ -572,6 +572,7 @@ vaccinated_people <- vac_table_totals_new(date = vac_date)
 #vac_map <- vac_plot_goal(date = vac_date)
 
 vac_plot <- vac_plot_daily(date = vac_date)
+vac_plot30 <- vac_plot_daily_30(date = vac_date)
 
 
 #vac_map_pct <- vac_map_pct(date = vac_date)
@@ -838,6 +839,15 @@ pptx <- pptx %>%
   officer::add_slide("Picture only", master) %>%
   officer::ph_with(
     value = vac_plot,
+    location = officer::ph_location_type("pic")
+  )
+
+
+# Create vac daily plot 30 day slide
+pptx <- pptx %>%
+  officer::add_slide("Picture only", master) %>%
+  officer::ph_with(
+    value = vac_plot30,
     location = officer::ph_location_type("pic")
   )
 
