@@ -140,6 +140,27 @@ active_ped_map_rate <- function(
   str_ms <- format(n_missing, big.mark = ",")
 
 
+  #addition 4/18: find n of the lowest and highest zip codes and censor lowest if less than 10
+  gg_data$max <- dplyr::case_when(
+    gg_data[["rate"]] ==  max(gg_data[["rate"]], na.rm = TRUE) ~ gg_data[["n"]]
+  )
+
+  gg_data$min <- dplyr::case_when(
+    gg_data[["rate"]] ==  min(gg_data[["rate"]], na.rm = TRUE) ~ gg_data[["n"]]
+  )
+
+  n_min <- min(gg_data[["min"]], na.rm = TRUE)
+
+  n_max <- max(gg_data[["max"]], na.rm = TRUE)
+
+  warning <- ifelse(min(gg_data[["n"]], na.rm = TRUE) < 10, "FOR INTERNAL USE ONLY: At least 1 zip less than n = 10\n", "")
+
+  #end addition 4/18
+
+
+
+
+
   rate_total <- 1e5 * n_total / ped_pop
   rate_min <- min(gg_data[["rate"]], na.rm = TRUE)
   rate_max <- max(gg_data[["rate"]], na.rm = TRUE)
@@ -164,9 +185,10 @@ active_ped_map_rate <- function(
   breaks <- scale_breaks(rate_min, rate_max)[[1L]]
 
   label <- paste0(
-    "Shelby Co. Total: ", str_rt_t, "\n",
-    "Lowest ZIP: ", str_rt_min, "\n",
-    "Highest ZIP: ", str_rt_max
+    warning,
+    "Shelby Co. Total Rate: ", str_rt_t, "\n",
+    "Lowest ZIP: ", str_rt_min, ", N: ", n_min, "\n",
+    "Highest ZIP: ", str_rt_max, ", N: ", n_max
   )
 
   zip_plt <- ggplot2::ggplot(
