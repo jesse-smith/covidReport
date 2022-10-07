@@ -87,9 +87,12 @@ active_map_rate <- function(
     gg_data[["rate"]] ==  min(gg_data[["rate"]], na.rm = TRUE) ~ gg_data[["n"]]
   )
 
-  n_min <- ifelse(min(gg_data[["min"]], na.rm = TRUE)>= 10 , min(gg_data[["min"]], na.rm = TRUE),
-                  "Censored")
-  n_max <- min(gg_data[["max"]], na.rm = TRUE)
+  n_min <- min(gg_data[["min"]], na.rm = TRUE)
+
+  n_max <- max(gg_data[["max"]], na.rm = TRUE)
+
+  warning <- ifelse(min(gg_data[["n"]], na.rm = TRUE) < 10, "FOR INTERNAL USE ONLY: At least 1 zip less than n = 10\n", "")
+
   #end addition 4/18
 
   #get the max zip code
@@ -127,8 +130,9 @@ active_map_rate <- function(
   breaks <- scale_breaks(rate_min, rate_max)[[1L]]
 
   label <- paste0(
+    warning,
     "Shelby Co. Total Rate: ", str_rt_t, "\n",
-    "Lowest ZIP: ", str_rt_min, "\n",
+    "Lowest ZIP: ", str_rt_min, ", N: ", n_min, "\n",
     "Highest ZIP: ", str_rt_max, ", N: ", n_max
   )
 
