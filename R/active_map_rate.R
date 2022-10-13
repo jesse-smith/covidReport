@@ -91,7 +91,7 @@ active_map_rate <- function(
 
   n_max <- max(gg_data[["max"]], na.rm = TRUE)
 
-  warning <- ifelse(min(gg_data[["n"]], na.rm = TRUE) < 10, "FOR INTERNAL USE ONLY: At least 1 zip less than n = 10\n", "")
+  warning <- ifelse(min(gg_data[["n"]], na.rm = TRUE) < 10, "FOR INTERNAL USE ONLY:\nAt least 1 zip less than n = 10\n", "")
 
   #end addition 4/18
 
