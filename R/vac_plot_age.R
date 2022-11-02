@@ -22,7 +22,7 @@
 #'
 #' @export
 vac_plot_age <- function(
-  .data = vac_prep(date = date),
+  data = vac_prep(date = date),
   date = NULL,
   by_pop = TRUE,
   incl_under_12 = TRUE
@@ -37,7 +37,7 @@ vac_plot_age <- function(
 
 
 
-  gg_data <- .data %>%
+  gg_data <- data %>%
     vac_count_grp() %>%
     vac_join_age_pop(incl_under_12 = incl_under_12) %>%
     vac_age_fct()%>%
@@ -56,7 +56,7 @@ vac_plot_age <- function(
       pct_pop < 0.0175, NA, cum_total
     ))%>%
     dplyr::mutate(label_tot = ifelse(
-      status == "Additional Dose (Multiple)", cum_total, NA
+      status == "Bivalent Booster", cum_total, NA
     ))
 
   gg_data %>%
@@ -114,8 +114,8 @@ add_vac_age_col <- function(gg_obj, by_pop) {
   width <- if (by_pop) 0.95 else 0.99
 
   gg_obj + ggplot2::geom_col()+
-    ggplot2::scale_fill_manual(values=c("slategray4", "deepskyblue4","steelblue3", "midnightblue"))+
-    ggplot2::scale_color_manual(values=c("slategray4","deepskyblue4","steelblue3", "midnightblue"))+
+    ggplot2::scale_fill_manual(values=c("deepskyblue4","steelblue3", "midnightblue"))+
+    ggplot2::scale_color_manual(values=c("deepskyblue4","steelblue3", "midnightblue"))+
     ggplot2::guides(fill = ggplot2::guide_legend(reverse=TRUE))+
     ggplot2::guides(color = ggplot2::guide_legend(reverse=TRUE))+
     ggplot2::labs(fill = "Status")+
@@ -269,22 +269,16 @@ add_vac_age_title_caption <- function(gg_obj, by_pop, date) {
 
 
 
-vac_count_grp <- function(.data) {
-  .data %>%
+vac_count_grp <- function(data) {
+  data %>%
     coviData::vac_distinct() %>%
-    dplyr::transmute(status = dplyr::case_when(
-      is.na(.data[["recip_fully_vacc"]]) ~ "Initiated",
-      .data[["recip_fully_vacc"]] == FALSE ~ "Initiated",
-      .data[["recip_fully_vacc"]] == TRUE & is.na(.data[["boost_dose1"]]) & is.na(.data[["boost_dose2"]]) ~ "Completed",
-      .data[["recip_fully_vacc"]] == TRUE & !is.na(.data[["boost_dose2"]]) ~ "Additional Dose (Multiple)",
-      .data[["recip_fully_vacc"]] == TRUE & !is.na(.data[["boost_dose1"]]) ~ "Additional Dose (One)"
-    ),
+    dplyr::transmute(status = .data[["status"]],
       age_grp = .data[["age_at_admin"]] %>% std_age() %>% vac_age_grp()
     ) %>%
     dplyr::count(.data[["status"]],  .data[["age_grp"]]) %>%
     tidyr::pivot_wider(names_from = "status", values_from = "n") %>%
     tidyr::pivot_longer(
-      c("Additional Dose (Multiple)", "Additional Dose (One)", "Completed", "Initiated"),
+      c("Bivalent Booster", "Completed/Monovalent Booster", "Initiated"),
       names_to = "status",
       values_to = "n",
       names_transform = list(full = as.logical)
