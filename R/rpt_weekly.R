@@ -510,6 +510,7 @@ rpt_weekly_mail <- function(
     dplyr::mutate(
       dplyr::across(.fns = ~ as.integer(stringr::str_remove_all(.x, "[^0-9]")))
     ) %>%
+    dplyr::slice(3L) %>%
     dplyr::pull(2L) %>%
     divide_by(7) %>%
     round()
