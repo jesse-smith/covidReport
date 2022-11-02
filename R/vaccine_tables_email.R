@@ -11,7 +11,7 @@
 #'
 #' @export
 vac_table_totals_email <- function(
-  people = coviData:::vac_prep(date = date, distinct = TRUE),
+  people = vac_prep(date = date, distinct = TRUE),
   date = NULL
 ) {
 
@@ -25,16 +25,16 @@ library("dplyr")
     "People Vaccinated (", format(today, "%m/%d/%y"), ")"
   )
   count_people <- people %>%
-    dplyr::mutate(
-      status = dplyr::case_when(
-        is.na(.data[["recip_fully_vacc"]]) ~ "Initiated",
-        .data[["recip_fully_vacc"]] == FALSE ~ "Initiated",
-        .data[["recip_fully_vacc"]] == TRUE & is.na(.data[["boost_dose1"]]) & is.na(.data[["boost_dose2"]]) ~ "Completed",
-        .data[["recip_fully_vacc"]] == TRUE & !is.na(.data[["boost_dose2"]]) ~ "Additional Dose (Multiple)",
-        .data[["recip_fully_vacc"]] == TRUE & !is.na(.data[["boost_dose1"]]) ~ "Additional Dose (One)"
-      ),
-      .before = 1L
-    )  %>%
+    # dplyr::mutate(
+    #   status = dplyr::case_when(
+    #     is.na(.data[["recip_fully_vacc"]]) ~ "Initiated",
+    #     .data[["recip_fully_vacc"]] == FALSE ~ "Initiated",
+    #     .data[["recip_fully_vacc"]] == TRUE & is.na(.data[["boost_dose1"]]) & is.na(.data[["boost_dose2"]]) ~ "Completed",
+    #     .data[["recip_fully_vacc"]] == TRUE & !is.na(.data[["boost_dose2"]]) ~ "Additional Dose (Multiple)",
+    #     .data[["recip_fully_vacc"]] == TRUE & !is.na(.data[["boost_dose1"]]) ~ "Additional Dose (One)"
+    #   ),
+    #   .before = 1L
+    # )  %>%
     dplyr::group_by(.data[["status"]]) %>%
     dplyr::summarize(n = n()) %>%
     dplyr::arrange(dplyr::desc(.data[["status"]])) %>%

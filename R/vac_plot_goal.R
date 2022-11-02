@@ -22,28 +22,30 @@ vac_plot_goal <- function(
 
   date <- date_vac(date)
 
-  data <- data %>%
-    dplyr::mutate(
-      dose_status = dplyr::case_when(
-        is.na(.data[["recip_fully_vacc"]]) ~ "Initiated",
-        .data[["recip_fully_vacc"]] == FALSE ~ "Initiated",
-        .data[["recip_fully_vacc"]] == TRUE & is.na(.data[["boost_dose1"]]) & is.na(.data[["boost_dose2"]]) ~ "Completed",
-        .data[["recip_fully_vacc"]] == TRUE & !is.na(.data[["boost_dose2"]]) ~ "Additional Dose (Multiple)",
-        .data[["recip_fully_vacc"]] == TRUE & !is.na(.data[["boost_dose1"]]) ~ "Additional Dose (One)"
-      ))
+  data$dose_status <- data$status
+
+  # data <- data %>%
+  #   dplyr::mutate(
+  #     dose_status = dplyr::case_when(
+  #       is.na(.data[["recip_fully_vacc"]]) ~ "Initiated",
+  #       .data[["recip_fully_vacc"]] == FALSE ~ "Initiated",
+  #       .data[["recip_fully_vacc"]] == TRUE & is.na(.data[["boost_dose1"]]) & is.na(.data[["boost_dose2"]]) ~ "Completed",
+  #       .data[["recip_fully_vacc"]] == TRUE & !is.na(.data[["boost_dose2"]]) ~ "Additional Dose (Multiple)",
+  #       .data[["recip_fully_vacc"]] == TRUE & !is.na(.data[["boost_dose1"]]) ~ "Additional Dose (One)"
+  #     ))
 
 
 
 
 
   n_initiated <- sum(data$dose_status == "Initiated", na.rm = TRUE)
-  n_completed <- sum(data$dose_status == "Completed", na.rm = TRUE)
-  n_additional1 <- sum(data$dose_status == "Additional Dose (One)", na.rm = TRUE)
-  n_additional2 <- sum(data$dose_status == "Additional Dose (Multiple)", na.rm = TRUE)
+  n_completed <- sum(data$dose_status == "Completed/Monovalent Booster", na.rm = TRUE)
+  n_additional1 <- sum(data$dose_status == "Bivalent Booster", na.rm = TRUE)
 
-  n_additional12 <- n_additional2 + n_additional1
-  n_completed2 <- n_additional2 + n_additional1 + n_completed
-  n_initiated2 <- n_additional2 + n_additional1 + n_completed + n_initiated
+
+  n_additional12 <- n_additional1
+  n_completed2 <-  n_additional1 + n_completed
+  n_initiated2 <-  n_additional1 + n_completed + n_initiated
 
   n_initiated <- n_initiated2
   n_completed <- n_completed2
@@ -61,8 +63,7 @@ vac_plot_goal <- function(
     add_vaccination_count_fill(
       n_initiated = n_initiated,
       n_completed = n_completed,
-      n_additional1 = n_additional1,
-      n_additional2 = n_additional2
+      n_additional1 = n_additional1
     ) %>%
     add_vaccination_goal_marker(n_goal = n_goal, n_max = n_max) %>%
     add_axis_labels(ylab = "People") %>%
@@ -70,7 +71,6 @@ vac_plot_goal <- function(
       n_initiated = n_initiated,
       n_completed = n_completed,
       n_additional1 = n_additional1,
-      n_additional2 = n_additional2,
       n_max = n_max
     ) %>%
     add_vaccination_title_caption(
@@ -100,13 +100,13 @@ add_vaccination_polygon <- function(gg_obj) {
   gg_obj + ggplot2::geom_polygon(fill = "grey83")
 }
 
-add_vaccination_count_fill <- function(gg_obj, n_initiated, n_completed, n_additional1, n_additional2) {
+add_vaccination_count_fill <- function(gg_obj, n_initiated, n_completed, n_additional1) {
 
   # Create fill polygon
   y_initiated <- rlang::expr(pmin(.data[["y"]], n_initiated))
   y_completed <- rlang::expr(pmin(.data[["y"]], n_completed))
   y_additional1 <- rlang::expr(pmin(.data[["y"]], n_additional1))
-  y_additional2 <- rlang::expr(pmin(.data[["y"]], n_additional2))
+
 
   # Create and assign fill colors
 
@@ -114,8 +114,7 @@ add_vaccination_count_fill <- function(gg_obj, n_initiated, n_completed, n_addit
   gg_obj +
     ggplot2::geom_polygon(ggplot2::aes(y = !!y_initiated), fill = "midnightblue") +
     ggplot2::geom_polygon(ggplot2::aes(y = !!y_completed), fill = "steelblue3")+
-    ggplot2::geom_polygon(ggplot2::aes(y = !!y_additional1), fill = "deepskyblue4")+
-    ggplot2::geom_polygon(ggplot2::aes(y = !!y_additional2), fill = "slategray4")
+    ggplot2::geom_polygon(ggplot2::aes(y = !!y_additional1), fill = "deepskyblue4")
 }
 
 add_vaccination_goal_marker <- function(gg_obj, n_goal, n_max) {
@@ -154,7 +153,6 @@ add_vaccination_labels <- function(
   n_initiated,
   n_completed,
   n_additional1,
-  n_additional2,
   n_max
 ) {
 
@@ -179,12 +177,8 @@ add_vaccination_labels <- function(
     get_vaccination_label_x_coord(gg_obj, n_additional1, side = "right")
   ))
 
-  x_add_pct2 <- mean(c(
-    get_vaccination_label_x_coord(gg_obj, n_additional2, side = "left"),
-    get_vaccination_label_x_coord(gg_obj, n_additional2, side = "right")
-  ))
 
-  x_both_pct <- c(x_init_pct, x_comp_pct, x_add_pct1, x_add_pct2)
+  x_both_pct <- c(x_init_pct, x_comp_pct, x_add_pct1)
 
   x_pct <- x_both_pct[which.min(abs(x_both_pct - 0.5))]
 
@@ -192,7 +186,7 @@ add_vaccination_labels <- function(
   pct_init <- round(100 * n_initiated / n_max, digits = 1L)
   pct_comp <- round(100 * n_completed / n_max, digits = 1L)
   pct_add1 <- round(100 * n_additional1 / n_max, digits = 1L)
-  pct_add2 <- round(100 * n_additional2 / n_max, digits = 1L)
+
 
   # Create label text
   label_init <- paste0(
@@ -201,32 +195,28 @@ add_vaccination_labels <- function(
     "(", pct_init, "% of population)"
   )
   label_comp <- paste0(
-    "Residents Vaccinated (Completed): ",
+    "Residents Vaccinated (Completed/Monovalent Booster): ",
     format(n_completed - n_additional1, big.mark = ",", scientific = FALSE), "\n",
     "(", pct_comp - pct_add1, "% of population)"
   )
   label_add1 <- paste0(
-    "Residents Vaccinated (One Additional Dose): ",
-    format(n_additional1 - n_additional2, big.mark = ",", scientific = FALSE), "\n",
-    "(", pct_add1 - pct_add2, "% of population)"
+    "Residents Vaccinated (Bivalent Booster): ",
+    format(n_additional1, big.mark = ",", scientific = FALSE), "\n",
+    "(", pct_add1, "% of population)"
   )
 
-  label_add2 <- paste0(
-    "Residents Vaccinated (Multiple Additional Dose): ",
-    format(n_additional2, big.mark = ",", scientific = FALSE), "\n",
-    "(", pct_add2, "% of population)"
-  )
+
 
   gg_obj +
     ggplot2::annotate(
       "label",
       x = x_pct,
-      y = c(n_initiated, n_completed, n_additional1, n_additional2),
-      label = c(label_init, label_comp, label_add1, label_add2),
-      color = c("midnightblue", "steelblue3", "deepskyblue4", "slategray4"),
+      y = c(n_initiated, n_completed, n_additional1),
+      label = c(label_init, label_comp, label_add1),
+      color = c("midnightblue", "steelblue3", "deepskyblue4"),
       fill = "#f0f0f0",
       label.size = 1,
-      vjust = c(0, 1, 1, 0),
+      vjust = c(0, 1, 0),
       fontface = "bold",
       size = 5
     )

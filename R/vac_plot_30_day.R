@@ -22,6 +22,10 @@ vac_plot_daily_30 <- function(
   date <- date_vac(date)
   min_date <- date - 30
 
+  # Date for current (and previous) counts
+  date <- date_vac(date)
+
+
   vac_date <- date
 
 
@@ -67,6 +71,9 @@ vac_plot_daily_30 <- function(
   dose2 <- subset(vac_data, dose_count == 2)
   dose3 <- subset(vac_data, dose_count == 3)
   dose4 <- subset(vac_data, dose_count == 4)
+  dose5 <- subset(vac_data, dose_count == 5)
+  dose6 <- subset(vac_data, dose_count == 6)
+  doseoth <- subset(vac_data, dose_count > 6)
 
   gg_data_dose1 <- prep_daily_vac_data(
     data = dose1,
@@ -104,7 +111,34 @@ vac_plot_daily_30 <- function(
   gg_data_dose4$Dose <- "4"
 
 
-  #output daily vaccint counts to v drive for google sheets
+  gg_data_dose5 <- prep_daily_vac_data(
+    data = dose5,
+    min_date = min_date,
+    date = date,
+    delay = delay
+  )
+  gg_data_dose5$Dose <- "5"
+
+
+  gg_data_dose6 <- prep_daily_vac_data(
+    data = dose6,
+    min_date = min_date,
+    date = date,
+    delay = delay
+  )
+  gg_data_dose6$Dose <- "6"
+
+
+  gg_data_doseoth <- prep_daily_vac_data(
+    data = doseoth,
+    min_date = min_date,
+    date = date,
+    delay = delay
+  )
+  gg_data_doseoth$Dose <- "Other"
+
+
+  #output daily vaccine counts to v drive for google sheets
   data_dose1 <- gg_data_dose1%>%
     dplyr::rename(dose1 = n)%>%
     dplyr::select(vac_date, dose1)
@@ -121,36 +155,67 @@ vac_plot_daily_30 <- function(
     dplyr::rename(dose4 = n)%>%
     dplyr::select(vac_date, dose4)
 
+  data_dose5 <- gg_data_dose5%>%
+    dplyr::rename(dose5 = n)%>%
+    dplyr::select(vac_date, dose5)
+
+  data_dose6 <- gg_data_dose6%>%
+    dplyr::rename(dose6 = n)%>%
+    dplyr::select(vac_date, dose6)
+
+  data_doseoth <- gg_data_doseoth%>%
+    dplyr::rename(doseoth = n)%>%
+    dplyr::select(vac_date, doseoth)
+
   all <- dplyr::left_join(data_dose1, data_dose2)%>%
     dplyr::left_join(data_dose3)%>%
-    dplyr::left_join(data_dose4)
+    dplyr::left_join(data_dose4)%>%
+    dplyr::left_join(data_dose5)%>%
+    dplyr::left_join(data_dose6)%>%
+    dplyr::left_join(data_doseoth)
 
-  all$total <- all$dose1 + all$dose2 + all$dose3 + all$dose4
+  all$total <- all$dose1 + all$dose2 + all$dose3 + all$dose4 + all$dose5 + all$dose6 + all$doseoth
 
-  #write.csv(all, file = paste0("//c19links/COVID-19/EPI DATA ANALYTICS TEAM/COVID SANDBOX REDCAP DATA/COVID-19 Vaccine Reporting/daily vac counts/dose_counts_", date, ".csv"))
-  #end output daily vaccint counts to v drive for google sheets
+
 
   gg_data <- dplyr::full_join(gg_data_dose1, gg_data_dose2)%>%
     dplyr::full_join(gg_data_dose3)%>%
-    dplyr::full_join(gg_data_dose4)
+    dplyr::full_join(gg_data_dose4)%>%
+    dplyr::full_join(gg_data_dose5)%>%
+    dplyr::full_join(gg_data_dose6)%>%
+    dplyr::full_join(gg_data_doseoth)
+
 
 
   avg <- dplyr::full_join(gg_data_dose1, gg_data_dose2, by="vac_date")%>%
     dplyr::full_join(gg_data_dose3, by="vac_date")%>%
-    dplyr::full_join(gg_data_dose4, by="vac_date")
+    dplyr::full_join(gg_data_dose4, by="vac_date")%>%
+    dplyr::full_join(gg_data_dose5, by="vac_date")%>%
+    dplyr::full_join(gg_data_dose6, by="vac_date")%>%
+    dplyr::full_join(gg_data_doseoth, by="vac_date")
 
-  avg$avg_total <- avg$avg.x + avg$avg.y + avg$avg.x.x + avg$avg.y.y
 
-  avg <- avg %>% dplyr::select(vac_date, avg_total)
+  dates <- avg %>% dplyr::select(vac_date)
+
+  avg <- avg %>% dplyr::select(dplyr::starts_with("avg"))%>%
+    dplyr::mutate(sum_of_rows = rowSums(.))%>%
+    dplyr::select(sum_of_rows)%>%
+    dplyr::bind_cols(dates)%>%
+    dplyr::rename(avg_total = sum_of_rows)%>%
+    dplyr::select(vac_date, avg_total)
+
 
   gg_data2 <- dplyr::full_join(gg_data, avg)
 
+  n_doseoth <- nrow(doseoth)
+  n_dose6 <- nrow(dose6)
+  n_dose5 <- nrow(dose5)
   n_dose4 <- nrow(dose4)
   n_dose3 <- nrow(dose3)
   n_dose2 <- nrow(dose2)
   n_dose1 <- nrow(dose1)
 
-  n_total_vac <- n_dose4 + n_dose3 + n_dose2 + n_dose1
+  n_total_vac <- n_doseoth + n_dose6 + n_dose5 + n_dose4 + n_dose3 + n_dose2 + n_dose1
   n_plotted <- sum(gg_data[["n"]], na.rm = TRUE)
   n_missing <- n_total_vac - n_plotted
 
@@ -170,7 +235,7 @@ vac_plot_daily_30 <- function(
 
   try_plot <- ggplot2::ggplot(gg_data2, ggplot2::aes(x = vac_date, y = n, fill = fct_rev(Dose))) +
     ggplot2::geom_col()+
-    scale_fill_manual(values=c("slategray4", "midnightblue","deepskyblue3", "cadetblue2"))+
+    scale_fill_manual(values=c("slategray4", "mediumorchid3","mediumpurple1", "mediumpurple4", "midnightblue","deepskyblue3", "cadetblue2"))+
     labs(fill = "Dose")
 
 
