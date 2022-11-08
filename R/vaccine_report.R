@@ -35,8 +35,8 @@ rpt_vac_pptx <- function(
   )
 
   people$ethnicity <- dplyr::case_when(
-    people$ethnicity == "Hispanic Or Latino"  ~ "Hispanic/Latino",
-    people$ethnicity == "Not Hispanic Or Latino" ~ "Not Hispanic/Latino",
+    people$ethnicity == "HISPANIC OR LATINO"  ~ "Hispanic/Latino",
+    people$ethnicity == "NOT HISPANIC OR LATINO" ~ "Not Hispanic/Latino",
     TRUE ~ "Other/Unknown"
   )
 

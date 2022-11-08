@@ -172,7 +172,7 @@ grant_zip_vac_map_pct <- function(
 
   set_covid_theme(zip_plt) %>%
     add_title_caption(
-      title = "Population Vaccinated by ZIP Code\n(at least 1 dose)",
+      title = "Population Vaccinated by ZIP Code\n(At Least 1 Dose)",
       subtitle = paste("12/16/2020 -", format(date_vac(date), "%m/%d/%Y")),
       caption = caption
     ) %>%

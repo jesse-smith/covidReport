@@ -1,5 +1,4 @@
-
-#' Plot % Vaccinated by ZIP Code
+#' Plot % Fully Vaccinated by ZIP Code
 #'
 #' @param data Prepped vaccination data from TennIIS
 #'
@@ -10,8 +9,8 @@
 #' @return A `ggplot` object
 #'
 #' @export
-vac_map_pct <- function(
-  data = coviData::vac_prep(date = date),
+grant_zip_vac_bivalent_map_pct <- function(
+  data = coviData::vac_prep(coviData::read_vac(date = date)),
   date = NULL,
   zip_path = coviData::path_create(
     "O:/EPI/Shapefiles 07.2014/MergedZips",
@@ -28,8 +27,9 @@ vac_map_pct <- function(
     ))
   }
 
+
   counts <- data %>%
-    vac_distinct() %>%
+    dplyr::filter(.data[["status"]] == "Bivalent Booster") %>%
     dplyr::transmute(
       zip = vac_parse_zip(.data[["address_zip"]]),
       zip_mrg = dplyr::case_when(
@@ -55,8 +55,8 @@ vac_map_pct <- function(
       n = dplyr::if_else(.data[["n"]] == 0L, NA_integer_, .data[["n"]])
     )
 
-
   n_total <- sum(counts[["n"]], na.rm = TRUE)
+
 
   gg_data <- counts %>%
     dplyr::full_join(covidReport::zip_shape, by = "zip") %>%
@@ -73,12 +73,9 @@ vac_map_pct <- function(
       )
     )
 
-
   data_out <- gg_data %>%
     dplyr::select(zip, n, vac_pct)
 
-  #output daily zip vaccine counts to v drive for google sheets
-  write.csv(data_out, file = paste0("//c19links/COVID-19/EPI DATA ANALYTICS TEAM/COVID SANDBOX REDCAP DATA/COVID-19 Vaccine Reporting/daily vac counts/zip_count_atleast1_", date, ".csv"))
 
 
   n_mapped_all <-  gg_data %>%
@@ -101,25 +98,55 @@ vac_map_pct <- function(
   str_pct_min <- paste0(round(pct_min, digits = 1L), "%")
   str_pct_max <- paste0(round(pct_max, digits = 1L), "%")
 
+
+
+  pal_n <- 9L
+  pal <- RColorBrewer::brewer.pal(pal_n, "Purples")
+
+  bbox <- sf::st_bbox(gg_data[["geometry"]])
+
+
+  break_max <- dplyr::case_when(
+    ceiling(max(gg_data$vac_pct, na.rm = TRUE)) < 25 ~ 25,
+    ceiling(max(gg_data$vac_pct, na.rm = TRUE)) < 50 ~ 50,
+    ceiling(max(gg_data$vac_pct, na.rm = TRUE)) < 75 ~ 75,
+    TRUE ~ 100
+  )
+
+  break_by <- dplyr::case_when(
+    break_max == 25 ~ 5,
+    break_max == 50 ~ 10,
+    break_max == 75 ~ 15,
+    TRUE ~ 20
+  )
+
+
   caption <- paste0(
     "Data Source: Tennessee Immunization Information System (TennIIS)\n",
     "Total = ", str_t, " Mapped = ", str_mp,
     " (Other/Missing ZIP = ", str_ms, ")\n",
-    # "Data shown on a continuous color scale from 0% to 80%\n",
+    "Data shown on a continuous color scale from 0% to ", break_max, "%\n",
     "Rates calculated with ACS 2019 5 Year population estimates"
   )
 
-  pal_n <- 9L
-  pal <- RColorBrewer::brewer.pal(pal_n, "Blues")
 
-  bbox <- sf::st_bbox(gg_data[["geometry"]])
-
-  breaks <- seq(0, 100, by = 20L)
+  breaks <- seq(0, break_max, by = break_by)
 
   label <- paste0(
     "Shelby Co. Total: ", str_pct_t, "\n",
     "Lowest ZIP: ", str_pct_min, "\n",
     "Highest ZIP: ", str_pct_max
+  )
+
+
+  specialzip <- subset(
+    gg_data, zip == "38106+38126" |
+      zip == "38107+38108" |
+      zip == "38114" |
+      zip == "38115" |
+      zip == "38118" |
+      zip == "38127" |
+      zip == "38128"
   )
 
   zip_plt <- ggplot2::ggplot(
@@ -132,11 +159,17 @@ vac_map_pct <- function(
       color = "grey30",
       fontface = "bold"
     ) +
+    ggplot2::geom_sf(
+      data = specialzip,
+      fill = NA,
+      color = "darkorange",
+      size = 1
+    ) +
     ggplot2::scale_fill_gradientn(
       name = "% Vaccinated",
       breaks = breaks,
       labels = function(x) paste0(round(x, 1L), "%"),
-      limits = c(0, 100),
+      limits = c(0, break_max),
       oob = scales::oob_squish,
       colors = pal,
       guide = ggplot2::guide_colorbar(
@@ -167,7 +200,7 @@ vac_map_pct <- function(
 
   set_covid_theme(zip_plt) %>%
     add_title_caption(
-      title = "Population Vaccinated by ZIP Code\n(At Least 1 Dose)",
+      title = "Population Vaccinated by ZIP Code\n(Bivalent Booster)",
       subtitle = paste("12/16/2020 -", format(date_vac(date), "%m/%d/%Y")),
       caption = caption
     ) %>%
