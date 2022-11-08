@@ -11,7 +11,7 @@
 #'
 #' @export
 vac_fully_map_pct <- function(
-  data = coviData::vac_prep(date = date),
+  data = coviData::vac_prep(date = date, distinct = TRUE),
   date = NULL,
   zip_path = coviData::path_create(
     "O:/EPI/Shapefiles 07.2014/MergedZips",
@@ -29,7 +29,6 @@ vac_fully_map_pct <- function(
   }
 
   counts <- data %>%
-    vac_distinct() %>%
     dplyr::filter(.data[["recip_fully_vacc"]] == TRUE) %>%
     dplyr::transmute(
       zip = vac_parse_zip(.data[["address_zip"]]),
@@ -167,7 +166,7 @@ vac_fully_map_pct <- function(
 
   set_covid_theme(zip_plt) %>%
     add_title_caption(
-      title = "Population Vaccinated by ZIP Code\n(fully vaccinated)",
+      title = "Population Vaccinated by ZIP Code\n(Fully Vaccinated)",
       subtitle = paste("12/16/2020 -", format(date_vac(date), "%m/%d/%Y")),
       caption = caption
     ) %>%
