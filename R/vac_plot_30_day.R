@@ -252,7 +252,7 @@ vac_plot_daily_30 <- function(
     set_ts_vac_theme() %>%
     add_daily_vac_label30(total = n_30day_vac, new7 = n_7day_vac, new = n_new) %>%
     add_daily_vac_axis_labels() %>%
-    add_daily_vac_title_caption30(date = date, missing = n_missing)
+    add_daily_vac_title_caption30(date = date)
 }
 
 
@@ -314,10 +314,11 @@ add_daily_vac_label30 <- function(gg_obj, total, new7, new) {
 #' @return The `ggplot` object with added title and subtitle
 #'
 #' @noRd
-add_daily_vac_title_caption30 <- function(gg_obj, date, missing) {
+add_daily_vac_title_caption30 <- function(gg_obj, date) {
 
   caption <- paste0(
-    "Data Source: Tennessee Immunization Information System (TennIIS)"
+    "Data Source: Tennessee Immunization Information System (TennIIS)\n",
+    "Only bivalent booster doses are authorized for age 12+ as of August 31, 2022 and for age 5-11 as of October 12, 2022"
   )
 
   add_title_caption(
