@@ -53,6 +53,8 @@ vac_plot_goal <- function(
 
   date_updated <- date_vac(date)
 
+  n_fully <- round(sum(data$recip_fully_vacc == TRUE, na.rm = TRUE)/n_max * 100, digits = 1)
+
   covidReport::shelby_poly %>%
     set_vaccination_count_max(n_max = n_max) %>%
     ggplot2::ggplot(ggplot2::aes(x = .data[["x"]], y = .data[["y"]])) %>%
@@ -76,7 +78,8 @@ vac_plot_goal <- function(
     add_vaccination_title_caption(
       date_updated = date_updated,
       n_goal = n_goal,
-      n_max = n_max
+      n_max = n_max,
+      n_fully = n_fully
     )
 }
 
@@ -222,7 +225,7 @@ add_vaccination_labels <- function(
     )
 }
 
-add_vaccination_title_caption <- function(gg_obj, date_updated, n_goal, n_max) {
+add_vaccination_title_caption <- function(gg_obj, date_updated, n_goal, n_max, n_fully) {
 
   n_chr   <- format(round(n_goal), scientific = FALSE, big.mark = ",")
 
@@ -231,7 +234,8 @@ add_vaccination_title_caption <- function(gg_obj, date_updated, n_goal, n_max) {
   caption <- paste0(
     "Vaccination goal is ", n_chr, " people ",
     "(~", pct_chr, " of the Shelby County population)\n",
-    "Data Source: Tennessee Immunization Information System (TennIIS)"
+    "Data Source: Tennessee Immunization Information System (TennIIS)\n",
+    "Percent with at least completed series  = ", n_fully, "%"
   )
 
   add_title_caption(
