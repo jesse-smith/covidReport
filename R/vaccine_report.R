@@ -11,8 +11,8 @@ rpt_vac_pptx <- function(
   vac_date <- date
 
 
-  data = vac_prep(date = date)
-  people = vac_prep(date = date, distinct = TRUE)
+  data = vac_prep(read_vac(date))
+  people = vac_prep(read_vac(date), distinct = TRUE)
 
   people$dose_status <- people$status
 

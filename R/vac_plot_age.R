@@ -22,7 +22,7 @@
 #'
 #' @export
 vac_plot_age <- function(
-  data = vac_prep(date = date),
+  data = vac_prep(read_vac(date = date), distinct = TRUE),
   date = NULL,
   by_pop = TRUE,
   incl_under_12 = TRUE
