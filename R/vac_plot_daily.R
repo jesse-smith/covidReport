@@ -216,8 +216,8 @@ vac_plot_daily <- function(
   n_plotted <- sum(gg_data[["n"]], na.rm = TRUE)
   n_missing <- n_total_vac - n_plotted
 
-  n_vac_yest <- nrow(coviData:::vac_prep(date = vac_date - 1))
-  n_new <- n_total_vac - n_vac_yest
+  #n_vac_yest <- nrow(coviData:::vac_prep(date = vac_date - 1))
+  n_new <- sum(lubridate::mdy(vac_data$insert_date) == date, na.rm = TRUE)
 
   #get number of doses administered in last 7 days
   last_7_day <- subset(gg_data, (date-6) <= gg_data$vac_date & gg_data$vac_date <= date)
