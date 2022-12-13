@@ -58,6 +58,46 @@ rpt_weekly_pptx <- function(
   remove(pcr, inv)
   gc(verbose = FALSE)
 
+  #process quick reference table
+  inv_last_week <-  pos(process_inv(read_inv(date-7)))
+
+  n_tests <- format(NROW(pos(pcr_subset)) + NROW(neg(pcr_subset)), big.mark = ",")
+  n_case <- format(NROW(pos_ppl), big.mark = ",")
+  new_report_case_week <- format(NROW(pos_ppl) - NROW(inv_last_week), big.mark = ",")
+  n_case_14_day <- format(NROW(filter_active(pos_ppl)), big.mark = ",")
+
+  n_death <- format(NROW(filter_deaths(pos_ppl)), big.mark = ",")
+  new_death_week <- format(NROW(filter_deaths(pos_ppl)) - NROW(filter_deaths(inv_last_week)), big.mark = ",")
+  avg_new_death_week <- format(round((NROW(filter_deaths(pos_ppl)) - NROW(filter_deaths(inv_last_week)))/7, digits = 2), big.mark = ",")
+
+  n_ped_30 <- format(NROW(filter_active(filter_peds(pos_ppl), days = 30L)), big.mark = ",")
+  n_ped_14 <- format(NROW(filter_active(filter_peds(pos_ppl))), big.mark = ",")
+
+  Number <- c(n_tests, n_case, new_report_case_week, n_case_14_day,
+              n_death, new_death_week, avg_new_death_week, n_ped_30, n_ped_14)
+
+
+  Metric <- c("Total Tests", "Total Cases", "New Reported Cases (7-day total)", "COVID-19 Cases Tested within 14 Days",
+              "Total Deaths", "New Reported Deaths (7-day total)",
+              "New Reported Deaths (7-day average)",
+              "Pediatric Cases Tested within 30 Days", "Pediatric Cases Tested within 14 Days")
+
+
+
+  quick_ref <- data.frame(Metric, Number)%>%
+    flextable::flextable()%>%
+    flextable::align(align = "right")%>%
+    fmt_covid_table()%>%
+    flextable::autofit()
+
+  remove(inv_last_week)
+  gc(verbose = FALSE)
+
+
+
+
+
+
   # Cumulative case slide
   case_plt_cumulative <- case_plot_cumulative_week(pos_ppl, date = date)
   gc(verbose = FALSE)
@@ -114,7 +154,7 @@ rpt_weekly_pptx <- function(
   date_last <- date - 6
   date_last_ppt <- format(date_last, "%B %d, %Y")
 
-  str_date_range <- paste(date_ppt, "-",date_last_ppt)
+  str_date_range <- paste(date_last_ppt, "-",date_ppt)
 
   # Create title slide
   title <- "COVID-19 Weekly Status Report"
@@ -302,6 +342,30 @@ rpt_weekly_pptx <- function(
   #     )
   #   )
 
+
+  cp_title <- "COVID-19 Quick Reference Numbers"
+  pptx <- pptx %>%
+    officer::add_slide("Table", master) %>%
+    officer::ph_with(
+      value = cp_title,
+      location = officer::ph_location_type("title")
+    ) %>%
+    officer::ph_with(
+      value = date_ppt,
+      location = officer::ph_location_type("subTitle")
+    ) %>%
+    officer::ph_with(
+      value = quick_ref,
+      location = ph_location_table(
+        quick_ref,
+        pptx,
+        layout = "Table",
+        valign = 1
+      )
+    )
+
+
+
   if (!is.null(dir)) {
     path <- coviData::path_create(
       dir,
@@ -347,7 +411,7 @@ rpt_weekly_mail <- function(
     "V:/EPI DATA ANALYTICS TEAM/COVID SANDBOX REDCAP DATA/Status Report",
     "automated"
   ),
-  demog = rlang::is_true(weekdays(date_inv(date)) == "Tuesday"),
+  demog = TRUE, # rlang::is_true(weekdays(date_inv(date)) == "Tuesday"),
   inv = process_inv(read_inv(date)),
   pcr = process_pcr(read_pcr(date), inv = inv)
 ) {
@@ -583,41 +647,7 @@ rpt_weekly_mail <- function(
     "<i>Note: This email was generated automatically</i>"
   )
 
-  if (weekdays(lubridate::today()) == "Tuesday") {
-    body <- paste0(
-      intro,
-      vac_msg,
-      "<br><br>",
-      "Total Tests: ", str_test_total, "<br>",
-      "Total Cases: ", str_ppl_pos, "<br>",
-      "New Cases (reported in last 7 days): ", str_ppl_new, "<br>",
-      "Total Deaths: ", str_deaths,
-      "<br><br>",
-      "Cumulative Pediatric Cases: ", str_ped_total, "<br>",
-      "Pediatric Cases in the Last 30 Days: ", str_ped_30, "<br>",
-      "14-Day Pediatric Cases: ", str_ped_active, "<br>",
-      "New Pediatric Cases (Reported in last 14 days): ", str_ped_new,
-      "<br><br>",
-      "% Vaccinated of Goal: ", str_pct_vac_goal, "<br>",
-      "% Vaccinated of Population: ", str_pct_vac, "<br>",
-      "Total People Vaccinated: ", str_ppl_vac, "<br>",
-      "Vaccinations per day (7-day average): ", str_avg_vac, "<br>",
-      "Reported cases per day (7-day average): ", str_avg_case,
-      "<br><br>",
-      vac_recent, "<br>",
-      vac_ppl,
-      "<br><br>",
-      "Thanks!",
-      "<br><br>",
-      "<h3>Supplementary Numbers: Delete Before Sending</h3>", "<br>",
-      test_tbl_total, "<br>",
-      ppl_tbl_total, "<br>",
-      cp_tbl, "<br>",
-      active_tbl,
-      "<br><br>",
-      "<i>Note: This email was generated automatically</i>"
-    )
-  }
+
 
   # Get powerpoints if available
   ppt_path <- fs::dir_ls(
