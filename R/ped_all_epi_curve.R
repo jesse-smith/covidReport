@@ -18,18 +18,17 @@ case_plot_daily_ped_all <- function(
   delay = NULL
 ) {
 
-  min_date <- lubridate::as_date("2020-03-08")
+  min_date <- lubridate::ymd("2020-03-08")#lubridate::as_date("2020-03-08")
 
   # Date for current (and previous) counts
   date <- date_inv(date)
 
   if (is.null(delay)) {
     rpt_data <- dplyr::as_tibble(coviData::load_report_date())
-
-    complete_date <- data %>%
+      complete_date <- data %>%
       dplyr::left_join(rpt_data, by = "inv_local_id") %>%
       dplyr::mutate(
-        collection_date = lubridate::as_date(.data[["collection_date"]])
+        collection_date = lubridate::ymd(.data[["collection_date"]])#lubridate::as_date(.data[["collection_date"]])
       ) %>%
       covidModel::estimate_delay(today = date) %>%
       dplyr::pull("collection_date")
