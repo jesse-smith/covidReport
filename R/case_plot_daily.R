@@ -52,6 +52,7 @@ case_plot_daily <- function(
   n_plotted <- sum(gg_data[["n"]], na.rm = TRUE)
   n_missing <- n_total - n_plotted
 
+
   gg_data %>%
     ggplot2::ggplot(
       ggplot2::aes(x = .data[["test_date"]], y = .data[["n"]])

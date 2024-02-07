@@ -331,7 +331,7 @@ rpt_daily_mail <- function(
   date = NULL,
   to = c(
     "Liang.Li@shelbycountytn.gov",
-    "Allison.Plaxco@shelbycountytn.gov"
+    "richard.ewool@shelbycountytn.gov"
   ),
   dir_pptx = coviData::path_create(
     "V:/EPI DATA ANALYTICS TEAM/COVID SANDBOX REDCAP DATA/Status Report",
