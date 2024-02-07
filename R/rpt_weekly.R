@@ -49,7 +49,7 @@ rpt_weekly_pptx <- function(
     "age_in_years",
     "investigation_status_cd"
   )
-  pcr_cols <- c("inv_local_id", "specimen_coll_dt", "lab_result")
+  pcr_cols <- c("inv_local_id", "specimen_coll_dt", "lab_result", "patient_last_name")
   pcr_subset <- dplyr::mutate(
     pcr,
     data = list_of(dplyr::select(.data[["data"]], {{ pcr_cols }}))
