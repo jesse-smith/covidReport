@@ -63,11 +63,11 @@ rpt_daily_pptx <- function(
   gc(verbose = FALSE)
 
   # Daily case slide
-  case_plt_daily_all <- case_plot_daily_ped_all(pos_ppl, date = date)
+  case_plt_daily_all <- case_plot_daily_ped_all(pos_ppl, date = date, delay = 5)
   gc(verbose = FALSE)
 
   # 30-Day case slide
-  case_plt_recent <- case_plot_daily_recent(pos_ppl, date = date)
+  case_plt_recent <- case_plot_daily_recent(pos_ppl, date = date, delay = 5)
   gc(verbose = FALSE)
 
   # # Daily ped slide
