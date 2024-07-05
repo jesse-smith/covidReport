@@ -14,7 +14,7 @@
 #' @return An `rpptx` object
 #'
 #' @export
-rpt_daily_pptx <- function(
+rpt_weekly_pptx <- function(
   date = NULL,
   dir = coviData::path_create(
     "V:/EPI DATA ANALYTICS TEAM/COVID SANDBOX REDCAP DATA/Status Report",
@@ -58,16 +58,53 @@ rpt_daily_pptx <- function(
   remove(pcr, inv)
   gc(verbose = FALSE)
 
+  #process quick reference table
+  inv_last_week <-  pos(process_inv(read_inv(date-7)))
+
+  n_tests <- format(NROW(pos(pcr_subset)) + NROW(neg(pcr_subset)), big.mark = ",")
+  n_case <- format(NROW(pos_ppl), big.mark = ",")
+  new_report_case_week <- format(NROW(pos_ppl) - NROW(inv_last_week), big.mark = ",")
+  n_case_14_day <- format(NROW(filter_active(pos_ppl)), big.mark = ",")
+
+  n_death <- format(NROW(filter_deaths(pos_ppl)), big.mark = ",")
+  new_death_week <- format(NROW(filter_deaths(pos_ppl)) - NROW(filter_deaths(inv_last_week)), big.mark = ",")
+  avg_new_death_week <- format(round((NROW(filter_deaths(pos_ppl)) - NROW(filter_deaths(inv_last_week)))/7, digits = 2), big.mark = ",")
+
+  n_ped_30 <- format(NROW(filter_active(filter_peds(pos_ppl), days = 30L)), big.mark = ",")
+  n_ped_14 <- format(NROW(filter_active(filter_peds(pos_ppl))), big.mark = ",")
+
+  Number <- c(n_tests, n_case, new_report_case_week, n_case_14_day,
+              n_death, new_death_week, avg_new_death_week, n_ped_30, n_ped_14)
+
+
+  Metric <- c("Total Tests", "Total Cases", "New Reported Cases (7-day total)", "COVID-19 Cases Tested within 14 Days",
+              "Total Deaths", "New Reported Deaths (7-day total)",
+              "New Reported Deaths (7-day average)",
+              "Pediatric Cases Tested within 30 Days", "Pediatric Cases Tested within 14 Days")
+
+
+
+  quick_ref <- data.frame(Metric, Number)%>%
+    flextable::flextable()%>%
+    flextable::align(align = "right")%>%
+    fmt_covid_table()%>%
+    flextable::autofit()
+
+  remove(inv_last_week)
+  gc(verbose = FALSE)
+
+
+
   # Cumulative case slide
-  case_plt_cumulative <- case_plot_cumulative(pos_ppl, date = date)
+  case_plt_cumulative <- case_plot_cumulative_week(pos_ppl, date = date)
   gc(verbose = FALSE)
 
   # Daily case slide
-  case_plt_daily_all <- case_plot_daily_ped_all(pos_ppl, date = date, delay = 5)
+  case_plt_daily_all <- case_plot_daily_week(pos_ppl, date = date)
   gc(verbose = FALSE)
 
   # 30-Day case slide
-  case_plt_recent <- case_plot_daily_recent(pos_ppl, date = date, delay = 5)
+  case_plt_recent <- case_plot_daily_recent_week(pos_ppl, date = date)
   gc(verbose = FALSE)
 
   # # Daily ped slide
@@ -84,9 +121,9 @@ rpt_daily_pptx <- function(
   death_tbl_age <- death_table_age_summary(pos_ppl, date = date)
   gc(verbose = FALSE)
 
-  # Active slide
-  case_tbl_active <- case_table_active(pos_ppl, date = date)
-  gc(verbose = FALSE)
+  # # Active slide
+  # case_tbl_active <- case_table_active(pos_ppl, date = date)
+  # gc(verbose = FALSE)
 
   # Test table slide
   test_tbl_total <- test_table_total(pcr_subset, date = date)
@@ -111,8 +148,13 @@ rpt_daily_pptx <- function(
   master <- "HD Blue and White"
   date_ppt <- format(date, "%B %d, %Y")
 
+  date_last <- date - 6
+  date_last_ppt <- format(date_last, "%B %d, %Y")
+
+  str_date_range <- paste(date_last_ppt, "-",date_ppt)
+
   # Create title slide
-  title <- "COVID-19 Daily Status Report"
+  title <- "COVID-19 Weekly Status Report"
   pptx <- pptx %>%
     officer::add_slide("Title Slide", master) %>%
     officer::ph_with(
@@ -120,7 +162,7 @@ rpt_daily_pptx <- function(
       location = officer::ph_location_type("ctrTitle")
     ) %>%
     officer::ph_with(
-      value = date_ppt,
+      value = str_date_range,
       location = officer::ph_location_type("subTitle")
     )
 
@@ -297,10 +339,34 @@ rpt_daily_pptx <- function(
   #     )
   #   )
 
+
+  cp_title <- "COVID-19 Quick Reference Numbers"
+  pptx <- pptx %>%
+    officer::add_slide("Table", master) %>%
+    officer::ph_with(
+      value = cp_title,
+      location = officer::ph_location_type("title")
+    ) %>%
+    officer::ph_with(
+      value = date_ppt,
+      location = officer::ph_location_type("subTitle")
+    ) %>%
+    officer::ph_with(
+      value = quick_ref,
+      location = ph_location_table(
+        quick_ref,
+        pptx,
+        layout = "Table",
+        valign = 1
+      )
+    )
+
+
+
   if (!is.null(dir)) {
     path <- coviData::path_create(
       dir,
-      paste0("daily_status_report_", date, ".pptx")
+      paste0("weekly_status_report_", date, ".pptx")
     )
     print(pptx, target = path)
     attr(pptx, "path") <- path
@@ -309,7 +375,12 @@ rpt_daily_pptx <- function(
   pptx
 }
 
-#' Send Daily COVID-19 Status Summary via Outlook Email
+
+
+
+
+
+#' Send Weekly COVID-19 Status Summary via Outlook Email
 #'
 #' @param date The date for which to run the report; defaults to most recent
 #'
@@ -327,32 +398,39 @@ rpt_daily_pptx <- function(
 #'   \code{\link[coviData:process-nbs]{process_pcr()}}
 #'
 #' @export
-rpt_daily_mail <- function(
+rpt_weekly_mail <- function(
   date = NULL,
   to = c(
     "Liang.Li@shelbycountytn.gov",
-    "richard.ewool@shelbycountytn.gov"
+    "Allison.Plaxco@shelbycountytn.gov"
   ),
   dir_pptx = coviData::path_create(
     "V:/EPI DATA ANALYTICS TEAM/COVID SANDBOX REDCAP DATA/Status Report",
     "automated"
   ),
-  demog = rlang::is_true(weekdays(date_inv(date)) == "Tuesday"),
+  demog = TRUE, # rlang::is_true(weekdays(date_inv(date)) == "Tuesday"),
   inv = process_inv(read_inv(date)),
   pcr = process_pcr(read_pcr(date), inv = inv)
 ) {
 
   date <- date_inv(date)
 
+  date_last <- date - 6
+
   str_date <- format(date, "%m/%d/%y")
 
-  if (weekdays(date) %in% c("Saturday", "Sunday")) {
-    subject <- paste("COVID-19 Numbers for", str_date)
-    intro <- paste("Below are the COVID-19 numbers for", str_date)
-  } else {
-    subject <- paste("COVID-19 Status Report for", str_date)
-    intro <- paste("Attached is the COVID-19 status report for", str_date)
-  }
+  str_date_last <- format(date_last, "%m/%d/%y")
+
+  subject <- paste("COVID-19 Weekly Status Report for", str_date_last, "-", str_date)
+  intro <- paste("Attached is the Weekly COVID-19 status report for", str_date_last, "-", str_date)
+
+  # if (weekdays(date) %in% c("Saturday", "Sunday")) {
+  #   subject <- paste("COVID-19 Numbers for", str_date)
+  #   intro <- paste("Below are the COVID-19 numbers for", str_date)
+  # } else {
+  #   subject <- paste("COVID-19 Status Report for", str_date)
+  #   intro <- paste("Attached is the COVID-19 status report for", str_date)
+  # }
 
   # Data
   inv_cols <- c(
@@ -380,25 +458,19 @@ rpt_daily_mail <- function(
   n_ped_total <- NROW(filter_peds(pos(inv)))
   n_ped_active <- NROW(filter_active(filter_peds(pos(inv))))
   n_ped_30 <- NROW(filter_active(filter_peds(pos(inv)), days = 30L))
+  n_ped_new <- n_ped_total - NROW(filter_peds(pos(process_inv(read_inv(date-14)))))
+
   inv_yest = process_inv(read_inv(date-1))
   inv_last_week = process_inv(read_inv(date-7))
-  inv_week = process_inv(read_inv(date-14))
 
   death_today <- NROW(filter_deaths(pos(inv)))
   death_yest <- NROW(filter_deaths(pos(inv_yest)))
   death_last_week <- NROW(filter_deaths(pos(inv_last_week)))
 
-  new_death_yest <- death_today - death_yest
   new_death_last_week <- death_today - death_last_week
-
   avg_new_death_last_week <- round((death_today - death_last_week)/7, digits = 2)
 
-
-#  n_ped_new <- n_ped_total - NROW(filter_peds(pos(inv_yest)))
-
-  n_ped_new <- n_ped_total - NROW(filter_peds(pos(inv_week)))
-
-  remove(pcr, inv, inv_yest)
+  remove(pcr, inv)
   gc()
 
   # People totals
@@ -517,7 +589,7 @@ rpt_daily_mail <- function(
     format(big.mark = ",")
   str_ppl_pos <- format(n_ppl_pos, big.mark = ",")
   str_ppl_new <- n_ppl_pos %>%
-    subtract(NROW(coviData::read_inv_id(date = date - 1L))) %>%
+    subtract(NROW(coviData::read_inv_id(date = date - 7L))) %>%
     format(big.mark = ",")
   gc()
   str_deaths <- format(n_deaths, big.mark = ",")
@@ -531,8 +603,9 @@ rpt_daily_mail <- function(
   str_ped_active <- format(n_ped_active, big.mark = ",")
   str_ped_new <- format(n_ped_new, big.mark = ",")
   str_ped_total <- format(n_ped_total, big.mark = ",")
-  str_new_death <- format(new_death_yest, big.mark = ",")
+  str_new_death <- format(new_death_last_week, big.mark = ",")
   str_new_death_avg <- format(avg_new_death_last_week, big.mark = ",")
+
 
 
   body <- paste0(
@@ -541,15 +614,15 @@ rpt_daily_mail <- function(
     "<br><br>",
     "Total Tests: ", str_test_total, "<br>",
     "Total Cases: ", str_ppl_pos, "<br>",
-    "New Cases: ", str_ppl_new, "<br>",
+    "New Reported Cases (7-day total): ", str_ppl_new, "<br>",
     "Total Deaths: ", str_deaths,"<br>",
-    "New Reported Deaths: ", str_new_death,"<br>",
+    "New Reported Deaths (7-day total): ", str_new_death,"<br>",
     "Reported deaths per day (7-day average): ", str_new_death_avg,"<br>",
     "<br><br>",
     #"Cumulative Pediatric Cases: ", str_ped_total, "<br>",
-    "Pediatric Cases in the Last 30 Days: ", str_ped_30, "<br>",
-    "14-Day Pediatric Cases: ", str_ped_active, "<br>",
-   # "New Pediatric Cases: ", str_ped_new,
+    "Pediatric Cases Tested within 30 Days: ", str_ped_30, "<br>",
+    "Pediatric Cases Tested within 14 Days: ", str_ped_active, "<br>",
+    # "New Pediatric Cases: ", str_ped_new,
     "<br><br>",
     "% Vaccinated of Goal: ", str_pct_vac_goal, "<br>",
     "% Vaccinated of Population: ", str_pct_vac, "<br>",
@@ -571,47 +644,13 @@ rpt_daily_mail <- function(
     "<i>Note: This email was generated automatically</i>"
   )
 
-  if (weekdays(lubridate::today()) == "Tuesday") {
-    body <- paste0(
-      intro,
-      vac_msg,
-      "<br><br>",
-      "Total Tests: ", str_test_total, "<br>",
-      "Total Cases: ", str_ppl_pos, "<br>",
-      "New Cases: ", str_ppl_new, "<br>",
-      "Total Deaths: ", str_deaths,
-      "<br><br>",
-      "Cumulative Pediatric Cases: ", str_ped_total, "<br>",
-      "Pediatric Cases in the Last 30 Days: ", str_ped_30, "<br>",
-      "14-Day Pediatric Cases: ", str_ped_active, "<br>",
-      "New Pediatric Cases (Reported in last 14 days): ", str_ped_new,
-      "<br><br>",
-      "% Vaccinated of Goal: ", str_pct_vac_goal, "<br>",
-      "% Vaccinated of Population: ", str_pct_vac, "<br>",
-      "Total People Vaccinated: ", str_ppl_vac, "<br>",
-      "Vaccinations per day (7-day average): ", str_avg_vac, "<br>",
-      "Reported cases per day (7-day average): ", str_avg_case,
-      "<br><br>",
-      vac_recent, "<br>",
-      vac_ppl,
-      "<br><br>",
-      "Thanks!",
-      "<br><br>",
-      "<h3>Supplementary Numbers: Delete Before Sending</h3>", "<br>",
-      test_tbl_total, "<br>",
-      ppl_tbl_total, "<br>",
-      cp_tbl, "<br>",
-      active_tbl,
-      "<br><br>",
-      "<i>Note: This email was generated automatically</i>"
-    )
-  }
+
 
   # Get powerpoints if available
   ppt_path <- fs::dir_ls(
     dir_pptx,
     type = "file",
-    regexp = paste0("daily_status_report_", date, ".pptx", collapse = "")
+    regexp = paste0("weekly_status_report_", date, ".pptx", collapse = "")
   )
 
   if (rlang::is_true(demog)) {
@@ -631,3 +670,7 @@ rpt_daily_mail <- function(
     attach = ppt_path
   )
 }
+
+
+
+

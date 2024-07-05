@@ -32,17 +32,47 @@ test_table_total <- function(
 #' @return A `tibble`
 #'
 #' @keywords internal
+# test_calc_total <- function(
+#   data = process_pcr(read_pcr(date)),
+#   date = NULL
+# ) {
+#   n_positive <- NROW(pos(data))
+#   n_negative <- NROW(neg(data))
+#   n_total    <- n_positive + n_negative
+#
+#   tibble::tibble(
+#     result = c("Positive", "Negative", "Total"),
+#     n = c(n_positive, n_negative, n_total),
+#     percent = .data[["n"]] / n_total
+#   )
+#
+#   tibble::tibble(
+#     result = c("Positive", "Negative", "Total"),
+#     n = c(n_positive, n_negative, n_total),
+#     percent = .data[["n"]] / n_total
+#   )
+# }
+
+
 test_calc_total <- function(
-  data = process_pcr(read_pcr(date)),
-  date = NULL
+    data = process_pcr(read_pcr(date)),
+    date = NULL
 ) {
   n_positive <- NROW(pos(data))
-  n_negative <- NROW(neg(data))
-  n_total    <- n_positive + n_negative
+  #n_negative <- 0#NROW(neg(data))
+  n_total    <- n_positive #+ n_negative
 
   tibble::tibble(
-    result = c("Positive", "Negative", "Total"),
-    n = c(n_positive, n_negative, n_total),
+    result = c("Positive",  "Total"), #"Negative",
+    n = c(n_positive,  n_total), #n_negative,
     percent = .data[["n"]] / n_total
   )
+
+  # tibble::tibble(
+  #   result = c("Positive", "Negative", "Total"),
+  #   n = c(n_positive, n_negative, n_total),
+  #   percent = .data[["n"]] / n_total
+  # )
 }
+
+

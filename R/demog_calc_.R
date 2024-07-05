@@ -22,7 +22,7 @@ demog_calc_ <- function(data, grp = c("age", "sex", "race", "ethnicity"), peds =
     dplyr::transmute(
       grp = .data[["grp"]] %>%
         factor() %>%
-        forcats::fct_explicit_na("Missing"),
+        forcats::fct_na_value_to_level("Missing"),
       .data[["n"]],
       percent = .data[["n"]] / sum(.data[["n"]], na.rm = TRUE),
       rate = .data[["n"]] / .data[["n_pop"]]
