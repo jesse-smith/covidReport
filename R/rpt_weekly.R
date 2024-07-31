@@ -61,7 +61,7 @@ rpt_weekly_pptx <- function(
   #process quick reference table
   inv_last_week <-  pos(process_inv(read_inv(date-7)))
 
-  n_tests <- format(NROW(pos(pcr_subset))) #+ NROW(neg(pcr_subset)), big.mark = ",")
+  #n_tests <- format(NROW(pos(pcr_subset))) #+ NROW(neg(pcr_subset)), big.mark = ",")
   n_case <- format(NROW(pos_ppl), big.mark = ",")
   new_report_case_week <- format(NROW(pos_ppl) - NROW(inv_last_week), big.mark = ",")
   n_case_14_day <- format(NROW(filter_active(pos_ppl)), big.mark = ",")
@@ -73,11 +73,11 @@ rpt_weekly_pptx <- function(
   n_ped_30 <- format(NROW(filter_active(filter_peds(pos_ppl), days = 30L)), big.mark = ",")
   n_ped_14 <- format(NROW(filter_active(filter_peds(pos_ppl))), big.mark = ",")
 
-  Number <- c(n_tests, n_case, new_report_case_week, n_case_14_day,
+  Number <- c(n_case, new_report_case_week, n_case_14_day,
               n_death, new_death_week, avg_new_death_week, n_ped_30, n_ped_14)
 
 
-  Metric <- c("Total Positive Tests", "Total Cases", "New Reported Cases (7-day total)", "COVID-19 Cases Tested within 14 Days",
+  Metric <- c("Total Cases", "New Reported Cases (7-day total)", "COVID-19 Cases Tested within 14 Days",
               "Total Deaths", "New Reported Deaths (7-day total)",
               "New Reported Deaths (7-day average)",
               "Pediatric Cases Tested within 30 Days", "Pediatric Cases Tested within 14 Days")
@@ -138,8 +138,8 @@ rpt_weekly_pptx <- function(
   gc(verbose = FALSE)
 
   # Investigations slide (recomment after test)
-  inv_tbl_total <- inv_table_total(pos_ppl, date = date)
-  gc(verbose = FALSE)
+  # inv_tbl_total <- inv_table_total(pos_ppl, date = date)
+  # gc(verbose = FALSE)
 
   remove(pos_ppl, pcr_subset)
   gc(verbose = FALSE)
@@ -320,27 +320,27 @@ rpt_weekly_pptx <- function(
     )
 
   # Create investigations slide
-  inv_title <- "COVID-19 Case Investigations"
-  pptx <- pptx %>%
-    officer::add_slide("Table", master) %>%
-    officer::ph_with(
-      value = inv_title,
-      location = officer::ph_location_type("title")
-    ) %>%
-    officer::ph_with(
-      value = date_ppt,
-      location = officer::ph_location_type("subTitle")
-    ) %>%
-    officer::ph_with(
-      value = inv_tbl_total,
-      location = ph_location_table(
-        inv_tbl_total,
-        pptx,
-        layout = "Table",
-        pos_h = FALSE,
-        valign = 1
-      )
-    )
+  # inv_title <- "COVID-19 Case Investigations"
+  # pptx <- pptx %>%
+  #   officer::add_slide("Table", master) %>%
+  #   officer::ph_with(
+  #     value = inv_title,
+  #     location = officer::ph_location_type("title")
+  #   ) %>%
+  #   officer::ph_with(
+  #     value = date_ppt,
+  #     location = officer::ph_location_type("subTitle")
+  #   ) %>%
+  #   officer::ph_with(
+  #     value = inv_tbl_total,
+  #     location = ph_location_table(
+  #       inv_tbl_total,
+  #       pptx,
+  #       layout = "Table",
+  #       pos_h = FALSE,
+  #       valign = 1
+  #     )
+  #   )
 
 
   cp_title <- "COVID-19 Quick Reference Numbers"
